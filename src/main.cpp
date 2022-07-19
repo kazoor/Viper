@@ -2,10 +2,12 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 #include <ImGui/imgui.h>
-#include "window/window.hpp"
+#include "graphics/window/window.hpp"
+#include "util/filehandler/filehandler.hpp"
 
-int main()
+/*int main()
 {
-    Window *window = new Window(800, 600, "Demo");
+    auto *window = new Viper::Graphics::Window(800, 600, "Monke");
+
     return 0;
-}
+} */

@@ -4,9 +4,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(Viper)
 
-add_executable(Viper
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/window/window.cpp
+add_library(Viper
+            # ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/window/window.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/shaders/shader/shader.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_demo.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_draw.cpp
@@ -24,6 +26,7 @@ set_target_properties( Viper
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
+
 
 # Make sure we also compile glad.c
 message(STATUS "Compiling glad")
@@ -43,3 +46,23 @@ target_link_libraries(Viper PUBLIC glfw)
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/external")
+
+# Sandbox
+set(SANDBOX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sandbox/)
+add_executable(Sandbox ${SANDBOX_DIR}/main.cpp)
+
+set_target_properties( Sandbox
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        )
+
+# target_include_directories(Sandbox SYSTEM PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}../src")
+target_link_libraries(Sandbox PUBLIC ${CMAKE_BINARY_DIR}/lib/libViper.a)
+
+target_link_libraries(Sandbox PUBLIC glfw)
+
+# Copy shaders to bin
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/resources/
+        DESTINATION ${CMAKE_BINARY_DIR}/bin/resources/)
