@@ -39,9 +39,18 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 # Add GLFW subdirectory and link it
-message(STATUS "Linking GLFW")
+message(STATUS "Compiling & Linking GLFW")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/glfw")
 target_link_libraries(Viper PUBLIC glfw)
+
+# Add GLM subdirectory and link it
+message(STATUS "Compiling & Linking GLM")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/glm")
+target_link_libraries(Viper PUBLIC glm)
+
+message(STATUS "Compiling & Linking SPDLOG")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/spdlog")
+target_link_libraries(Viper PUBLIC spdlog)
 
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
@@ -62,6 +71,7 @@ set_target_properties( Sandbox
 target_link_libraries(Sandbox PUBLIC ${CMAKE_BINARY_DIR}/lib/libViper.a)
 
 target_link_libraries(Sandbox PUBLIC glfw)
+target_link_libraries(Sandbox PUBLIC glm)
 
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/resources/
