@@ -1,13 +1,12 @@
 #pragma once
+
 #include <iostream>
 #include <stdio.h>
 #include <string>
 #include <glfw/glfw3.h>
 
-namespace Viper::Graphics
-{
-    struct WindowParams_t
-    {
+namespace Viper::Graphics {
+    struct WindowParams_t {
         int Width;            // Window width.
         int Height;           // Window height.
         std::string Title;    // Window title.
@@ -15,15 +14,22 @@ namespace Viper::Graphics
         GLFWwindow *Share;    // The window whose context to share resources with, or `NULL` to not share resources.
     };
 
-    class Window
-    {
+    class Window {
     public:
         Window(int Width, int Height, const std::string &WindowName);
+
         ~Window();
 
         void Initialize();
+
+        void Update() const;
+
+        bool Closed() const;
+
         static GLFWwindow *CreateWindow(WindowParams_t Params);
+
         void ProcessInput(GLFWwindow *Window);
+
         static void FramebufferSizeCallback(GLFWwindow *Window, int Width, int Height);
 
         inline GLFWwindow *Ctx() { return Context; }
@@ -31,5 +37,6 @@ namespace Viper::Graphics
     private:
         WindowParams_t WindowParams;
         GLFWwindow *Context;
+        bool isClosed;
     };
 }

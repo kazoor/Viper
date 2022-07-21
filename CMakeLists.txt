@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION  3.3)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 project(Viper)
 
 add_library(Viper
-            # ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/window/window.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/shaders/shader/shader.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/keyboard/keyboard.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_demo.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_draw.cpp
@@ -72,7 +72,7 @@ target_link_libraries(Sandbox PUBLIC ${CMAKE_BINARY_DIR}/lib/libViper.a)
 
 target_link_libraries(Sandbox PUBLIC glfw)
 target_link_libraries(Sandbox PUBLIC glm)
-
+target_link_libraries(Sandbox PUBLIC spdlog)
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/resources/
         DESTINATION ${CMAKE_BINARY_DIR}/bin/resources/)
