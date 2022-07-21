@@ -1,4 +1,5 @@
 #include <sstream>
+#include <spdlog/spdlog.h>
 #include "filehandler.hpp"
 
 namespace Viper::Util
@@ -7,8 +8,7 @@ namespace Viper::Util
     {
         std::ifstream InputFile(FilePath);
         if (!InputFile.is_open()) {
-            std::cerr << "Could not open the file - '"
-                 << FilePath << "'" << std::endl;
+            spdlog::error("Failed to open file: ", FilePath);
         }
 
         return std::string((std::istreambuf_iterator<char>(InputFile)), std::istreambuf_iterator<char>());

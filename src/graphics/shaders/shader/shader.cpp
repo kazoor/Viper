@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <sstream>
+#include <spdlog/spdlog.h>
 #include "shader.hpp"
 #include "../../../util/filehandler/filehandler.hpp"
 
@@ -60,20 +61,18 @@ namespace Viper::Graphics {
 
     void Shader::CheckCompileErrors(unsigned int Shader, const std::string &Type) {
         int success;
-        char infoLog[1024];
+        char InfoLog[1024];
         if (Type != "PROGRAM") {
             glGetShaderiv(Shader, GL_COMPILE_STATUS, &success);
             if (!success) {
-                glGetShaderInfoLog(Shader, 1024, NULL, infoLog);
-                std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << Type << "\n" << infoLog
-                          << "\n -- --------------------------------------------------- -- " << std::endl;
+                glGetShaderInfoLog(Shader, 1024, NULL, InfoLog);
+                spdlog::error("ERROR::SHADER_COMPILATION_ERROR of type: ", Type, "\n", InfoLog);
             }
         } else {
             glGetProgramiv(Shader, GL_LINK_STATUS, &success);
             if (!success) {
-                glGetProgramInfoLog(Shader, 1024, NULL, infoLog);
-                std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << Type << "\n" << infoLog
-                          << "\n -- --------------------------------------------------- -- " << std::endl;
+                glGetProgramInfoLog(Shader, 1024, NULL, InfoLog);
+                spdlog::error("ERROR::PROGRAM_LINKING_ERROR of type: ", Type, "\n", InfoLog);
             }
         }
     }
