@@ -36,7 +36,7 @@ namespace Viper::Graphics {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        Context = CreateWindow(WindowParams);
+        Context = CreateWindowEx(WindowParams);
 
         if (!Context) {
             spdlog::error("Failed to create GLFW window");
@@ -117,6 +117,8 @@ namespace Viper::Graphics {
             glBindVertexArray(VAO);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
+            auto scrolldelta = Input::Input::GetScrollInput();
+
             Update();
         }
         glDeleteVertexArrays(1, &VAO);
@@ -127,7 +129,7 @@ namespace Viper::Graphics {
         glfwTerminate();
     }
 
-    GLFWwindow *Window::CreateWindow(WindowParams_t Params) {
+    GLFWwindow *Window::CreateWindowEx(WindowParams_t Params) {
         return glfwCreateWindow(Params.Width, Params.Height, Params.Title.c_str(), Params.Monitor, Params.Share);
     }
 
@@ -139,6 +141,7 @@ namespace Viper::Graphics {
     void Window::Update() const {
         glfwSwapBuffers(Context);
         glfwPollEvents();
+        Input::Input::ResetScroll();
     }
 
     bool Window::Closed() const {
