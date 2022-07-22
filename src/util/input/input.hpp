@@ -45,7 +45,7 @@ namespace Viper::Input {
 
         virtual std::pair<double, double> GetScrollInputImpl() = 0;
 
-        virtual void ResetScrollImpl();
+        virtual void ResetScrollImpl() = 0;
     private:
         static Input *Instance;
     };
