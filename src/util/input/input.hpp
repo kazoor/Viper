@@ -26,6 +26,8 @@ namespace Viper::Input {
 
         static std::pair<double, double> GetScrollInput() { return Instance->GetScrollInputImpl(); }
 
+        static void ResetScroll() { Instance->ResetScrollImpl(); };
+
     protected:
         virtual bool IsKeyPressedImpl(int KeyCode) = 0;
 
@@ -37,7 +39,13 @@ namespace Viper::Input {
 
         virtual double GetMouseYImpl() = 0;
 
+        virtual double GetScrollXImpl() = 0;
+
+        virtual double GetScrollYImpl() = 0;
+
         virtual std::pair<double, double> GetScrollInputImpl() = 0;
+
+        virtual void ResetScrollImpl();
     private:
         static Input *Instance;
     };

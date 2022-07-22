@@ -117,6 +117,8 @@ namespace Viper::Graphics {
             glBindVertexArray(VAO);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
+            auto scrolldelta = Input::Input::GetScrollInput();
+
             Update();
         }
         glDeleteVertexArrays(1, &VAO);
@@ -139,6 +141,7 @@ namespace Viper::Graphics {
     void Window::Update() const {
         glfwSwapBuffers(Context);
         glfwPollEvents();
+        Input::Input::ResetScroll();
     }
 
     bool Window::Closed() const {
