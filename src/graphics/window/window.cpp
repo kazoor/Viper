@@ -14,8 +14,11 @@
 #include <glm/gtc/matrix_transform.hpp> // ortho
 #include "../../graphics/shaders/shader/shader.hpp"
 #include "../../util/input/inputhandler/inputhandler.hpp"
+#include "../../imguieditor/imguieditor.hpp"
 #include "../../graphics/renderer/renderer.hpp"
 #include "../../util/input/mouse/mouseevents.hpp"
+#include "../../layers/layer/layer.hpp"
+#include "../../layers/layerstack/layerstack.hpp"
 
 namespace Viper::Graphics {
 
@@ -52,6 +55,8 @@ namespace Viper::Graphics {
             spdlog::error("Failed to initialize GLAD");
         }
 
+        LayerStack = new Viper::Layers::LayerStack();
+
         SetEventSubscriptions();
         UpdateWindowEvents();
 
@@ -59,11 +64,7 @@ namespace Viper::Graphics {
 
         Renderer::Renderer2D* g_pRenderer = new Renderer::Renderer2D();
 
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        ImGui_ImplGlfw_InitForOpenGL(Context, true);
-        ImGui_ImplOpenGL3_Init("#version 130");
+        PushLayer(new Viper::ImGuiEditor(this));
 
         while (!glfwWindowShouldClose(Context)) {
             ProcessInput(Context);
@@ -78,24 +79,6 @@ namespace Viper::Graphics {
                     g_pRenderer->DrawQuad(glm::vec2(x, y), (x + y) % 2 ? RendererAPI::Color(0.1f, 0.1f, 0.1f, 1.0f) : RendererAPI::Color(1.0f, 1.0f, 1.0f, 1.0f));
 
             g_pRenderer->Flush();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui::NewFrame();
-            
-            
-            if( ImGui::Begin("Viewport", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove)) {
-                ImGui::SetWindowPos(ImVec2(0.0f, 0.0f));
-                ImGui::SetWindowSize(ImVec2(static_cast< float >( WindowParams.Width ), static_cast< float >( WindowParams.Height ) ));
-                static auto m_dock_space = ImGui::GetID("m_view_id");
-                ImGui::DockSpace(m_dock_space, ImVec2(0,0));
-                ImGui::End();
-            }
-            ImGui::ShowDemoWindow();
-            
-            ImGui::EndFrame();
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
             auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
             auto m_ViewMatrix = glm::mat4(1.0f);
 
@@ -105,6 +88,11 @@ namespace Viper::Graphics {
             Shader.Use();
             Shader.SetUniformMat4("u_Transform", m_Transform);
             Shader.SetUniformMat4("u_ViewProjection", m_ViewProjectionMatrix);
+
+            for(auto Layer : *LayerStack) {
+                spdlog::info("Updating Layer {0}", Layer->GetLayerName());
+                Layer->OnUpdate();
+            }
 
             g_pRenderer->End();
 
@@ -117,10 +105,7 @@ namespace Viper::Graphics {
         }
 
         delete g_pRenderer;
-
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
+        delete LayerStack;
 
         glfwDestroyWindow(Context);
         glfwTerminate();
@@ -141,6 +126,10 @@ namespace Viper::Graphics {
         WindowEvents->Subscribe(this, &Window::OnWindowFocusEvent);
         WindowEvents->Subscribe(this, &Window::OnWindowCloseEvent);
         WindowEvents->Subscribe(new Viper::Input::MouseEvents(), &Input::MouseEvents::OnMouseCursorPositionEvent);
+
+        for(auto It = LayerStack->end(); It != LayerStack->begin();) {
+            WindowEvents->Subscribe((*--It), &Viper::Layers::Layer::OnEvent);
+        }
     }
 
     void Window::UpdateWindowEvents() {
@@ -184,6 +173,13 @@ namespace Viper::Graphics {
         glfwSwapBuffers(Context);
         glfwPollEvents();
         Input::Input::ResetScroll();
+    }
+    void Window::PushLayer(Layers::Layer *Layer) {
+        LayerStack->PushLayer(Layer);
+    }
+
+    void Window::PushOverlay(Layers::Layer *Overlay) {
+        LayerStack->PushOverlay(Overlay);
     }
 
     bool Window::Closed() const {

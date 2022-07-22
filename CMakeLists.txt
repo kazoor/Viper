@@ -8,6 +8,10 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/window/window.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/shaders/shader/shader.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/renderer.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/entitymanager.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/demo/demo.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/inputhandler/inputhandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/mouse/mouseevents.cpp
