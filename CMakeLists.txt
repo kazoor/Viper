@@ -10,6 +10,7 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/renderer.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/inputhandler/inputhandler.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/mouse/mouseevents.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_demo.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_draw.cpp
@@ -27,6 +28,7 @@ set_target_properties( Viper
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
+
 
 # Make sure we also compile glad.c
 message(STATUS "Compiling glad")

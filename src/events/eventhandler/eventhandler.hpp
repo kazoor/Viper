@@ -8,18 +8,19 @@
 
 namespace Viper::Events {
 
-   typedef std::list<HandlerFunctionBase*> HandlerList;
+    typedef std::list<HandlerFunctionBase *> HandlerList;
+
     class EventBus {
     public:
         template<typename EventType>
-        void Commit(EventType * E) {
-            HandlerList * Handlers = Subscribers[typeid(EventType)];
+        void Commit(EventType *E) {
+            HandlerList *Handlers = Subscribers[typeid(EventType)];
 
-            if (!Handlers) {
+            if (Handlers == nullptr) {
                 return;
             }
 
-            for (auto & Handler : *Handlers) {
+            for (auto &Handler: *Handlers) {
                 if (Handler != nullptr) {
                     Handler->Exec(E);
                 }
@@ -27,19 +28,19 @@ namespace Viper::Events {
         }
 
         template<class T, class EventType>
-        void Subscribe(T * instance, void (T::*memberFunction)(EventType *)) {
-            HandlerList * Handlers = Subscribers[typeid(EventType)];
+        void Subscribe(T *instance, void (T::*memberFunction)(EventType *)) {
+            HandlerList *Handlers = Subscribers[typeid(EventType)];
 
             //First time initialization
-            if (!Handlers) {
+            if (Handlers == nullptr) {
                 Handlers = new HandlerList();
                 Subscribers[typeid(EventType)] = Handlers;
             }
 
             Handlers->push_back(new MemberFunctionHandler<T, EventType>(instance, memberFunction));
         }
-    private:
-        std::map<std::type_index, HandlerList*> Subscribers;
-    };
 
-};
+    private:
+        std::map<std::type_index, HandlerList *> Subscribers;
+    };
+}

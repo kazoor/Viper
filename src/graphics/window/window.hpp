@@ -1,11 +1,12 @@
 #pragma once
-
+#pragma once
 #include <iostream>
 #include <stdio.h>
 #include <string>
 #include <glfw/glfw3.h>
 #include "../../events/event/event.hpp"
 #include "../../events/eventhandler/eventhandler.hpp"
+#include "../../util/input/mouse/mouseevents.hpp"
 
 namespace Viper::Graphics {
     struct WindowParams_t {
@@ -53,8 +54,7 @@ namespace Viper::Graphics {
         int Focused;
     };
 
-    struct WindowCloseEvent : public Viper::Events::Event {
-    };
+    struct WindowCloseEvent : public Viper::Events::Event { };
 
     class Window {
     public:
@@ -71,6 +71,10 @@ namespace Viper::Graphics {
         static GLFWwindow *CreateWindowEx(WindowParams_t Params);
 
         void ProcessInput(GLFWwindow *Window);
+
+        void SetEventSubscriptions();
+
+        void UpdateWindowEvents();
 
         inline GLFWwindow *Ctx() { return Context; }
 
@@ -98,10 +102,14 @@ namespace Viper::Graphics {
     private:
         WindowParams_t WindowParams;
 
+        Viper::Input::MouseEvents *MEvents;
+
         GLFWwindow *Context;
 
         Events::EventBus *WindowEvents;
 
         bool isClosed;
+
+        float AspectRatio;
     };
 }
