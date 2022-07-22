@@ -21,6 +21,12 @@ namespace Viper::Input {
 
         double GetMouseYImpl() override;
 
+        double GetScrollXImpl() override;
+
+        double GetScrollYImpl() override;
+
         std::pair<double, double> GetScrollInputImpl() override;
+
+        void ResetScrollImpl() override;
     };
 }
