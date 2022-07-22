@@ -54,6 +54,8 @@ namespace Viper::Graphics {
         WindowEvents->Subscribe(this, &Window::OnWindowResizeEvent);
         WindowEvents->Subscribe(this, &Window::OnWindowPositionEvent);
         WindowEvents->Subscribe(this, &Window::OnWindowContentScaleEvent);
+        WindowEvents->Subscribe(this, &Window::OnWindowMaximizationEvent);
+        WindowEvents->Subscribe(this, &Window::OnWindowFocusEvent);
         WindowEvents->Subscribe(this, &Window::OnWindowCloseEvent);
 
         glfwSetFramebufferSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
@@ -74,6 +76,16 @@ namespace Viper::Graphics {
         glfwSetWindowContentScaleCallback(Context, [](GLFWwindow *Window, float XScale, float YScale) {
             WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
             WindowData.EventCallback->Commit(new WindowContentScaleEvent(XScale, YScale));
+        });
+
+        glfwSetWindowMaximizeCallback(Context, [](GLFWwindow *Window, int Maximized) {
+            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowMaximizationEvent(Maximized));
+        });
+
+        glfwSetWindowFocusCallback(Context, [](GLFWwindow *Window, int Focused) {
+            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowFocusEvent(Focused));
         });
 
         glfwSetWindowCloseCallback(Context, [](GLFWwindow *Window) {
@@ -171,6 +183,14 @@ namespace Viper::Graphics {
 
     void Window::OnWindowContentScaleEvent(WindowContentScaleEvent *E) {
         spdlog::info("WindowContentScale Event triggered! Scale (X:Y): {0}:{1}", E->XScale, E->YScale);
+    }
+
+    void Window::OnWindowMaximizationEvent(WindowMaximizationEvent *E) {
+        spdlog::info("WindowMaximization Event triggered! Value: {0}", E->Maximized);
+    }
+
+    void Window::OnWindowFocusEvent(WindowFocusEvent *E) {
+        spdlog::info("WindowFocus Event triggered! Focus: {0}", E->Focused);
     }
 
     void Window::OnWindowCloseEvent(WindowCloseEvent *E) {

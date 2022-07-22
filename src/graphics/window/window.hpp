@@ -41,6 +41,18 @@ namespace Viper::Graphics {
         float XScale, YScale;
     };
 
+    struct WindowMaximizationEvent : public Viper::Events::Event {
+        WindowMaximizationEvent(int Maximized) : Maximized(Maximized) {}
+
+        int Maximized;
+    };
+
+    struct WindowFocusEvent : public Viper::Events::Event {
+        WindowFocusEvent(int Focused) : Focused(Focused) {}
+
+        int Focused;
+    };
+
     struct WindowCloseEvent : public Viper::Events::Event {
     };
 
@@ -62,16 +74,26 @@ namespace Viper::Graphics {
 
         inline GLFWwindow *Ctx() { return Context; }
 
+        // Sends an event when the framebuffer of the window is resized.
         void OnWindowFrameBufferSizeEvent(WindowFrameBufferSizeEvent *E);
 
+        // Sends an event when the window is resized.
         void OnWindowResizeEvent(WindowResizeEvent *E);
 
+        // Sends an event when the position of the window is changed.
         void OnWindowPositionEvent(WindowPositionEvent *E);
 
+        // Sends an event when the content scale of the window is changed.
         void OnWindowContentScaleEvent(WindowContentScaleEvent *E);
 
-        void OnWindowCloseEvent(WindowCloseEvent *E);
+        // Sends an event when the window is maximized or restored.
+        void OnWindowMaximizationEvent(WindowMaximizationEvent *E);
 
+        // Sends an event when the window loses/gains input focus.
+        void OnWindowFocusEvent(WindowFocusEvent *E);
+
+        // Sends an event when window is closing.
+        void OnWindowCloseEvent(WindowCloseEvent *E);
 
     private:
         WindowParams_t WindowParams;
