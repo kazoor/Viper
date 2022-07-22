@@ -16,6 +16,8 @@
 #include "../../util/input/inputhandler/inputhandler.hpp"
 #include "../../graphics/renderer/renderer.hpp"
 #include "../../util/input/mouse/mouseevents.hpp"
+#include "../../layers/layer/layer.hpp"
+#include "../../layers/layerstack/layerstack.hpp"
 
 namespace Viper::Graphics {
 

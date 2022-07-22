@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -7,7 +6,7 @@
 #include "../../events/event/event.hpp"
 #include "../../events/eventhandler/eventhandler.hpp"
 #include "../../util/input/mouse/mouseevents.hpp"
-#include "../../layers/layer/kayer.hpp"
+#include "../../layers/layer/layer.hpp"
 #include "../../layers/layerstack/layerstack.hpp"
 
 namespace Viper::Graphics {
