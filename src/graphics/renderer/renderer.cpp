@@ -2,7 +2,7 @@
 #include <glm/mat4x4.hpp>
 #include <glad/glad.h>
 
-constexpr uint32_t max_quad_count = 10000;
+constexpr uint32_t max_quad_count = 32000;
 constexpr uint32_t max_vertices_count = max_quad_count * 4;
 constexpr uint32_t max_indices_count = max_quad_count * 6;
 
@@ -58,12 +58,28 @@ namespace Viper::Renderer {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_IndexArray), m_IndexArray, GL_STATIC_DRAW);
 
         glBindVertexArray(0);
+
+        glGenFramebuffers(1, &m_Fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_Fbo);
+
+        // TESTING. (Skapa textur.)
+        glGenTextures(1, &m_Tcb);
+        glBindTexture(GL_TEXTURE_2D, m_Tcb);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 800, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Tcb, 0);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     Renderer2D::~Renderer2D()
     {
         delete[] s_Renderer.m_VertexBuffer;
+        glDeleteFramebuffers(1, &m_Fbo);
         glDeleteVertexArrays(1, &m_Vao);
+        glDeleteTextures(1, &m_Tcb);
         glDeleteBuffers(1, &m_Vbo);
         glDeleteBuffers(1, &m_Ibo);
     }
@@ -122,15 +138,26 @@ namespace Viper::Renderer {
 
     void Renderer2D::Begin() {
         s_Renderer.m_VertexBufferPtr = s_Renderer.m_VertexBuffer;
+        //glBindFramebuffer(GL_FRAMEBUFFER, m_Fbo);
     };
 
     void Renderer2D::End() {
+        
         glBindVertexArray(m_Vao);
+        //glBindTexture(GL_TEXTURE_2D, m_Tcb);
         glDrawElements(GL_TRIANGLES, s_Renderer.m_IndexCount, GL_UNSIGNED_INT, nullptr );
+        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         s_Renderer.m_IndexCount = 0;
         s_Renderer.m_QuadCount = 0;
         s_Renderer.m_VertexCount = 0;
     };
+
+    void Renderer2D::FboBegin() {
+    }
+
+    void Renderer2D::FboEnd() {
+    }
 
     uint32_t Renderer2D::GetVertexCount() { return s_Renderer.m_VertexCount; }
     uint32_t Renderer2D::GetIndexCount() { return s_Renderer.m_IndexCount; }

@@ -13,6 +13,8 @@ namespace Viper::Renderer {
         void DrawQuadRotated( const glm::vec2& pos, float radians, RendererAPI::Color color );
         void DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color );
 
+        void FboBegin();
+        void FboEnd();
         void Begin();
         void Flush();
         void End();
