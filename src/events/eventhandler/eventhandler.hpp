@@ -34,7 +34,7 @@ namespace Viper::Events {
             //First time initialization
             if (Handlers == nullptr) {
                 Handlers = new HandlerList();
-                subscribers[typeid(EventType)] = Handlers;
+                Subscribers[typeid(EventType)] = Handlers;
             }
 
             Handlers->push_back(new MemberFunctionHandler<T, EventType>(instance, memberFunction));
