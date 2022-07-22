@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <glfw/glfw3.h>
+#include <glm/mat4x4.hpp>
 
 namespace Viper::Graphics
 {
@@ -17,7 +18,7 @@ namespace Viper::Graphics
         void SetBool(const std::string &Name, bool Value) const;
         void SetInt(const std::string &Name, int Value) const;
         void SetFloat(const std::string &Name, float Value) const;
-
+        void SetUniformMat4(const std::string& Name, const glm::mat4& Value) const;
         inline unsigned int ID() const { return ProgramID; }
     private:
         unsigned int ProgramID;

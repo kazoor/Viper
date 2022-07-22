@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <sstream>
 #include <spdlog/spdlog.h>
+#include <glm/gtc/type_ptr.hpp>
 #include "shader.hpp"
 #include "../../../util/filehandler/filehandler.hpp"
 
@@ -57,6 +58,11 @@ namespace Viper::Graphics {
     // ------------------------------------------------------------------------
     void Shader::SetFloat(const std::string &Name, float Value) const {
         glUniform1f(glGetUniformLocation(ProgramID, Name.c_str()), Value);
+    }
+
+    // ------------------------------------------------------------------------
+    void Shader::SetUniformMat4(const std::string& Name, const glm::mat4& Value) const {
+        glUniformMatrix4fv(glGetUniformLocation(ProgramID, Name.c_str()), 1, GL_FALSE, glm::value_ptr(Value));
     }
 
     void Shader::CheckCompileErrors(unsigned int Shader, const std::string &Type) {

@@ -16,7 +16,7 @@ namespace Viper::Events {
         void Commit(EventType *E) {
             HandlerList *Handlers = Subscribers[typeid(EventType)];
 
-            if (!Handlers) {
+            if (Handlers == nullptr) {
                 return;
             }
 
@@ -32,7 +32,7 @@ namespace Viper::Events {
             HandlerList *Handlers = Subscribers[typeid(EventType)];
 
             //First time initialization
-            if (!Handlers) {
+            if (Handlers == nullptr) {
                 Handlers = new HandlerList();
                 Subscribers[typeid(EventType)] = Handlers;
             }
