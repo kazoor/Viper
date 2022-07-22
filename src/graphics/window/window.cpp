@@ -15,6 +15,7 @@
 #include "../../graphics/shaders/shader/shader.hpp"
 #include "../../util/input/inputhandler/inputhandler.hpp"
 #include "../../graphics/renderer/renderer.hpp"
+#include "../../util/input/mouse/mouseevents.hpp"
 
 namespace Viper::Graphics {
 
@@ -51,49 +52,8 @@ namespace Viper::Graphics {
             spdlog::error("Failed to initialize GLAD");
         }
 
-        // WindowEvents subscriptions.
-        WindowEvents->Subscribe(this, &Window::OnWindowFrameBufferSizeEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowResizeEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowPositionEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowContentScaleEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowMaximizationEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowFocusEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowCloseEvent);
-
-        glfwSetFramebufferSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowFrameBufferSizeEvent(Width, Height));
-        });
-
-        glfwSetWindowSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowResizeEvent(Width, Height));
-        });
-
-        glfwSetWindowPosCallback(Context, [](GLFWwindow *Window, int X, int Y) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowPositionEvent(X, Y));
-        });
-
-        glfwSetWindowContentScaleCallback(Context, [](GLFWwindow *Window, float XScale, float YScale) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowContentScaleEvent(XScale, YScale));
-        });
-
-        glfwSetWindowMaximizeCallback(Context, [](GLFWwindow *Window, int Maximized) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowMaximizationEvent(Maximized));
-        });
-
-        glfwSetWindowFocusCallback(Context, [](GLFWwindow *Window, int Focused) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowFocusEvent(Focused));
-        });
-
-        glfwSetWindowCloseCallback(Context, [](GLFWwindow *Window) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowCloseEvent());
-        });
+        SetEventSubscriptions();
+        UpdateWindowEvents();
 
         Shader Shader("resources/test.vert", "resources/test.frag");
 
@@ -148,6 +108,11 @@ namespace Viper::Graphics {
 
             g_pRenderer->End();
 
+            auto scrolldelta = Input::Input::GetScrollInput();
+            auto [X, Y] = Input::MouseEvents::GetMousePosition();
+
+            spdlog::info("MouseCallbackPos: {0}, {1}", X, Y);
+
             Update();
         }
 
@@ -164,6 +129,55 @@ namespace Viper::Graphics {
     void Window::ProcessInput(GLFWwindow *Window) {
         // if (glfwGetKey(Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         // glfwSetWindowShouldClose(Window, true);
+    }
+
+    void Window::SetEventSubscriptions() {
+        // WindowEvents subscriptions.
+        WindowEvents->Subscribe(this, &Window::OnWindowFrameBufferSizeEvent);
+        WindowEvents->Subscribe(this, &Window::OnWindowResizeEvent);
+        WindowEvents->Subscribe(this, &Window::OnWindowPositionEvent);
+        WindowEvents->Subscribe(this, &Window::OnWindowContentScaleEvent);
+        WindowEvents->Subscribe(this, &Window::OnWindowMaximizationEvent);
+        WindowEvents->Subscribe(this, &Window::OnWindowFocusEvent);
+        WindowEvents->Subscribe(this, &Window::OnWindowCloseEvent);
+        WindowEvents->Subscribe(new Viper::Input::MouseEvents(), &Input::MouseEvents::OnMouseCursorPositionEvent);
+    }
+
+    void Window::UpdateWindowEvents() {
+        glfwSetFramebufferSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
+            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowFrameBufferSizeEvent(Width, Height));
+        });
+
+        glfwSetWindowSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
+            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowResizeEvent(Width, Height));
+        });
+
+        glfwSetWindowPosCallback(Context, [](GLFWwindow *Window, int X, int Y) {
+            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowPositionEvent(X, Y));
+        });
+
+        glfwSetWindowContentScaleCallback(Context, [](GLFWwindow *Window, float XScale, float YScale) {
+            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowContentScaleEvent(XScale, YScale));
+        });
+
+        glfwSetWindowMaximizeCallback(Context, [](GLFWwindow *Window, int Maximized) {
+            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowMaximizationEvent(Maximized));
+        });
+
+        glfwSetWindowFocusCallback(Context, [](GLFWwindow *Window, int Focused) {
+            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowFocusEvent(Focused));
+        });
+
+        glfwSetWindowCloseCallback(Context, [](GLFWwindow *Window) {
+            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowCloseEvent());
+        });
     }
 
     void Window::Update() const {

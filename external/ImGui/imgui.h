@@ -839,7 +839,7 @@ namespace ImGui
     IMGUI_API void          EndDisabled();
 
     // Clipping
-    // - Mouse hovering is affected by ImGui::PushClipRect() calls, unlike direct calls to ImDrawList::PushClipRect() which are render only.
+    // - mouse hovering is affected by ImGui::PushClipRect() calls, unlike direct calls to ImDrawList::PushClipRect() which are render only.
     IMGUI_API void          PushClipRect(const ImVec2& clip_rect_min, const ImVec2& clip_rect_max, bool intersect_with_current_clip_rect);
     IMGUI_API void          PopClipRect();
 
@@ -915,7 +915,7 @@ namespace ImGui
     IMGUI_API const char*   GetKeyName(ImGuiKey key);                                           // [DEBUG] returns English name of the key. Those names a provided for debugging purpose and are not meant to be saved persistently not compared.
     IMGUI_API void          SetNextFrameWantCaptureKeyboard(bool want_capture_keyboard);        // Override io.WantCaptureKeyboard flag next frame (said flag is left for your application to handle, typically when true it instructs your app to ignore inputs). e.g. force capture keyboard when your widget is being hovered. This is equivalent to setting "io.WantCaptureKeyboard = want_capture_keyboard"; after the next NewFrame() call.
 
-    // Inputs Utilities: Mouse
+    // Inputs Utilities: mouse
     // - To refer to a mouse button, you may use named enums in your code e.g. ImGuiMouseButton_Left, ImGuiMouseButton_Right.
     // - You can also use regular integer: it is forever guaranteed that 0=Left, 1=Right, 2=Middle.
     // - Dragging operations are only reported after mouse has moved a certain distance away from the initial clicking position (see 'lock_threshold' and 'io.MouseDraggingThreshold')
@@ -1083,9 +1083,9 @@ enum ImGuiTreeNodeFlags_
 enum ImGuiPopupFlags_
 {
     ImGuiPopupFlags_None                    = 0,
-    ImGuiPopupFlags_MouseButtonLeft         = 0,        // For BeginPopupContext*(): open on Left Mouse release. Guaranteed to always be == 0 (same as ImGuiMouseButton_Left)
-    ImGuiPopupFlags_MouseButtonRight        = 1,        // For BeginPopupContext*(): open on Right Mouse release. Guaranteed to always be == 1 (same as ImGuiMouseButton_Right)
-    ImGuiPopupFlags_MouseButtonMiddle       = 2,        // For BeginPopupContext*(): open on Middle Mouse release. Guaranteed to always be == 2 (same as ImGuiMouseButton_Middle)
+    ImGuiPopupFlags_MouseButtonLeft         = 0,        // For BeginPopupContext*(): open on Left mouse release. Guaranteed to always be == 0 (same as ImGuiMouseButton_Left)
+    ImGuiPopupFlags_MouseButtonRight        = 1,        // For BeginPopupContext*(): open on Right mouse release. Guaranteed to always be == 1 (same as ImGuiMouseButton_Right)
+    ImGuiPopupFlags_MouseButtonMiddle       = 2,        // For BeginPopupContext*(): open on Middle mouse release. Guaranteed to always be == 2 (same as ImGuiMouseButton_Middle)
     ImGuiPopupFlags_MouseButtonMask_        = 0x1F,
     ImGuiPopupFlags_MouseButtonDefault_     = 1,
     ImGuiPopupFlags_NoOpenOverExistingPopup = 1 << 5,   // For OpenPopup*(), BeginPopupContext*(): don't open if there's already a popup at the same level of the popup stack
@@ -1491,6 +1491,10 @@ enum ImGuiKey_
     //   In practice: it's complicated; mods are often provided from different sources. Keyboard layout, IME, sticky keys and
     //   backends tend to interfere and break that equivalence. The safer decision is to relay that ambiguity down to the end-user...
     ImGuiKey_ModCtrl, ImGuiKey_ModShift, ImGuiKey_ModAlt, ImGuiKey_ModSuper,
+
+    // mouse Buttons (auto-submitted from AddMouseButtonEvent() calls)
+    // - This is mirroring the data also written to io.MouseDown[], io.MouseWheel, in a format allowing them to be accessed via standard key API.
+    ImGuiKey_MouseLeft, ImGuiKey_MouseRight, ImGuiKey_MouseMiddle, ImGuiKey_MouseX1, ImGuiKey_MouseX2, ImGuiKey_MouseWheelX, ImGuiKey_MouseWheelY,
 
     // End of list
     ImGuiKey_COUNT,                 // No valid ImGuiKey is ever greater than this value
@@ -2071,7 +2075,7 @@ struct ImGuiIO
     int         MetricsRenderWindows;               // Number of visible windows
     int         MetricsActiveWindows;               // Number of active windows
     int         MetricsActiveAllocations;           // Number of active allocations, updated by MemAlloc/MemFree based on current context. May be off if you have multiple imgui contexts.
-    ImVec2      MouseDelta;                         // Mouse delta. Note that this is zero if either current or previous position are invalid (-FLT_MAX,-FLT_MAX), so a disappearing/reappearing mouse won't have a huge delta.
+    ImVec2      MouseDelta;                         // mouse delta. Note that this is zero if either current or previous position are invalid (-FLT_MAX,-FLT_MAX), so a disappearing/reappearing mouse won't have a huge delta.
 
     // Legacy: before 1.87, we required backend to fill io.KeyMap[] (imgui->native map) during initialization and io.KeysDown[] (native indices) every frame.
     // This is still temporarily supported as a legacy feature. However the new preferred scheme is for backend to call io.AddKeyEvent().
@@ -2088,15 +2092,15 @@ struct ImGuiIO
     // Main Input State
     // (this block used to be written by backend, since 1.87 it is best to NOT write to those directly, call the AddXXX functions above instead)
     // (reading from those variables is fair game, as they are extremely unlikely to be moving anywhere)
-    ImVec2      MousePos;                           // Mouse position, in pixels. Set to ImVec2(-FLT_MAX, -FLT_MAX) if mouse is unavailable (on another screen, etc.)
-    bool        MouseDown[5];                       // Mouse buttons: 0=left, 1=right, 2=middle + extras (ImGuiMouseButton_COUNT == 5). Dear ImGui mostly uses left and right buttons. Others buttons allows us to track if the mouse is being used by your application + available to user as a convenience via IsMouse** API.
-    float       MouseWheel;                         // Mouse wheel Vertical: 1 unit scrolls about 5 lines text.
-    float       MouseWheelH;                        // Mouse wheel Horizontal. Most users don't have a mouse with an horizontal wheel, may not be filled by all backends.
-    ImGuiID     MouseHoveredViewport;               // (Optional) Modify using io.AddMouseViewportEvent(). With multi-viewports: viewport the OS mouse is hovering. If possible _IGNORING_ viewports with the ImGuiViewportFlags_NoInputs flag is much better (few backends can handle that). Set io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport if you can provide this info. If you don't imgui will infer the value using the rectangles and last focused time of the viewports it knows about (ignoring other OS windows).
-    bool        KeyCtrl;                            // Keyboard modifier down: Control
-    bool        KeyShift;                           // Keyboard modifier down: Shift
-    bool        KeyAlt;                             // Keyboard modifier down: Alt
-    bool        KeySuper;                           // Keyboard modifier down: Cmd/Super/Windows
+
+    ImVec2      MousePos;                           // mouse position, in pixels. Set to ImVec2(-FLT_MAX, -FLT_MAX) if mouse is unavailable (on another screen, etc.)
+    bool        MouseDown[5];                       // mouse buttons: 0=left, 1=right, 2=middle + extras (ImGuiMouseButton_COUNT == 5). Dear ImGui mostly uses left and right buttons. Others buttons allows us to track if the mouse is being used by your application + available to user as a convenience via IsMouse** API.
+    float       MouseWheel;                         // mouse wheel Vertical: 1 unit scrolls about 5 lines text.
+    float       MouseWheelH;                        // mouse wheel Horizontal. Most users don't have a mouse with an horizontal wheel, may not be filled by all backends.
+    bool        KeyCtrl;                            // InputHandler modifier down: Control
+    bool        KeyShift;                           // InputHandler modifier down: Shift
+    bool        KeyAlt;                             // InputHandler modifier down: Alt
+    bool        KeySuper;                           // InputHandler modifier down: Cmd/Super/Windows
 
     // Other state maintained from data above + IO function calls
     ImGuiModFlags KeyMods;                          // Key mods flags (same as io.KeyCtrl/KeyShift/KeyAlt/KeySuper but merged into flags), updated by NewFrame()
@@ -2105,11 +2109,11 @@ struct ImGuiIO
     ImVec2      MousePosPrev;                       // Previous mouse position (note that MouseDelta is not necessary == MousePos-MousePosPrev, in case either position is invalid)
     ImVec2      MouseClickedPos[5];                 // Position at time of clicking
     double      MouseClickedTime[5];                // Time of last click (used to figure out double-click)
-    bool        MouseClicked[5];                    // Mouse button went from !Down to Down (same as MouseClickedCount[x] != 0)
+    bool        MouseClicked[5];                    // mouse button went from !Down to Down (same as MouseClickedCount[x] != 0)
     bool        MouseDoubleClicked[5];              // Has mouse button been double-clicked? (same as MouseClickedCount[x] == 2)
     ImU16       MouseClickedCount[5];               // == 0 (not clicked), == 1 (same as MouseClicked[]), == 2 (double-clicked), == 3 (triple-clicked) etc. when going from !Down to Down
     ImU16       MouseClickedLastCount[5];           // Count successive number of clicks. Stays valid after mouse release. Reset after another click is done.
-    bool        MouseReleased[5];                   // Mouse button went from Down to !Down
+    bool        MouseReleased[5];                   // mouse button went from Down to !Down
     bool        MouseDownOwned[5];                  // Track if button was clicked inside a dear imgui window or over void blocked by a popup. We don't request mouse capture from the application if click started outside ImGui bounds.
     bool        MouseDownOwnedUnlessPopupClose[5];  // Track if button was clicked inside a dear imgui window.
     float       MouseDownDuration[5];               // Duration the mouse button has been down (0.0f == just clicked)
@@ -2821,7 +2825,7 @@ enum ImFontAtlasFlags_
 // Load and rasterize multiple TTF/OTF fonts into a same texture. The font atlas will build a single texture holding:
 //  - One or more fonts.
 //  - Custom graphics data needed to render the shapes needed by Dear ImGui.
-//  - Mouse cursor shapes for software cursor rendering (unless setting 'Flags |= ImFontAtlasFlags_NoMouseCursors' in the font atlas).
+//  - mouse cursor shapes for software cursor rendering (unless setting 'Flags |= ImFontAtlasFlags_NoMouseCursors' in the font atlas).
 // It is the user-code responsibility to setup/build the atlas, then upload the pixel data into a texture accessible by your graphics api.
 //  - Optionally, call any of the AddFont*** functions. If you don't call any, the default font embedded in the code will be loaded for you.
 //  - Call GetTexDataAsAlpha8() or GetTexDataAsRGBA32() to build and retrieve pixels data.

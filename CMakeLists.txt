@@ -10,6 +10,7 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/renderer.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/inputhandler/inputhandler.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/mouse/mouseevents.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_demo.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_draw.cpp

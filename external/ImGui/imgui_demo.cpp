@@ -233,7 +233,7 @@ void ImGui::ShowUserGuide()
     ImGui::BulletText("TAB/SHIFT+TAB to cycle through keyboard editable fields.");
 	ImGui::BulletText("CTRL+Tab to select a window.");
 	if (io.FontAllowUserScaling)
-        ImGui::BulletText("CTRL+Mouse Wheel to zoom window contents.");
+        ImGui::BulletText("CTRL+mouse Wheel to zoom window contents.");
     ImGui::BulletText("While inputing text:\n");
     ImGui::Indent();
     ImGui::BulletText("CTRL+Left/Right to word jump.");
@@ -2575,7 +2575,7 @@ static void ShowDemoWindowLayout()
         HelpMarker("Use child windows to begin into a self-contained independent scrolling/clipping regions within a host window.");
         static bool disable_mouse_wheel = false;
         static bool disable_menu = false;
-        ImGui::Checkbox("Disable Mouse Wheel", &disable_mouse_wheel);
+        ImGui::Checkbox("Disable mouse Wheel", &disable_mouse_wheel);
         ImGui::Checkbox("Disable Menu", &disable_menu);
 
         // Child 1: no border, enable horizontal scrollbar
@@ -5768,28 +5768,28 @@ static void ShowDemoWindowMisc()
             ImGui::TreePop();
         }
 
-        // Display Mouse state
-        IMGUI_DEMO_MARKER("Inputs, Navigation & Focus/Mouse State");
-        if (ImGui::TreeNode("Mouse State"))
+        // Display mouse state
+        IMGUI_DEMO_MARKER("Inputs, Navigation & Focus/mouse State");
+        if (ImGui::TreeNode("mouse State"))
         {
             if (ImGui::IsMousePosValid())
-                ImGui::Text("Mouse pos: (%g, %g)", io.MousePos.x, io.MousePos.y);
+                ImGui::Text("mouse pos: (%g, %g)", io.MousePos.x, io.MousePos.y);
             else
-                ImGui::Text("Mouse pos: <INVALID>");
-            ImGui::Text("Mouse delta: (%g, %g)", io.MouseDelta.x, io.MouseDelta.y);
+                ImGui::Text("mouse pos: <INVALID>");
+            ImGui::Text("mouse delta: (%g, %g)", io.MouseDelta.x, io.MouseDelta.y);
 
             int count = IM_ARRAYSIZE(io.MouseDown);
-            ImGui::Text("Mouse down:");         for (int i = 0; i < count; i++) if (ImGui::IsMouseDown(i))      { ImGui::SameLine(); ImGui::Text("b%d (%.02f secs)", i, io.MouseDownDuration[i]); }
-            ImGui::Text("Mouse clicked:");      for (int i = 0; i < count; i++) if (ImGui::IsMouseClicked(i))   { ImGui::SameLine(); ImGui::Text("b%d (%d)", i, ImGui::GetMouseClickedCount(i)); }
-            ImGui::Text("Mouse released:");     for (int i = 0; i < count; i++) if (ImGui::IsMouseReleased(i))  { ImGui::SameLine(); ImGui::Text("b%d", i); }
-            ImGui::Text("Mouse wheel: %.1f", io.MouseWheel);
+            ImGui::Text("mouse down:");         for (int i = 0; i < count; i++) if (ImGui::IsMouseDown(i))      { ImGui::SameLine(); ImGui::Text("b%d (%.02f secs)", i, io.MouseDownDuration[i]); }
+            ImGui::Text("mouse clicked:");      for (int i = 0; i < count; i++) if (ImGui::IsMouseClicked(i))   { ImGui::SameLine(); ImGui::Text("b%d (%d)", i, ImGui::GetMouseClickedCount(i)); }
+            ImGui::Text("mouse released:");     for (int i = 0; i < count; i++) if (ImGui::IsMouseReleased(i))  { ImGui::SameLine(); ImGui::Text("b%d", i); }
+            ImGui::Text("mouse wheel: %.1f", io.MouseWheel);
             ImGui::Text("Pen Pressure: %.1f", io.PenPressure); // Note: currently unused
             ImGui::TreePop();
         }
 
-        // Display Keyboard/Mouse state
-        IMGUI_DEMO_MARKER("Inputs, Navigation & Focus/Keyboard, Gamepad & Navigation State");
-        if (ImGui::TreeNode("Keyboard, Gamepad & Navigation State"))
+        // Display InputHandler/mouse state
+        IMGUI_DEMO_MARKER("Inputs, Navigation & Focus/InputHandler, Gamepad & Navigation State");
+        if (ImGui::TreeNode("InputHandler, Gamepad & Navigation State"))
         {
             // We iterate both legacy native range and named ImGuiKey ranges, which is a little odd but this allow displaying the data for old/new backends.
             // User code should never have to go through such hoops: old code may use native keycodes, new code may use ImGuiKey codes.
@@ -5980,8 +5980,8 @@ static void ShowDemoWindowMisc()
             ImGui::TreePop();
         }
 
-        IMGUI_DEMO_MARKER("Inputs, Navigation & Focus/Mouse cursors");
-        if (ImGui::TreeNode("Mouse cursors"))
+        IMGUI_DEMO_MARKER("Inputs, Navigation & Focus/mouse cursors");
+        if (ImGui::TreeNode("mouse cursors"))
         {
             const char* mouse_cursors_names[] = { "Arrow", "TextInput", "ResizeAll", "ResizeNS", "ResizeEW", "ResizeNESW", "ResizeNWSE", "Hand", "NotAllowed" };
             IM_ASSERT(IM_ARRAYSIZE(mouse_cursors_names) == ImGuiMouseCursor_COUNT);
@@ -5996,7 +5996,7 @@ static void ShowDemoWindowMisc()
             for (int i = 0; i < ImGuiMouseCursor_COUNT; i++)
             {
                 char label[32];
-                sprintf(label, "Mouse cursor %d: %s", i, mouse_cursors_names[i]);
+                sprintf(label, "mouse cursor %d: %s", i, mouse_cursors_names[i]);
                 ImGui::Bullet(); ImGui::Selectable(label, false);
                 if (ImGui::IsItemHovered())
                     ImGui::SetMouseCursor(i);
@@ -7437,9 +7437,9 @@ static void ShowExampleAppSimpleOverlay(bool* p_open)
         ImGui::Text("Simple overlay\n" "in the corner of the screen.\n" "(right-click to change position)");
         ImGui::Separator();
         if (ImGui::IsMousePosValid())
-            ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
+            ImGui::Text("mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
         else
-            ImGui::Text("Mouse Position: <invalid>");
+            ImGui::Text("mouse Position: <invalid>");
         if (ImGui::BeginPopupContextWindow())
         {
             if (ImGui::MenuItem("Custom",       NULL, corner == -1)) corner = -1;
@@ -7657,7 +7657,7 @@ static void ShowExampleAppCustomRendering(bool* p_open)
 
             ImGui::Checkbox("Enable grid", &opt_enable_grid);
             ImGui::Checkbox("Enable context menu", &opt_enable_context_menu);
-            ImGui::Text("Mouse Left: drag to add lines,\nMouse Right: drag to scroll, click for context menu.");
+            ImGui::Text("mouse Left: drag to add lines,\nmouse Right: drag to scroll, click for context menu.");
 
             // Typically you would use a BeginChild()/EndChild() pair to benefit from a clipping region + own scrolling.
             // Here we demonstrate that this can be replaced by simple offsetting + custom drawing + PushClipRect/PopClipRect() calls.
