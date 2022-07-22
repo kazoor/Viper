@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string>
 #include <glfw/glfw3.h>
+#include "../../events/event/event.hpp"
+#include "../../events/eventhandler/eventhandler.hpp"
 
 namespace Viper::Graphics {
     struct WindowParams_t {
@@ -12,8 +14,20 @@ namespace Viper::Graphics {
         std::string Title;    // Window title.
         GLFWmonitor *Monitor; // The monitor to use for full screen mode, or `NULL` for windowed mode.
         GLFWwindow *Share;    // The window whose context to share resources with, or `NULL` to not share resources.
+        Events::EventBus *EventCallback;
     };
 
+    struct WindowResizeEvent : public Viper::Events::Event {
+        WindowResizeEvent(int Width, int Height) : Height(Height), Width(Width) {}
+
+        int Width, Height;
+    };
+
+    struct WindowPositionEvent : public Viper::Events::Event {
+        WindowPositionEvent(int X, int Y) : X(X), Y(Y) {}
+
+        int X, Y;
+    };
 
     class Window {
     public:
@@ -35,9 +49,17 @@ namespace Viper::Graphics {
 
         inline GLFWwindow *Ctx() { return Context; }
 
+        void OnWindowResizeEvent(WindowResizeEvent *E);
+
+        void OnWindowPositionEvent(WindowPositionEvent *E);
+
     private:
         WindowParams_t WindowParams;
+
         GLFWwindow *Context;
+
+        Events::EventBus *WindowEvents;
+
         bool isClosed;
     };
 }

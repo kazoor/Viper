@@ -22,12 +22,15 @@ namespace Viper::Graphics {
     Window::Window(int Width, int Height, const std::string &WindowName) {
         glfwInit();
 
+        WindowEvents = new Events::EventBus();
+
         WindowParams = {
                 Width,
                 Height,
                 WindowName,
                 nullptr,
-                nullptr};
+                nullptr,
+                this->WindowEvents};
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -44,9 +47,25 @@ namespace Viper::Graphics {
         glfwSetFramebufferSizeCallback(Context, FramebufferSizeCallback);
         glfwSwapInterval(1); // Vsync on for now.
 
+        glfwSetWindowUserPointer(Context, &WindowParams);
+
         if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
             spdlog::error("Failed to initialize GLAD");
         }
+
+        // WindowEvents subscriptions.
+        WindowEvents->Subscribe(this, &Window::OnWindowResizeEvent);
+        WindowEvents->Subscribe(this, &Window::OnWindowPositionEvent);
+
+        glfwSetWindowSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
+            WindowParams_t& WindowData = *(WindowParams_t*)glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowResizeEvent(Width, Height));
+        });
+
+        glfwSetWindowPosCallback(Context, [](GLFWwindow *Window, int X, int Y) {
+            WindowParams_t& WindowData = *(WindowParams_t*)glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowPositionEvent(X, Y));
+        });
 
         Shader Shader("resources/test.vert", "resources/test.frag");
 
@@ -98,6 +117,7 @@ namespace Viper::Graphics {
         glDeleteBuffers(1, &VBO);
         glDeleteBuffers(1, &EBO);
 
+        delete WindowEvents;
         glfwDestroyWindow(Context);
         glfwTerminate();
     }
@@ -118,5 +138,13 @@ namespace Viper::Graphics {
 
     bool Window::Closed() const {
         return glfwWindowShouldClose(Context);
+    }
+
+    void Window::OnWindowResizeEvent(WindowResizeEvent *E) {
+        spdlog::info("Window size change detected! New size is {0}x{1}", E->Width, E->Height);
+    }
+
+    void Window::OnWindowPositionEvent(WindowPositionEvent *E) {
+        spdlog::info("Window Position change detected! New position is X: {0} : Y: {1}", E->X, E->Y);
     }
 }
