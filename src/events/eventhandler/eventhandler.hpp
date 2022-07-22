@@ -13,9 +13,9 @@ namespace Viper::Events {
     public:
         template<typename EventType>
         void Commit(EventType * E) {
-            HandlerList * Handlers = subscribers[typeid(EventType)];
+            HandlerList * Handlers = Subscribers[typeid(EventType)];
 
-            if (Handlers == nullptr) {
+            if (!Handlers) {
                 return;
             }
 
@@ -28,18 +28,18 @@ namespace Viper::Events {
 
         template<class T, class EventType>
         void Subscribe(T * instance, void (T::*memberFunction)(EventType *)) {
-            HandlerList * Handlers = subscribers[typeid(EventType)];
+            HandlerList * Handlers = Subscribers[typeid(EventType)];
 
             //First time initialization
-            if (Handlers == nullptr) {
+            if (!Handlers) {
                 Handlers = new HandlerList();
-                subscribers[typeid(EventType)] = Handlers;
+                Subscribers[typeid(EventType)] = Handlers;
             }
 
             Handlers->push_back(new MemberFunctionHandler<T, EventType>(instance, memberFunction));
         }
     private:
-        std::map<std::type_index, HandlerList*> subscribers;
+        std::map<std::type_index, HandlerList*> Subscribers;
     };
 
 };
