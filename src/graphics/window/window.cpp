@@ -122,6 +122,9 @@ namespace Viper::Graphics {
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
         glDeleteBuffers(1, &EBO);
+
+        glfwDestroyWindow(Context);
+        glfwTerminate();
     }
 
     GLFWwindow *Window::CreateWindow(WindowParams_t Params) {
@@ -153,7 +156,5 @@ namespace Viper::Graphics {
     void Window::OnWindowCloseEvent(WindowCloseEvent *E) {
         spdlog::info("WindowCloseEvent() Called!");
         delete WindowEvents;
-        glfwDestroyWindow(Context);
-        glfwTerminate();
     }
 }
