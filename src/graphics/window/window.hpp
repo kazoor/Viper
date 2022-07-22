@@ -43,7 +43,7 @@ namespace Viper::Graphics {
 
         bool Closed() const;
 
-        static GLFWwindow *CreateWindow(WindowParams_t Params);
+        static GLFWwindow *CreateWindowEx(WindowParams_t Params);
 
         void ProcessInput(GLFWwindow *Window);
 

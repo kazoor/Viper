@@ -36,7 +36,7 @@ namespace Viper::Graphics {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        Context = CreateWindow(WindowParams);
+        Context = CreateWindowEx(WindowParams);
 
         if (!Context) {
             spdlog::error("Failed to create GLFW window");
@@ -127,7 +127,7 @@ namespace Viper::Graphics {
         glfwTerminate();
     }
 
-    GLFWwindow *Window::CreateWindow(WindowParams_t Params) {
+    GLFWwindow *Window::CreateWindowEx(WindowParams_t Params) {
         return glfwCreateWindow(Params.Width, Params.Height, Params.Title.c_str(), Params.Monitor, Params.Share);
     }
 
