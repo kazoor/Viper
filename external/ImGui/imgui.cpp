@@ -364,7 +364,7 @@ CODE
     - You can download PNG/PSD files depicting the gamepad controls for common controllers at: http://dearimgui.org/controls_sheets
     - If you need to share inputs between your game and the Dear ImGui interface, the easiest approach is to go all-or-nothing,
       with a buttons combo to toggle the target. Please reach out if you think the game vs navigation input sharing could be improved.
- - Mouse:
+ - mouse:
     - PS4/PS5 users: Consider emulating a mouse cursor with DualShock4 touch pad or a spare analog stick as a mouse-emulation fallback.
     - Consoles/Tablet/Phone users: Consider using a Synergy 1.x server (on your PC) + uSynergy.c (on your console/tablet/phone app) to share your PC mouse/inputhandler.
     - On a TV/console system where readability may be lower or mouse inputs may be awkward, you may want to set the ImGuiConfigFlags_NavEnableSetMousePos flag.
@@ -4185,12 +4185,12 @@ void ImGui::UpdateMouseWheel()
         return;
     }
 
-    // Mouse wheel scrolling
+    // mouse wheel scrolling
     // If a child window has the ImGuiWindowFlags_NoScrollWithMouse flag, we give a chance to scroll its parent
     if (g.IO.KeyCtrl)
         return;
 
-    // As a standard behavior holding SHIFT while using Vertical Mouse Wheel triggers Horizontal scroll instead
+    // As a standard behavior holding SHIFT while using Vertical mouse Wheel triggers Horizontal scroll instead
     // (we avoid doing it on OSX as it the OS input layer handles this already)
     const bool swap_axis = g.IO.KeyShift && !g.IO.ConfigMacOSXBehaviors;
     if (swap_axis)
@@ -4199,7 +4199,7 @@ void ImGui::UpdateMouseWheel()
         wheel_y = 0.0f;
     }
 
-    // Vertical Mouse Wheel scrolling
+    // Vertical mouse Wheel scrolling
     if (wheel_y != 0.0f)
     {
         StartLockWheelingWindow(window);
@@ -4213,7 +4213,7 @@ void ImGui::UpdateMouseWheel()
         }
     }
 
-    // Horizontal Mouse Wheel scrolling, or Vertical Mouse Wheel w/ Shift held
+    // Horizontal mouse Wheel scrolling, or Vertical mouse Wheel w/ Shift held
     if (wheel_x != 0.0f)
     {
         StartLockWheelingWindow(window);
@@ -4491,7 +4491,7 @@ void ImGui::NewFrame()
     g.PlatformImeDataPrev = g.PlatformImeData;
     g.PlatformImeData.WantVisible = false;
 
-    // Mouse wheel scrolling, scale
+    // mouse wheel scrolling, scale
     UpdateMouseWheel();
 
     // Mark all windows as not visible and compact unused memory.
@@ -6591,7 +6591,7 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
         // [LEGACY] Content Region
         // FIXME-OBSOLETE: window->ContentRegionRect.Max is currently very misleading / partly faulty, but some BeginChild() patterns relies on it.
         // Used by:
-        // - Mouse wheel scrolling + many other things
+        // - mouse wheel scrolling + many other things
         window->ContentRegionRect.Min.x = window->Pos.x - window->Scroll.x + window->WindowPadding.x;
         window->ContentRegionRect.Min.y = window->Pos.y - window->Scroll.y + window->WindowPadding.y + decoration_up_height;
         window->ContentRegionRect.Max.x = window->ContentRegionRect.Min.x + (window->ContentSizeExplicit.x != 0.0f ? window->ContentSizeExplicit.x : (window->Size.x - window->WindowPadding.x * 2.0f - window->ScrollbarSizes.x));
@@ -7956,7 +7956,7 @@ void ImGui::SetNextFrameWantCaptureMouse(bool want_capture_mouse)
 #ifndef IMGUI_DISABLE_DEBUG_TOOLS
 static const char* GetInputSourceName(ImGuiInputSource source)
 {
-    const char* input_source_names[] = { "None", "Mouse", "InputHandler", "Gamepad", "Nav", "Clipboard" };
+    const char* input_source_names[] = { "None", "mouse", "InputHandler", "Gamepad", "Nav", "Clipboard" };
     IM_ASSERT(IM_ARRAYSIZE(input_source_names) == ImGuiInputSource_COUNT && source >= 0 && source < ImGuiInputSource_COUNT);
     return input_source_names[source];
 }
@@ -10199,7 +10199,7 @@ static ImVec2 ImGui::NavCalcPreferredRefPos()
     ImGuiWindow* window = g.NavWindow;
     if (g.NavDisableHighlight || !g.NavDisableMouseHover || !window)
     {
-        // Mouse (we need a fallback in case the mouse becomes invalid after being used)
+        // mouse (we need a fallback in case the mouse becomes invalid after being used)
         // The +1.0f offset when stored by OpenPopupEx() allows reopening this or another popup (same or another mouse button) while not moving the mouse, it is pretty standard.
         // In theory we could move that +1.0f offset in OpenPopupEx()
         ImVec2 p = IsMousePosValid(&g.IO.MousePos) ? g.IO.MousePos : g.MouseLastValidPos;
