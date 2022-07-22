@@ -67,6 +67,11 @@ namespace Viper::Graphics {
             WindowData.EventCallback->Commit(new WindowPositionEvent(X, Y));
         });
 
+        glfwSetWindowCloseCallback(Context, [](GLFWwindow *Window) {
+            WindowParams_t& WindowData = *(WindowParams_t*)glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new Events::Event());
+        });
+
         Shader Shader("resources/test.vert", "resources/test.frag");
 
         float vertices[] = {
@@ -146,5 +151,9 @@ namespace Viper::Graphics {
 
     void Window::OnWindowPositionEvent(WindowPositionEvent *E) {
         spdlog::info("Window Position change detected! New position is X: {0} : Y: {1}", E->X, E->Y);
+    }
+
+    void Window::OnWindowCloseEvent(Events::Event *E) {
+        spdlog::info("WindowCloseEvent() Called!");
     }
 }
