@@ -17,6 +17,12 @@ namespace Viper::Graphics {
         Events::EventBus *EventCallback;
     };
 
+    struct WindowFrameBufferSizeEvent : public Viper::Events::Event {
+        WindowFrameBufferSizeEvent(int Width, int Height) : Width(Width), Height(Height) {}
+
+        int Width, Height;
+    };
+
     struct WindowResizeEvent : public Viper::Events::Event {
         WindowResizeEvent(int Width, int Height) : Height(Height), Width(Width) {}
 
@@ -29,7 +35,14 @@ namespace Viper::Graphics {
         int X, Y;
     };
 
-    struct WindowCloseEvent : public Viper::Events::Event {};
+    struct WindowContentScaleEvent : public Viper::Events::Event {
+        WindowContentScaleEvent(float XScale, float YScale) : XScale(XScale), YScale(YScale) {}
+
+        float XScale, YScale;
+    };
+
+    struct WindowCloseEvent : public Viper::Events::Event {
+    };
 
     class Window {
     public:
@@ -47,15 +60,18 @@ namespace Viper::Graphics {
 
         void ProcessInput(GLFWwindow *Window);
 
-        static void FramebufferSizeCallback(GLFWwindow *Window, int Width, int Height);
-
         inline GLFWwindow *Ctx() { return Context; }
+
+        void OnWindowFrameBufferSizeEvent(WindowFrameBufferSizeEvent *E);
 
         void OnWindowResizeEvent(WindowResizeEvent *E);
 
         void OnWindowPositionEvent(WindowPositionEvent *E);
 
+        void OnWindowContentScaleEvent(WindowContentScaleEvent *E);
+
         void OnWindowCloseEvent(WindowCloseEvent *E);
+
 
     private:
         WindowParams_t WindowParams;
