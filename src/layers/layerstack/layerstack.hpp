@@ -19,6 +19,8 @@ namespace Viper::Layers {
        std::vector<Layer*>::iterator begin() { return Layers.begin(); }
        std::vector<Layer*>::iterator end() { return Layers.end(); }
 
+       int GetSize() { return Layers.size(); }
+
     private:
         std::vector<Layer*> Layers;
         std::vector<Layer*>::iterator LayerInsert;
