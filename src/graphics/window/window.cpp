@@ -62,7 +62,7 @@ namespace Viper::Graphics {
 
         Shader Shader("resources/test.vert", "resources/test.frag");
 
-        Renderer::Renderer2D* g_pRenderer = new Renderer::Renderer2D();
+        Renderer::Renderer2D* Renderer = new Renderer::Renderer2D();
 
         PushLayer(new Viper::ImGuiEditor(this));
 
@@ -72,13 +72,13 @@ namespace Viper::Graphics {
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            g_pRenderer->Begin();
+            Renderer->Begin();
             
             for( int y = -5; y < 20; y++ )
                 for( int x = -5; x < 20; x++ )
-                    g_pRenderer->DrawQuad(glm::vec2(x, y), (x + y) % 2 ? RendererAPI::Color(0.1f, 0.1f, 0.1f, 1.0f) : RendererAPI::Color(1.0f, 1.0f, 1.0f, 1.0f));
+                    Renderer->DrawQuad(glm::vec2(x, y), (x + y) % 2 ? RendererAPI::Color(0.1f, 0.1f, 0.1f, 1.0f) : RendererAPI::Color(1.0f, 1.0f, 1.0f, 1.0f));
 
-            g_pRenderer->Flush();
+            Renderer->Flush();
             auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
             auto m_ViewMatrix = glm::mat4(1.0f);
 
@@ -94,17 +94,17 @@ namespace Viper::Graphics {
                 Layer->OnUpdate();
             }
 
-            g_pRenderer->End();
+            Renderer->End();
 
             auto scrolldelta = Input::Input::GetScrollInput();
-            auto [X, Y] = Input::MouseEvents::GetMousePosition();
+            auto mouse = Input::MouseEvents::GetMousePosition();
 
-            spdlog::info("MouseCallbackPos: {0}, {1}", X, Y);
+            spdlog::info("MouseCallbackPos: {0}, {1}", mouse.first, mouse.second);
 
             Update();
         }
 
-        delete g_pRenderer;
+        delete Renderer;
         delete LayerStack;
 
         glfwDestroyWindow(Context);
