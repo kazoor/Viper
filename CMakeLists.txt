@@ -28,6 +28,7 @@ set_target_properties( Viper
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
+
 # Make sure we also compile glad.c
 message(STATUS "Compiling glad")
 target_sources(Viper PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/glad.c")

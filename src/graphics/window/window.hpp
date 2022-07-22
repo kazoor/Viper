@@ -17,12 +17,6 @@ namespace Viper::Graphics {
         Events::EventBus *EventCallback;
     };
 
-    struct WindowFrameBufferSizeEvent : public Viper::Events::Event {
-        WindowFrameBufferSizeEvent(int Width, int Height) : Width(Width), Height(Height) {}
-
-        int Width, Height;
-    };
-
     struct WindowResizeEvent : public Viper::Events::Event {
         WindowResizeEvent(int Width, int Height) : Height(Height), Width(Width) {}
 
@@ -35,26 +29,7 @@ namespace Viper::Graphics {
         int X, Y;
     };
 
-    struct WindowContentScaleEvent : public Viper::Events::Event {
-        WindowContentScaleEvent(float XScale, float YScale) : XScale(XScale), YScale(YScale) {}
-
-        float XScale, YScale;
-    };
-
-    struct WindowMaximizationEvent : public Viper::Events::Event {
-        WindowMaximizationEvent(int Maximized) : Maximized(Maximized) {}
-
-        int Maximized;
-    };
-
-    struct WindowFocusEvent : public Viper::Events::Event {
-        WindowFocusEvent(int Focused) : Focused(Focused) {}
-
-        int Focused;
-    };
-
-    struct WindowCloseEvent : public Viper::Events::Event {
-    };
+    struct WindowCloseEvent : public Viper::Events::Event {};
 
     class Window {
     public:
@@ -72,27 +47,14 @@ namespace Viper::Graphics {
 
         void ProcessInput(GLFWwindow *Window);
 
+        static void FramebufferSizeCallback(GLFWwindow *Window, int Width, int Height);
+
         inline GLFWwindow *Ctx() { return Context; }
 
-        // Sends an event when the framebuffer of the window is resized.
-        void OnWindowFrameBufferSizeEvent(WindowFrameBufferSizeEvent *E);
-
-        // Sends an event when the window is resized.
         void OnWindowResizeEvent(WindowResizeEvent *E);
 
-        // Sends an event when the position of the window is changed.
         void OnWindowPositionEvent(WindowPositionEvent *E);
 
-        // Sends an event when the content scale of the window is changed.
-        void OnWindowContentScaleEvent(WindowContentScaleEvent *E);
-
-        // Sends an event when the window is maximized or restored.
-        void OnWindowMaximizationEvent(WindowMaximizationEvent *E);
-
-        // Sends an event when the window loses/gains input focus.
-        void OnWindowFocusEvent(WindowFocusEvent *E);
-
-        // Sends an event when window is closing.
         void OnWindowCloseEvent(WindowCloseEvent *E);
 
     private:
@@ -103,5 +65,7 @@ namespace Viper::Graphics {
         Events::EventBus *WindowEvents;
 
         bool isClosed;
+
+        float AspectRatio;
     };
 }
