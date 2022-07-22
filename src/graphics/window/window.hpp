@@ -14,6 +14,7 @@ namespace Viper::Graphics {
         GLFWwindow *Share;    // The window whose context to share resources with, or `NULL` to not share resources.
     };
 
+
     class Window {
     public:
         Window(int Width, int Height, const std::string &WindowName);

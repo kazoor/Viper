@@ -122,7 +122,7 @@ struct ImGuiGroupData;              // Stacked storage data for BeginGroup()/End
 struct ImGuiInputTextState;         // Internal state of the currently focused/edited text input box
 struct ImGuiLastItemData;           // Status storage for last submitted items
 struct ImGuiMenuColumns;            // Simple column measurement, currently used for MenuItem() only
-struct ImGuiNavItemData;            // Result of a gamepad/keyboard directional navigation move query result
+struct ImGuiNavItemData;            // Result of a gamepad/inputhandler directional navigation move query result
 struct ImGuiMetricsConfig;          // Storage for ShowMetricsWindow() and DebugNodeXXX() functions
 struct ImGuiNextWindowData;         // Storage for SetNextWindow** functions
 struct ImGuiNextItemData;           // Storage for SetNextItem** functions
@@ -759,10 +759,10 @@ enum ImGuiItemFlags_
 {
     // Controlled by user
     ImGuiItemFlags_None                     = 0,
-    ImGuiItemFlags_NoTabStop                = 1 << 0,  // false     // Disable keyboard tabbing (FIXME: should merge with _NoNav)
+    ImGuiItemFlags_NoTabStop                = 1 << 0,  // false     // Disable inputhandler tabbing (FIXME: should merge with _NoNav)
     ImGuiItemFlags_ButtonRepeat             = 1 << 1,  // false     // Button() will return true multiple times based on io.KeyRepeatDelay and io.KeyRepeatRate settings.
     ImGuiItemFlags_Disabled                 = 1 << 2,  // false     // Disable interactions but doesn't affect visuals. See BeginDisabled()/EndDisabled(). See github.com/ocornut/imgui/issues/211
-    ImGuiItemFlags_NoNav                    = 1 << 3,  // false     // Disable keyboard/gamepad directional navigation (FIXME: should merge with _NoTabStop)
+    ImGuiItemFlags_NoNav                    = 1 << 3,  // false     // Disable inputhandler/gamepad directional navigation (FIXME: should merge with _NoTabStop)
     ImGuiItemFlags_NoNavDefaultFocus        = 1 << 4,  // false     // Disable item being a candidate for default focus (e.g. used by title bar items)
     ImGuiItemFlags_SelectableDontClosePopup = 1 << 5,  // false     // Disable MenuItem/Selectable() automatically closing their popup window
     ImGuiItemFlags_MixedValue               = 1 << 6,  // false     // [BETA] Represent a mixed/indeterminate value, generally multi-selection where values differ. Currently only supported by Checkbox() (later should support all sorts of widgets)
@@ -1290,8 +1290,8 @@ struct ImGuiListClipperData
 enum ImGuiActivateFlags_
 {
     ImGuiActivateFlags_None                 = 0,
-    ImGuiActivateFlags_PreferInput          = 1 << 0,       // Favor activation that requires keyboard text input (e.g. for Slider/Drag). Default if keyboard is available.
-    ImGuiActivateFlags_PreferTweak          = 1 << 1,       // Favor activation for tweaking with arrows or gamepad (e.g. for Slider/Drag). Default if keyboard is not available.
+    ImGuiActivateFlags_PreferInput          = 1 << 0,       // Favor activation that requires inputhandler text input (e.g. for Slider/Drag). Default if inputhandler is available.
+    ImGuiActivateFlags_PreferTweak          = 1 << 1,       // Favor activation for tweaking with arrows or gamepad (e.g. for Slider/Drag). Default if inputhandler is not available.
     ImGuiActivateFlags_TryToPreserveState   = 1 << 2,       // Request widget to preserve state if it can (e.g. InputText will try to preserve cursor/selection)
 };
 
@@ -1334,7 +1334,7 @@ enum ImGuiNavMoveFlags_
     ImGuiNavMoveFlags_FocusApi              = 1 << 9,
     ImGuiNavMoveFlags_Tabbing               = 1 << 10,  // == Focus + Activate if item is Inputable + DontChangeNavHighlight
     ImGuiNavMoveFlags_Activate              = 1 << 11,
-    ImGuiNavMoveFlags_DontSetNavHighlight   = 1 << 12,  // Do not alter the visible state of keyboard vs mouse nav highlight
+    ImGuiNavMoveFlags_DontSetNavHighlight   = 1 << 12,  // Do not alter the visible state of inputhandler vs mouse nav highlight
 };
 
 enum ImGuiNavLayer
@@ -1641,7 +1641,7 @@ struct ImGuiContext
     bool                    ActiveIdHasBeenEditedThisFrame;
     ImVec2                  ActiveIdClickOffset;                // Clicked offset from upper-left corner, if applicable (currently only set by ButtonBehavior)
     ImGuiWindow*            ActiveIdWindow;
-    ImGuiInputSource        ActiveIdSource;                     // Activating with mouse or nav (gamepad/keyboard)
+    ImGuiInputSource        ActiveIdSource;                     // Activating with mouse or nav (gamepad/inputhandler)
     int                     ActiveIdMouseButton;
     ImGuiID                 ActiveIdPreviousFrame;
     bool                    ActiveIdPreviousFrameIsAlive;
@@ -1677,7 +1677,7 @@ struct ImGuiContext
     // Viewports
     ImVector<ImGuiViewportP*> Viewports;                        // Active viewports (Size==1 in 'master' branch). Each viewports hold their copy of ImDrawData.
 
-    // Gamepad/keyboard Navigation
+    // Gamepad/inputhandler Navigation
     ImGuiWindow*            NavWindow;                          // Focused window for navigation. Could be called 'FocusedWindow'
     ImGuiID                 NavId;                              // Focused item for navigation
     ImGuiID                 NavFocusScopeId;                    // Identify a selection scope (selection code often wants to "clear other items" when landing on an item of the selection set)
@@ -1691,12 +1691,12 @@ struct ImGuiContext
     ImGuiModFlags           NavJustMovedToKeyMods;
     ImGuiID                 NavNextActivateId;                  // Set by ActivateItem(), queued until next frame.
     ImGuiActivateFlags      NavNextActivateFlags;
-    ImGuiInputSource        NavInputSource;                     // Keyboard or Gamepad mode? THIS WILL ONLY BE None or NavGamepad or NavKeyboard.
+    ImGuiInputSource        NavInputSource;                     // InputHandler or Gamepad mode? THIS WILL ONLY BE None or NavGamepad or NavKeyboard.
     ImGuiNavLayer           NavLayer;                           // Layer we are navigating on. For now the system is hard-coded for 0=main contents and 1=menu/title bar, may expose layers later.
     bool                    NavIdIsAlive;                       // Nav widget has been seen this frame ~~ NavRectRel is valid
     bool                    NavMousePosDirty;                   // When set we will update mouse position if (io.ConfigFlags & ImGuiConfigFlags_NavEnableSetMousePos) if set (NB: this not enabled by default)
-    bool                    NavDisableHighlight;                // When user starts using mouse, we hide gamepad/keyboard highlight (NB: but they are still available, which is why NavDisableHighlight isn't always != NavDisableMouseHover)
-    bool                    NavDisableMouseHover;               // When user starts using gamepad/keyboard, we hide mouse hovering highlight until mouse is touched again.
+    bool                    NavDisableHighlight;                // When user starts using mouse, we hide gamepad/inputhandler highlight (NB: but they are still available, which is why NavDisableHighlight isn't always != NavDisableMouseHover)
+    bool                    NavDisableMouseHover;               // When user starts using gamepad/inputhandler, we hide mouse hovering highlight until mouse is touched again.
 
     // Navigation: Init & Move Requests
     bool                    NavAnyRequest;                      // ~~ NavMoveRequest || NavInitRequest this is to perform early out in ItemAdd()
@@ -2025,7 +2025,7 @@ struct IMGUI_API ImGuiWindowTempData
     ImVec1                  GroupOffset;
     ImVec2                  CursorStartPosLossyness;// Record the loss of precision of CursorStartPos due to really large scrolling amount. This is used by clipper to compensentate and fix the most common use case of large scroll area.
 
-    // Keyboard/Gamepad navigation
+    // InputHandler/Gamepad navigation
     ImGuiNavLayer           NavLayerCurrent;        // Current layer, 0..31 (we currently only use 0..1)
     short                   NavLayersActiveMask;    // Which layers have been written to (result from previous frame)
     short                   NavLayersActiveMaskNext;// Which layers have been written to (accumulator for current frame)
@@ -2671,7 +2671,7 @@ namespace ImGui
     IMGUI_API bool          BeginComboPreview();
     IMGUI_API void          EndComboPreview();
 
-    // Gamepad/Keyboard Navigation
+    // Gamepad/InputHandler Navigation
     IMGUI_API void          NavInitWindow(ImGuiWindow* window, bool force_reinit);
     IMGUI_API void          NavInitRequestApplyResult();
     IMGUI_API bool          NavMoveRequestButNoResultYet();

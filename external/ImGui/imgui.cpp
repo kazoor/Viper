@@ -119,7 +119,7 @@ CODE
  - Click upper right corner to close a window, available when 'bool* p_open' is passed to ImGui::Begin().
  - Click and drag on lower right corner to resize window (double-click to auto fit window to its contents).
  - Click and drag on any empty space to move window.
- - TAB/SHIFT+TAB to cycle through keyboard editable fields.
+ - TAB/SHIFT+TAB to cycle through inputhandler editable fields.
  - CTRL+Click on a slider or drag box to input value as text.
  - Use mouse wheel to scroll.
  - Text editor:
@@ -131,7 +131,7 @@ CODE
    - CTRL+Z,CTRL+Y to undo/redo.
    - ESCAPE to revert text to its original value.
    - Controls are automatically adjusted for OSX to match standard OSX text editing operations.
- - General Keyboard controls: enable with ImGuiConfigFlags_NavEnableKeyboard.
+ - General InputHandler controls: enable with ImGuiConfigFlags_NavEnableKeyboard.
  - General Gamepad controls: enable with ImGuiConfigFlags_NavEnableGamepad. Download controller mapping PNG/PSD at http://dearimgui.org/controls_sheets
 
 
@@ -197,7 +197,7 @@ CODE
      // Application init: create a dear imgui context, setup some options, load fonts
      ImGui::CreateContext();
      ImGuiIO& io = ImGui::GetIO();
-     // TODO: Set optional io.ConfigFlags values, e.g. 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard' to enable keyboard controls.
+     // TODO: Set optional io.ConfigFlags values, e.g. 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard' to enable inputhandler controls.
      // TODO: Fill optional fields of the io structure later.
      // TODO: Load TTF/OTF fonts if you don't want to use the default font.
 
@@ -232,7 +232,7 @@ CODE
      // Application init: create a dear imgui context, setup some options, load fonts
      ImGui::CreateContext();
      ImGuiIO& io = ImGui::GetIO();
-     // TODO: Set optional io.ConfigFlags values, e.g. 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard' to enable keyboard controls.
+     // TODO: Set optional io.ConfigFlags values, e.g. 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard' to enable inputhandler controls.
      // TODO: Fill optional fields of the io structure later.
      // TODO: Load TTF/OTF fonts if you don't want to use the default font.
 
@@ -281,7 +281,7 @@ CODE
      // Shutdown
      ImGui::DestroyContext();
 
- To decide whether to dispatch mouse/keyboard inputs to Dear ImGui to the rest of your application,
+ To decide whether to dispatch mouse/inputhandler inputs to Dear ImGui to the rest of your application,
  you should read the 'io.WantCaptureMouse', 'io.WantCaptureKeyboard' and 'io.WantTextInput' flags!
  Please read the FAQ and example applications for details about this!
 
@@ -344,12 +344,12 @@ CODE
 
  USING GAMEPAD/KEYBOARD NAVIGATION CONTROLS
  ------------------------------------------
- - The gamepad/keyboard navigation is fairly functional and keeps being improved.
+ - The gamepad/inputhandler navigation is fairly functional and keeps being improved.
  - Gamepad support is particularly useful to use Dear ImGui on a console system (e.g. PlayStation, Switch, Xbox) without a mouse!
- - The initial focus was to support game controllers, but keyboard is becoming increasingly and decently usable.
- - Keyboard:
+ - The initial focus was to support game controllers, but inputhandler is becoming increasingly and decently usable.
+ - InputHandler:
     - Application: Set io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard to enable.
-    - When keyboard navigation is active (io.NavActive + ImGuiConfigFlags_NavEnableKeyboard),
+    - When inputhandler navigation is active (io.NavActive + ImGuiConfigFlags_NavEnableKeyboard),
       the io.WantCaptureKeyboard flag will be set. For more advanced uses, you may want to read from:
        - io.NavActive: true when a window is focused and it doesn't have the ImGuiWindowFlags_NoNavInputs flag set.
        - io.NavVisible: true when the navigation cursor is visible (and usually goes false when mouse is used).
@@ -366,7 +366,7 @@ CODE
       with a buttons combo to toggle the target. Please reach out if you think the game vs navigation input sharing could be improved.
  - Mouse:
     - PS4/PS5 users: Consider emulating a mouse cursor with DualShock4 touch pad or a spare analog stick as a mouse-emulation fallback.
-    - Consoles/Tablet/Phone users: Consider using a Synergy 1.x server (on your PC) + uSynergy.c (on your console/tablet/phone app) to share your PC mouse/keyboard.
+    - Consoles/Tablet/Phone users: Consider using a Synergy 1.x server (on your PC) + uSynergy.c (on your console/tablet/phone app) to share your PC mouse/inputhandler.
     - On a TV/console system where readability may be lower or mouse inputs may be awkward, you may want to set the ImGuiConfigFlags_NavEnableSetMousePos flag.
       Enabling ImGuiConfigFlags_NavEnableSetMousePos + ImGuiBackendFlags_HasSetMousePos instructs dear imgui to move your mouse cursor along with navigation movements.
       When enabled, the NewFrame() function may alter 'io.MousePos' and set 'io.WantSetMousePos' to notify you that it wants the mouse cursor to be moved.
@@ -403,13 +403,13 @@ CODE
                         - Backend writing to io.MouseHoveredViewport   -> backend should call io.AddMouseViewportEvent() [Docking branch w/ multi-viewports only]
                        note: for all calls to IO new functions, the Dear ImGui context should be bound/current.
                        read https://github.com/ocornut/imgui/issues/4921 for details.
- - 2022/01/10 (1.87) - inputs: reworked keyboard IO. Removed io.KeyMap[], io.KeysDown[] in favor of calling io.AddKeyEvent(). Removed GetKeyIndex(), now unecessary. All IsKeyXXX() functions now take ImGuiKey values. All features are still functional until IMGUI_DISABLE_OBSOLETE_KEYIO is defined. Read Changelog and Release Notes for details.
+ - 2022/01/10 (1.87) - inputs: reworked inputhandler IO. Removed io.KeyMap[], io.KeysDown[] in favor of calling io.AddKeyEvent(). Removed GetKeyIndex(), now unecessary. All IsKeyXXX() functions now take ImGuiKey values. All features are still functional until IMGUI_DISABLE_OBSOLETE_KEYIO is defined. Read Changelog and Release Notes for details.
                         - IsKeyPressed(MY_NATIVE_KEY_XXX)              -> use IsKeyPressed(ImGuiKey_XXX)
                         - IsKeyPressed(GetKeyIndex(ImGuiKey_XXX))      -> use GetKeyState(ImGuiKey_XXX)
                         - Backend writing to io.KeyMap[],io.KeysDown[] -> backend should call io.AddKeyEvent() (+ call io.SetKeyEventNativeData() if you want legacy user code to stil function with legacy key codes).
                         - Backend writing to io.KeyCtrl, io.KeyShift.. -> backend should call io.AddKeyEvent() with ImGuiKey_ModXXX values. *IF YOU PULLED CODE BETWEEN 2021/01/10 and 2021/01/27: We used to have a io.AddKeyModsEvent() function which was now replaced by io.AddKeyEvent() with ImGuiKey_ModXXX values.*
                      - one case won't work with backward compatibility: if your custom backend used ImGuiKey as mock native indices (e.g. "io.KeyMap[ImGuiKey_A] = ImGuiKey_A") because those values are now larger than the legacy KeyDown[] array. Will assert.
-                     - inputs: added ImGuiKey_ModCtrl/ImGuiKey_ModShift/ImGuiKey_ModAlt/ImGuiKey_ModSuper values to submit keyboard modifiers using io.AddKeyEvent(), instead of writing directly to io.KeyCtrl, io.KeyShift, io.KeyAlt, io.KeySuper.
+                     - inputs: added ImGuiKey_ModCtrl/ImGuiKey_ModShift/ImGuiKey_ModAlt/ImGuiKey_ModSuper values to submit inputhandler modifiers using io.AddKeyEvent(), instead of writing directly to io.KeyCtrl, io.KeyShift, io.KeyAlt, io.KeySuper.
  - 2022/01/05 (1.87) - inputs: renamed ImGuiKey_KeyPadEnter to ImGuiKey_KeypadEnter to align with new symbols. Kept redirection enum.
  - 2022/01/05 (1.87) - removed io.ImeSetInputScreenPosFn() in favor of more flexible io.SetPlatformImeDataFn(). Removed 'void* io.ImeWindowHandle' in favor of writing to 'void* ImGuiViewport::PlatformHandleRaw'.
  - 2022/01/01 (1.87) - commented out redirecting functions/enums names that were marked obsolete in 1.69, 1.70, 1.71, 1.72 (March-July 2019)
@@ -515,7 +515,7 @@ CODE
                        - AlignFirstTextHeightToWidgets()     -> use AlignTextToFramePadding()
                        - SetNextWindowPosCenter()            -> use SetNextWindowPos() with a pivot of (0.5f, 0.5f)
                        - ImFont::Glyph                       -> use ImFontGlyph
- - 2019/10/14 (1.74) - inputs: Fixed a miscalculation in the keyboard/mouse "typematic" repeat delay/rate calculation, used by keys and e.g. repeating mouse buttons as well as the GetKeyPressedAmount() function.
+ - 2019/10/14 (1.74) - inputs: Fixed a miscalculation in the inputhandler/mouse "typematic" repeat delay/rate calculation, used by keys and e.g. repeating mouse buttons as well as the GetKeyPressedAmount() function.
                        if you were using a non-default value for io.KeyRepeatRate (previous default was 0.250), you can add +io.KeyRepeatDelay to it to compensate for the fix.
                        The function was triggering on: 0.0 and (delay+rate*N) where (N>=1). Fixed formula responds to (N>=0). Effectively it made io.KeyRepeatRate behave like it was set to (io.KeyRepeatRate + io.KeyRepeatDelay).
                        If you never altered io.KeyRepeatRate nor used GetKeyPressedAmount() this won't affect you.
@@ -749,12 +749,12 @@ CODE
  Q: How to get started?
  A: Read 'PROGRAMMER GUIDE' above. Read examples/README.txt.
 
- Q: How can I tell whether to dispatch mouse/keyboard to Dear ImGui or my application?
+ Q: How can I tell whether to dispatch mouse/inputhandler to Dear ImGui or my application?
  A: You should read the 'io.WantCaptureMouse', 'io.WantCaptureKeyboard' and 'io.WantTextInput' flags!
  >> See https://www.dearimgui.org/faq for a fully detailed answer. You really want to read this.
 
- Q. How can I enable keyboard controls?
- Q: How can I use this without a mouse, without a keyboard or without a screen? (gamepad, input share, remote display)
+ Q. How can I enable inputhandler controls?
+ Q: How can I use this without a mouse, without a inputhandler or without a screen? (gamepad, input share, remote display)
  Q: I integrated Dear ImGui in my engine and little squares are showing instead of text...
  Q: I integrated Dear ImGui in my engine and some elements are clipping or disappearing when I move windows around...
  Q: I integrated Dear ImGui in my engine and some elements are displaying outside their expected windows boundaries...
@@ -1181,7 +1181,7 @@ ImGuiIO::ImGuiIO()
 
 // Pass in translated ASCII characters for text input.
 // - with glfw you can get those from the callback set in glfwSetCharCallback()
-// - on Windows you can get those using ToAscii+keyboard state, or via the WM_CHAR message
+// - on Windows you can get those using ToAscii+inputhandler state, or via the WM_CHAR message
 // FIXME: Should in theory be called "AddCharacterEvent()" to be consistent with new API
 void ImGuiIO::AddInputCharacter(unsigned int c)
 {
@@ -4081,7 +4081,7 @@ static void ImGui::UpdateMouseInputs()
     else
         io.MouseDelta = ImVec2(0.0f, 0.0f);
 
-    // If mouse moved we re-enable mouse hovering in case it was disabled by gamepad/keyboard. In theory should use a >0.0f threshold but would need to reset in everywhere we set this to true.
+    // If mouse moved we re-enable mouse hovering in case it was disabled by gamepad/inputhandler. In theory should use a >0.0f threshold but would need to reset in everywhere we set this to true.
     if (io.MouseDelta.x != 0.0f || io.MouseDelta.y != 0.0f)
         g.NavDisableMouseHover = false;
 
@@ -4121,7 +4121,7 @@ static void ImGui::UpdateMouseInputs()
         // We provide io.MouseDoubleClicked[] as a legacy service
         io.MouseDoubleClicked[i] = (io.MouseClickedCount[i] == 2);
 
-        // Clicking any mouse button reactivate mouse hovering which may have been deactivated by gamepad/keyboard navigation
+        // Clicking any mouse button reactivate mouse hovering which may have been deactivated by gamepad/inputhandler navigation
         if (io.MouseClicked[i])
             g.NavDisableMouseHover = false;
     }
@@ -4293,7 +4293,7 @@ void ImGui::UpdateHoveredWindowAndCaptureFlags()
         io.WantCaptureMouseUnlessPopupClose = (mouse_avail_unless_popup_close && (g.HoveredWindow != NULL || mouse_any_down)) || has_open_modal;
     }
 
-    // Update io.WantCaptureKeyboard for the user application (true = dispatch keyboard info to Dear ImGui only, false = dispatch keyboard info to Dear ImGui + underlying app)
+    // Update io.WantCaptureKeyboard for the user application (true = dispatch inputhandler info to Dear ImGui only, false = dispatch inputhandler info to Dear ImGui + underlying app)
     if (g.WantCaptureKeyboardNextFrame != -1)
         io.WantCaptureKeyboard = (g.WantCaptureKeyboardNextFrame != 0);
     else
@@ -4301,7 +4301,7 @@ void ImGui::UpdateHoveredWindowAndCaptureFlags()
     if (io.NavActive && (io.ConfigFlags & ImGuiConfigFlags_NavEnableKeyboard) && !(io.ConfigFlags & ImGuiConfigFlags_NavNoCaptureKeyboard))
         io.WantCaptureKeyboard = true;
 
-    // Update io.WantTextInput flag, this is to allow systems without a keyboard (e.g. mobile, hand-held) to show a software keyboard if possible
+    // Update io.WantTextInput flag, this is to allow systems without a inputhandler (e.g. mobile, hand-held) to show a software inputhandler if possible
     io.WantTextInput = (g.WantTextInputNextFrame != -1) ? (g.WantTextInputNextFrame != 0) : false;
 }
 
@@ -4457,7 +4457,7 @@ void ImGui::NewFrame()
     g.InputEventsTrail.resize(0);
     UpdateInputEvents(g.IO.ConfigInputTrickleEventQueue);
 
-    // Update keyboard input state
+    // Update inputhandler input state
     UpdateKeyboardInputs();
 
     //IM_ASSERT(g.IO.KeyCtrl == IsKeyDown(ImGuiKey_LeftCtrl) || IsKeyDown(ImGuiKey_RightCtrl));
@@ -4465,7 +4465,7 @@ void ImGui::NewFrame()
     //IM_ASSERT(g.IO.KeyAlt == IsKeyDown(ImGuiKey_LeftAlt) || IsKeyDown(ImGuiKey_RightAlt));
     //IM_ASSERT(g.IO.KeySuper == IsKeyDown(ImGuiKey_LeftSuper) || IsKeyDown(ImGuiKey_RightSuper));
 
-    // Update gamepad/keyboard navigation
+    // Update gamepad/inputhandler navigation
     NavUpdate();
 
     // Update mouse input state
@@ -5766,7 +5766,7 @@ static bool ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& s
     // Restore nav layer
     window->DC.NavLayerCurrent = ImGuiNavLayer_Main;
 
-    // Navigation resize (keyboard/gamepad)
+    // Navigation resize (inputhandler/gamepad)
     // FIXME: This cannot be moved to NavUpdateWindowing() because CalcWindowSizeAfterConstraint() need to callback into user.
     // Not even sure the callback works here.
     if (g.NavWindowingTarget && g.NavWindowingTarget->RootWindow == window)
@@ -5940,7 +5940,7 @@ void ImGui::RenderWindowTitleBarContents(ImGuiWindow* window, const ImRect& titl
     const bool has_collapse_button = !(flags & ImGuiWindowFlags_NoCollapse) && (style.WindowMenuButtonPosition != ImGuiDir_None);
 
     // Close & Collapse button are on the Menu NavLayer and don't default focus (unless there's nothing else on that layer)
-    // FIXME-NAV: Might want (or not?) to set the equivalent of ImGuiButtonFlags_NoNavFocus so that mouse clicks on standard title bar items don't necessarily set nav/keyboard ref?
+    // FIXME-NAV: Might want (or not?) to set the equivalent of ImGuiButtonFlags_NoNavFocus so that mouse clicks on standard title bar items don't necessarily set nav/inputhandler ref?
     const ImGuiItemFlags item_flags_backup = g.CurrentItemFlags;
     g.CurrentItemFlags |= ImGuiItemFlags_NoNavDefaultFocus;
     window->DC.NavLayerCurrent = ImGuiNavLayer_Menu;
@@ -6886,7 +6886,7 @@ void ImGui::FocusWindow(ImGuiWindow* window)
         if (!g.ActiveIdNoClearOnFocusLoss)
             ClearActiveID();
 
-    // Passing NULL allow to disable keyboard focus
+    // Passing NULL allow to disable inputhandler focus
     if (!window)
         return;
 
@@ -7956,7 +7956,7 @@ void ImGui::SetNextFrameWantCaptureMouse(bool want_capture_mouse)
 #ifndef IMGUI_DISABLE_DEBUG_TOOLS
 static const char* GetInputSourceName(ImGuiInputSource source)
 {
-    const char* input_source_names[] = { "None", "Mouse", "Keyboard", "Gamepad", "Nav", "Clipboard" };
+    const char* input_source_names[] = { "None", "Mouse", "InputHandler", "Gamepad", "Nav", "Clipboard" };
     IM_ASSERT(IM_ARRAYSIZE(input_source_names) == ImGuiInputSource_COUNT && source >= 0 && source < ImGuiInputSource_COUNT);
     return input_source_names[source];
 }
@@ -8170,7 +8170,7 @@ static void ImGui::ErrorCheckNewFrameSanityChecks()
 
     // Check: required key mapping (we intentionally do NOT check all keys to not pressure user into setting up everything, but Space is required and was only added in 1.60 WIP)
     if ((g.IO.ConfigFlags & ImGuiConfigFlags_NavEnableKeyboard) && g.IO.BackendUsingLegacyKeyArrays == 1)
-        IM_ASSERT(g.IO.KeyMap[ImGuiKey_Space] != -1 && "ImGuiKey_Space is not mapped, required for keyboard navigation.");
+        IM_ASSERT(g.IO.KeyMap[ImGuiKey_Space] != -1 && "ImGuiKey_Space is not mapped, required for inputhandler navigation.");
 #endif
 
     // Check: the io.ConfigWindowsResizeFromEdges option requires backend to honor mouse cursor changes and set the ImGuiBackendFlags_HasMouseCursors flag accordingly.
@@ -9774,7 +9774,7 @@ static void inline NavClampRectToVisibleAreaForMoveDir(ImGuiDir move_dir, ImRect
     }
 }
 
-// Scoring function for gamepad/keyboard directional navigation. Based on https://gist.github.com/rygorous/6981057
+// Scoring function for gamepad/inputhandler directional navigation. Based on https://gist.github.com/rygorous/6981057
 static bool ImGui::NavScoreItem(ImGuiNavItemData* result)
 {
     ImGuiContext& g = *GImGui;
@@ -10252,7 +10252,7 @@ static void ImGui::NavUpdate()
     io.WantSetMousePos = false;
     //if (g.NavScoringDebugCount > 0) IMGUI_DEBUG_LOG_NAV("[nav] NavScoringDebugCount %d for '%s' layer %d (Init:%d, Move:%d)\n", g.NavScoringDebugCount, g.NavWindow ? g.NavWindow->Name : "NULL", g.NavLayer, g.NavInitRequest || g.NavInitResultId != 0, g.NavMoveRequest);
 
-    // Set input source based on which keys are last pressed (as some features differs when used with Gamepad vs Keyboard)
+    // Set input source based on which keys are last pressed (as some features differs when used with Gamepad vs InputHandler)
     // FIXME-NAV: Now that keys are separated maybe we can get rid of NavInputSource?
     const bool nav_gamepad_active = (io.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad) != 0 && (io.BackendFlags & ImGuiBackendFlags_HasGamepad) != 0;
     const ImGuiKey nav_gamepad_keys_to_change_source[] = { ImGuiKey_GamepadFaceRight, ImGuiKey_GamepadFaceLeft, ImGuiKey_GamepadFaceUp, ImGuiKey_GamepadFaceDown, ImGuiKey_GamepadDpadRight, ImGuiKey_GamepadDpadLeft, ImGuiKey_GamepadDpadUp, ImGuiKey_GamepadDpadDown };
@@ -10882,7 +10882,7 @@ static void NavUpdateWindowingHighlightWindow(int focus_change_dir)
 }
 
 // Windowing management mode
-// Keyboard: CTRL+Tab (change focus/move/resize), Alt (toggle menu layer)
+// InputHandler: CTRL+Tab (change focus/move/resize), Alt (toggle menu layer)
 // Gamepad:  Hold Menu/Square (change focus/move/resize), Tap Menu/Square (toggle menu layer)
 static void ImGui::NavUpdateWindowing()
 {
@@ -10945,7 +10945,7 @@ static void ImGui::NavUpdateWindowing()
         }
     }
 
-    // Keyboard: Focus
+    // InputHandler: Focus
     if (g.NavWindowingTarget && g.NavInputSource == ImGuiInputSource_Keyboard)
     {
         // Visuals only appears after a brief time after pressing TAB the first time, so that a fast CTRL+TAB doesn't add visual noise
@@ -10956,7 +10956,7 @@ static void ImGui::NavUpdateWindowing()
             apply_focus_window = g.NavWindowingTarget;
     }
 
-    // Keyboard: Press and Release ALT to toggle menu layer
+    // InputHandler: Press and Release ALT to toggle menu layer
     // - Testing that only Alt is tested prevents Alt+Shift or AltGR from toggling menu layer.
     // - AltGR is normally Alt+Ctrl but we can't reliably detect it (not all backends/systems/layout emit it as Alt+Ctrl). But even on keyboards without AltGR we don't want Alt+Ctrl to open menu anyway.
 	const bool nav_keyboard_active = (io.ConfigFlags & ImGuiConfigFlags_NavEnableKeyboard) != 0;

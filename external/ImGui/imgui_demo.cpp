@@ -218,7 +218,7 @@ void ImGui::ShowUserGuide()
         "Click and drag on lower corner to resize window\n"
         "(double-click to auto fit window to its contents).");
     ImGui::BulletText("CTRL+Click on a slider or drag box to input value as text.");
-    ImGui::BulletText("TAB/SHIFT+TAB to cycle through keyboard editable fields.");
+    ImGui::BulletText("TAB/SHIFT+TAB to cycle through inputhandler editable fields.");
 	ImGui::BulletText("CTRL+Tab to select a window.");
 	if (io.FontAllowUserScaling)
         ImGui::BulletText("CTRL+Mouse Wheel to zoom window contents.");
@@ -230,7 +230,7 @@ void ImGui::ShowUserGuide()
     ImGui::BulletText("CTRL+Z,CTRL+Y to undo/redo.");
     ImGui::BulletText("ESCAPE to revert.");
     ImGui::Unindent();
-    ImGui::BulletText("With keyboard navigation enabled:");
+    ImGui::BulletText("With inputhandler navigation enabled:");
     ImGui::Indent();
     ImGui::BulletText("Arrow keys to navigate.");
     ImGui::BulletText("Space to activate a widget.");
@@ -434,7 +434,7 @@ void ImGui::ShowDemoWindow(bool* p_open)
         ImGui::BulletText("See comments in imgui.cpp.");
         ImGui::BulletText("See example applications in the examples/ folder.");
         ImGui::BulletText("Read the FAQ at http://www.dearimgui.org/faq/");
-        ImGui::BulletText("Set 'io.ConfigFlags |= NavEnableKeyboard' for keyboard controls.");
+        ImGui::BulletText("Set 'io.ConfigFlags |= NavEnableKeyboard' for inputhandler controls.");
         ImGui::BulletText("Set 'io.ConfigFlags |= NavEnableGamepad' for gamepad controls.");
         ImGui::Separator();
 
@@ -450,7 +450,7 @@ void ImGui::ShowDemoWindow(bool* p_open)
         if (ImGui::TreeNode("Configuration##2"))
         {
             ImGui::CheckboxFlags("io.ConfigFlags: NavEnableKeyboard",    &io.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard);
-            ImGui::SameLine(); HelpMarker("Enable keyboard controls.");
+            ImGui::SameLine(); HelpMarker("Enable inputhandler controls.");
             ImGui::CheckboxFlags("io.ConfigFlags: NavEnableGamepad",     &io.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad);
             ImGui::SameLine(); HelpMarker("Enable gamepad controls. Require backend to set io.BackendFlags |= ImGuiBackendFlags_HasGamepad.\n\nRead instructions in imgui.cpp for details.");
             ImGui::CheckboxFlags("io.ConfigFlags: NavEnableSetMousePos", &io.ConfigFlags, ImGuiConfigFlags_NavEnableSetMousePos);
@@ -1106,7 +1106,7 @@ static void ShowDemoWindowWidgets()
                 if (ImGui::Selectable(items[n], is_selected))
                     item_current_idx = n;
 
-                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                // Set the initial focus when opening the combo (scrolling + inputhandler navigation focus)
                 if (is_selected)
                     ImGui::SetItemDefaultFocus();
             }
@@ -1147,7 +1147,7 @@ static void ShowDemoWindowWidgets()
                 if (ImGui::Selectable(items[n], is_selected))
                     item_current_idx = n;
 
-                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                // Set the initial focus when opening the combo (scrolling + inputhandler navigation focus)
                 if (is_selected)
                     ImGui::SetItemDefaultFocus();
             }
@@ -1164,7 +1164,7 @@ static void ShowDemoWindowWidgets()
                 if (ImGui::Selectable(items[n], is_selected))
                     item_current_idx = n;
 
-                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                // Set the initial focus when opening the combo (scrolling + inputhandler navigation focus)
                 if (is_selected)
                     ImGui::SetItemDefaultFocus();
             }
@@ -5714,9 +5714,9 @@ static void ShowDemoWindowMisc()
             ImGui::TreePop();
         }
 
-        // Display Keyboard/Mouse state
-        IMGUI_DEMO_MARKER("Inputs, Navigation & Focus/Keyboard, Gamepad & Navigation State");
-        if (ImGui::TreeNode("Keyboard, Gamepad & Navigation State"))
+        // Display InputHandler/Mouse state
+        IMGUI_DEMO_MARKER("Inputs, Navigation & Focus/InputHandler, Gamepad & Navigation State");
+        if (ImGui::TreeNode("InputHandler, Gamepad & Navigation State"))
         {
             // We iterate both legacy native range and named ImGuiKey ranges, which is a little odd but this allow displaying the data for old/new backends.
             // User code should never have to go through such hoops: old code may use native keycodes, new code may use ImGuiKey codes.
@@ -5734,7 +5734,7 @@ static void ShowDemoWindowMisc()
             ImGui::Text("Keys mods: %s%s%s%s", io.KeyCtrl ? "CTRL " : "", io.KeyShift ? "SHIFT " : "", io.KeyAlt ? "ALT " : "", io.KeySuper ? "SUPER " : "");
             ImGui::Text("Chars queue:");        for (int i = 0; i < io.InputQueueCharacters.Size; i++) { ImWchar c = io.InputQueueCharacters[i]; ImGui::SameLine();  ImGui::Text("\'%c\' (0x%04X)", (c > ' ' && c <= 255) ? (char)c : '?', c); } // FIXME: We should convert 'c' to UTF-8 here but the functions are not public.
 
-            // Draw an arbitrary US keyboard layout to visualize translated keys
+            // Draw an arbitrary US inputhandler layout to visualize translated keys
             {
                 const ImVec2 key_size = ImVec2(35.0f, 35.0f);
                 const float  key_rounding = 3.0f;
@@ -5823,7 +5823,7 @@ static void ShowDemoWindowMisc()
         IMGUI_DEMO_MARKER("Inputs, Navigation & Focus/Tabbing");
         if (ImGui::TreeNode("Tabbing"))
         {
-            ImGui::Text("Use TAB/SHIFT+TAB to cycle through keyboard editable fields.");
+            ImGui::Text("Use TAB/SHIFT+TAB to cycle through inputhandler editable fields.");
             static char buf[32] = "hello";
             ImGui::InputText("1", buf, IM_ARRAYSIZE(buf));
             ImGui::InputText("2", buf, IM_ARRAYSIZE(buf));

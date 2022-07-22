@@ -12,9 +12,7 @@
 #include <ImGui/imgui_impl_opengl3.h>
 #include "window.hpp"
 #include "../../graphics/shaders/shader/shader.hpp"
-#include "../../util/input/keyboard/keyboard.hpp"
-#include "../../events/eventhandler/eventhandler.hpp"
-#include "../../util/global/global.hpp"
+#include "../../util/input/inputhandler/inputhandler.hpp"
 
 namespace Viper::Graphics {
     void Window::FramebufferSizeCallback(GLFWwindow *Window, int Width, int Height) {
@@ -36,7 +34,6 @@ namespace Viper::Graphics {
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         Context = CreateWindow(WindowParams);
-        Viper::Global::WindowContext = Context; // Give global variable the context.
 
         if (!Context) {
             spdlog::error("Failed to create GLFW window");
@@ -52,8 +49,6 @@ namespace Viper::Graphics {
         }
 
         Shader Shader("resources/test.vert", "resources/test.frag");
-
-        Viper::Global::Events = new Viper::Events::EventBus();
 
         float vertices[] = {
                 0.5f, 0.5f, 0.0f,   // top right
@@ -86,6 +81,7 @@ namespace Viper::Graphics {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindVertexArray(0);
+
         while (!glfwWindowShouldClose(Context)) {
             ProcessInput(Context);
 
@@ -102,8 +98,6 @@ namespace Viper::Graphics {
         glDeleteBuffers(1, &VBO);
         glDeleteBuffers(1, &EBO);
 
-        delete Viper::Global::Events;
-
         glfwDestroyWindow(Context);
         glfwTerminate();
     }
@@ -114,7 +108,7 @@ namespace Viper::Graphics {
 
     void Window::ProcessInput(GLFWwindow *Window) {
         // if (glfwGetKey(Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-           // glfwSetWindowShouldClose(Window, true);
+        // glfwSetWindowShouldClose(Window, true);
     }
 
     void Window::Update() const {

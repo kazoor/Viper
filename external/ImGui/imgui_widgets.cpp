@@ -437,7 +437,7 @@ void ImGui::BulletTextV(const char* fmt, va_list args)
 //-------------------------------------------------------------------------
 
 // The ButtonBehavior() function is key to many interactions and used by many/most widgets.
-// Because we handle so many cases (keyboard/gamepad navigation, drag and drop) and many specific behavior (via ImGuiButtonFlags_),
+// Because we handle so many cases (inputhandler/gamepad navigation, drag and drop) and many specific behavior (via ImGuiButtonFlags_),
 // this code is a little complex.
 // By far the most common path is interacting with the Mouse using the default ImGuiButtonFlags_PressedOnClickRelease button behavior.
 // See the series of events below and the corresponding state reported by dear imgui:
@@ -603,7 +603,7 @@ bool ImGui::ButtonBehavior(const ImRect& bb, ImGuiID id, bool* out_hovered, bool
             g.NavDisableHighlight = true;
     }
 
-    // Gamepad/Keyboard navigation
+    // Gamepad/InputHandler navigation
     // We report navigated item as hovered but we don't set g.HoveredId to not interfere with mouse.
     if (g.NavId == id && !g.NavDisableHighlight && g.NavDisableMouseHover && (g.ActiveId == 0 || g.ActiveId == id || g.ActiveId == window->MoveId))
         if (!(flags & ImGuiButtonFlags_NoHoveredOnFocus))
@@ -2808,14 +2808,14 @@ bool ImGui::SliderBehaviorT(const ImRect& bb, ImGuiID id, ImGuiDataType data_typ
                 const int decimal_precision = is_floating_point ? ImParseFormatPrecision(format, 3) : 0;
                 if (decimal_precision > 0)
                 {
-                    input_delta /= 100.0f;    // Gamepad/keyboard tweak speeds in % of slider bounds
+                    input_delta /= 100.0f;    // Gamepad/inputhandler tweak speeds in % of slider bounds
                     if (tweak_slow)
                         input_delta /= 10.0f;
                 }
                 else
                 {
                     if ((v_range >= -100.0f && v_range <= 100.0f) || tweak_slow)
-                        input_delta = ((input_delta < 0.0f) ? -1.0f : +1.0f) / (float)v_range; // Gamepad/keyboard tweak speeds in integer steps
+                        input_delta = ((input_delta < 0.0f) ? -1.0f : +1.0f) / (float)v_range; // Gamepad/inputhandler tweak speeds in integer steps
                     else
                         input_delta /= 100.0f;
                 }
@@ -3755,22 +3755,22 @@ static bool STB_TEXTEDIT_INSERTCHARS(ImGuiInputTextState* obj, int pos, const Im
 }
 
 // We don't use an enum so we can build even with conflicting symbols (if another user of stb_textedit.h leak their STB_TEXTEDIT_K_* symbols)
-#define STB_TEXTEDIT_K_LEFT         0x200000 // keyboard input to move cursor left
-#define STB_TEXTEDIT_K_RIGHT        0x200001 // keyboard input to move cursor right
-#define STB_TEXTEDIT_K_UP           0x200002 // keyboard input to move cursor up
-#define STB_TEXTEDIT_K_DOWN         0x200003 // keyboard input to move cursor down
-#define STB_TEXTEDIT_K_LINESTART    0x200004 // keyboard input to move cursor to start of line
-#define STB_TEXTEDIT_K_LINEEND      0x200005 // keyboard input to move cursor to end of line
-#define STB_TEXTEDIT_K_TEXTSTART    0x200006 // keyboard input to move cursor to start of text
-#define STB_TEXTEDIT_K_TEXTEND      0x200007 // keyboard input to move cursor to end of text
-#define STB_TEXTEDIT_K_DELETE       0x200008 // keyboard input to delete selection or character under cursor
-#define STB_TEXTEDIT_K_BACKSPACE    0x200009 // keyboard input to delete selection or character left of cursor
-#define STB_TEXTEDIT_K_UNDO         0x20000A // keyboard input to perform undo
-#define STB_TEXTEDIT_K_REDO         0x20000B // keyboard input to perform redo
-#define STB_TEXTEDIT_K_WORDLEFT     0x20000C // keyboard input to move cursor left one word
-#define STB_TEXTEDIT_K_WORDRIGHT    0x20000D // keyboard input to move cursor right one word
-#define STB_TEXTEDIT_K_PGUP         0x20000E // keyboard input to move cursor up a page
-#define STB_TEXTEDIT_K_PGDOWN       0x20000F // keyboard input to move cursor down a page
+#define STB_TEXTEDIT_K_LEFT         0x200000 // inputhandler input to move cursor left
+#define STB_TEXTEDIT_K_RIGHT        0x200001 // inputhandler input to move cursor right
+#define STB_TEXTEDIT_K_UP           0x200002 // inputhandler input to move cursor up
+#define STB_TEXTEDIT_K_DOWN         0x200003 // inputhandler input to move cursor down
+#define STB_TEXTEDIT_K_LINESTART    0x200004 // inputhandler input to move cursor to start of line
+#define STB_TEXTEDIT_K_LINEEND      0x200005 // inputhandler input to move cursor to end of line
+#define STB_TEXTEDIT_K_TEXTSTART    0x200006 // inputhandler input to move cursor to start of text
+#define STB_TEXTEDIT_K_TEXTEND      0x200007 // inputhandler input to move cursor to end of text
+#define STB_TEXTEDIT_K_DELETE       0x200008 // inputhandler input to delete selection or character under cursor
+#define STB_TEXTEDIT_K_BACKSPACE    0x200009 // inputhandler input to delete selection or character left of cursor
+#define STB_TEXTEDIT_K_UNDO         0x20000A // inputhandler input to perform undo
+#define STB_TEXTEDIT_K_REDO         0x20000B // inputhandler input to perform redo
+#define STB_TEXTEDIT_K_WORDLEFT     0x20000C // inputhandler input to move cursor left one word
+#define STB_TEXTEDIT_K_WORDRIGHT    0x20000D // inputhandler input to move cursor right one word
+#define STB_TEXTEDIT_K_PGUP         0x20000E // inputhandler input to move cursor up a page
+#define STB_TEXTEDIT_K_PGDOWN       0x20000F // inputhandler input to move cursor down a page
 #define STB_TEXTEDIT_K_SHIFT        0x400000
 
 #define STB_TEXTEDIT_IMPLEMENTATION
@@ -4165,7 +4165,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
             SetActiveIdUsingKey(ImGuiKey_PageUp);
             SetActiveIdUsingKey(ImGuiKey_PageDown);
         }
-        if (flags & (ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AllowTabInput)) // Disable keyboard tabbing out as we will use the \t character.
+        if (flags & (ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AllowTabInput)) // Disable inputhandler tabbing out as we will use the \t character.
         {
             SetActiveIdUsingKey(ImGuiKey_Tab);
         }
@@ -4350,7 +4350,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
         const bool is_redo  = ((is_shortcut_key && IsKeyPressed(ImGuiKey_Y)) || (is_osx_shift_shortcut && IsKeyPressed(ImGuiKey_Z))) && !is_readonly && is_undoable;
         const bool is_select_all = is_shortcut_key && IsKeyPressed(ImGuiKey_A);
 
-        // We allow validate/cancel with Nav source (gamepad) to makes it easier to undo an accidental NavInput press with no keyboard wired, but otherwise it isn't very useful.
+        // We allow validate/cancel with Nav source (gamepad) to makes it easier to undo an accidental NavInput press with no inputhandler wired, but otherwise it isn't very useful.
         const bool is_enter_pressed = IsKeyPressed(ImGuiKey_Enter, true) || IsKeyPressed(ImGuiKey_KeypadEnter, true);
         const bool is_gamepad_validate = IsKeyPressed(ImGuiKey_NavGamepadActivate, false) || IsKeyPressed(ImGuiKey_NavGamepadInput, false);
         const bool is_cancel = IsKeyPressed(ImGuiKey_Escape, false) || IsKeyPressed(ImGuiKey_NavGamepadCancel, false);
@@ -4509,7 +4509,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
             {
                 IM_ASSERT(callback != NULL);
 
-                // The reason we specify the usage semantic (Completion/History) is that Completion needs to disable keyboard TABBING at the moment.
+                // The reason we specify the usage semantic (Completion/History) is that Completion needs to disable inputhandler TABBING at the moment.
                 ImGuiInputTextFlags event_flag = 0;
                 ImGuiKey event_key = ImGuiKey_None;
                 if ((flags & ImGuiInputTextFlags_CallbackCompletion) != 0 && IsKeyPressed(ImGuiKey_Tab))
@@ -6028,9 +6028,9 @@ bool ImGui::TreeNodeBehavior(ImGuiID id, ImGuiTreeNodeFlags flags, const char* l
     if (!is_leaf)
         button_flags |= ImGuiButtonFlags_PressedOnDragDropHold;
 
-    // We allow clicking on the arrow section with keyboard modifiers held, in order to easily
+    // We allow clicking on the arrow section with inputhandler modifiers held, in order to easily
     // allow browsing a tree while preserving selection with code implementing multi-selection patterns.
-    // When clicking on the rest of the tree node we always disallow keyboard modifiers.
+    // When clicking on the rest of the tree node we always disallow inputhandler modifiers.
     const float arrow_hit_x1 = (text_pos.x - text_offset_x) - style.TouchExtraPadding.x;
     const float arrow_hit_x2 = (text_pos.x - text_offset_x) + (g.FontSize + padding.x * 2.0f) + style.TouchExtraPadding.x;
     const bool is_mouse_x_over_arrow = (g.IO.MousePos.x >= arrow_hit_x1 && g.IO.MousePos.x < arrow_hit_x2);
@@ -6369,7 +6369,7 @@ bool ImGui::Selectable(const char* label, bool selected, ImGuiSelectableFlags fl
         if (g.NavJustMovedToId == id)
             selected = pressed = true;
 
-    // Update NavId when clicking or when Hovering (this doesn't happen on most widgets), so navigation can be resumed with gamepad/keyboard
+    // Update NavId when clicking or when Hovering (this doesn't happen on most widgets), so navigation can be resumed with gamepad/inputhandler
     if (pressed || (hovered && (flags & ImGuiSelectableFlags_SetNavIdOnHover)))
     {
         if (!g.NavDisableMouseHover && g.NavWindow == window && g.NavLayer == window->DC.NavLayerCurrent)
@@ -7768,7 +7768,7 @@ static float ImGui::TabBarScrollClamp(ImGuiTabBar* tab_bar, float scrolling)
     return ImMax(scrolling, 0.0f);
 }
 
-// Note: we may scroll to tab that are not selected! e.g. using keyboard arrow keys
+// Note: we may scroll to tab that are not selected! e.g. using inputhandler arrow keys
 static void ImGui::TabBarScrollToTab(ImGuiTabBar* tab_bar, ImGuiID tab_id, ImGuiTabBarSection* sections)
 {
     ImGuiTabItem* tab = TabBarFindTabByID(tab_bar, tab_id);
