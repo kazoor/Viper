@@ -1,4 +1,5 @@
 #include <vector>
+#include <algorithm>
 #include "layerstack.hpp"
 #include "../layer/layer.hpp"
 #include "../../events/event/event.hpp"
