@@ -29,6 +29,8 @@ namespace Viper::Graphics {
         int X, Y;
     };
 
+    struct WindowCloseEvent : public Viper::Events::Event {};
+
     class Window {
     public:
         Window(int Width, int Height, const std::string &WindowName);
@@ -52,6 +54,8 @@ namespace Viper::Graphics {
         void OnWindowResizeEvent(WindowResizeEvent *E);
 
         void OnWindowPositionEvent(WindowPositionEvent *E);
+
+        void OnWindowCloseEvent(WindowCloseEvent *E);
 
     private:
         WindowParams_t WindowParams;

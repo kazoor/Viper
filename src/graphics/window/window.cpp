@@ -56,6 +56,7 @@ namespace Viper::Graphics {
         // WindowEvents subscriptions.
         WindowEvents->Subscribe(this, &Window::OnWindowResizeEvent);
         WindowEvents->Subscribe(this, &Window::OnWindowPositionEvent);
+        WindowEvents->Subscribe(this, &Window::OnWindowCloseEvent);
 
         glfwSetWindowSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
             WindowParams_t& WindowData = *(WindowParams_t*)glfwGetWindowUserPointer(Window);
@@ -65,6 +66,11 @@ namespace Viper::Graphics {
         glfwSetWindowPosCallback(Context, [](GLFWwindow *Window, int X, int Y) {
             WindowParams_t& WindowData = *(WindowParams_t*)glfwGetWindowUserPointer(Window);
             WindowData.EventCallback->Commit(new WindowPositionEvent(X, Y));
+        });
+
+        glfwSetWindowCloseCallback(Context, [](GLFWwindow *Window) {
+            WindowParams_t& WindowData = *(WindowParams_t*)glfwGetWindowUserPointer(Window);
+            WindowData.EventCallback->Commit(new WindowCloseEvent());
         });
 
         Shader Shader("resources/test.vert", "resources/test.frag");
@@ -116,10 +122,6 @@ namespace Viper::Graphics {
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
         glDeleteBuffers(1, &EBO);
-
-        delete WindowEvents;
-        glfwDestroyWindow(Context);
-        glfwTerminate();
     }
 
     GLFWwindow *Window::CreateWindow(WindowParams_t Params) {
@@ -146,5 +148,12 @@ namespace Viper::Graphics {
 
     void Window::OnWindowPositionEvent(WindowPositionEvent *E) {
         spdlog::info("Window Position change detected! New position is X: {0} : Y: {1}", E->X, E->Y);
+    }
+
+    void Window::OnWindowCloseEvent(WindowCloseEvent *E) {
+        spdlog::info("WindowCloseEvent() Called!");
+        delete WindowEvents;
+        glfwDestroyWindow(Context);
+        glfwTerminate();
     }
 }
