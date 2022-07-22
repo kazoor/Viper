@@ -23,6 +23,7 @@ namespace Viper::Renderer {
         m_Vbo = 0;
         m_Ibo = 0;
         m_Fbo = 0;
+        m_Tcb = 0;
 
         s_Renderer.m_VertexBuffer = new Viper::RendererAPI::Vertex_t[ max_quad_count ];
         
