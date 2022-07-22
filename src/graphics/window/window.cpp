@@ -52,6 +52,8 @@ namespace Viper::Graphics {
             spdlog::error("Failed to initialize GLAD");
         }
 
+        LayerStack = new Viper::Layers::LayerStack();
+
         SetEventSubscriptions();
         UpdateWindowEvents();
 
@@ -117,6 +119,7 @@ namespace Viper::Graphics {
         }
 
         delete g_pRenderer;
+        delete LayerStack;
 
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
@@ -141,6 +144,10 @@ namespace Viper::Graphics {
         WindowEvents->Subscribe(this, &Window::OnWindowFocusEvent);
         WindowEvents->Subscribe(this, &Window::OnWindowCloseEvent);
         WindowEvents->Subscribe(new Viper::Input::MouseEvents(), &Input::MouseEvents::OnMouseCursorPositionEvent);
+
+        for(auto It = LayerStack->end(); It != LayerStack->begin();) {
+            WindowEvents->Subscribe((*--It), &Viper::Layers::Layer::OnEvent);
+        }
     }
 
     void Window::UpdateWindowEvents() {
@@ -184,6 +191,18 @@ namespace Viper::Graphics {
         glfwSwapBuffers(Context);
         glfwPollEvents();
         Input::Input::ResetScroll();
+
+        for(auto Layer : *LayerStack) {
+            spdlog::info("Updating Layer {0}", Layer->GetLayerName());
+            Layer->OnUpdate();
+        }
+    }
+    void Window::PushLayer(Layers::Layer *Layer) {
+        LayerStack->PushLayer(Layer);
+    }
+
+    void Window::PushOverlay(Layers::Layer *Overlay) {
+        LayerStack->PushOverlay(Overlay);
     }
 
     bool Window::Closed() const {

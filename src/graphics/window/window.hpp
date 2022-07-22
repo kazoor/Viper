@@ -7,6 +7,8 @@
 #include "../../events/event/event.hpp"
 #include "../../events/eventhandler/eventhandler.hpp"
 #include "../../util/input/mouse/mouseevents.hpp"
+#include "../../layers/layer/kayer.hpp"
+#include "../../layers/layerstack/layerstack.hpp"
 
 namespace Viper::Graphics {
     struct WindowParams_t {
@@ -66,6 +68,10 @@ namespace Viper::Graphics {
 
         void Update() const;
 
+        void PushLayer(Layers::Layer *Layer);
+
+        void PushOverlay(Layers::Layer *Overlay);
+
         bool Closed() const;
 
         static GLFWwindow *CreateWindowEx(WindowParams_t Params);
@@ -102,9 +108,9 @@ namespace Viper::Graphics {
     private:
         WindowParams_t WindowParams;
 
-        Viper::Input::MouseEvents *MEvents;
-
         GLFWwindow *Context;
+
+        Layers::LayerStack *LayerStack;
 
         Events::EventBus *WindowEvents;
 

@@ -7,6 +7,7 @@ project(Viper)
 add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/window/window.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/shaders/shader/shader.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/layers/layerstack/layerstack.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/renderer.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/inputhandler/inputhandler.cpp
