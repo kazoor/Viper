@@ -393,7 +393,7 @@ typedef struct
 
 /////////////////////////////////////////////////////////////////////////////
 //
-//      Mouse input handling
+//      mouse input handling
 //
 
 // traverse the layout to locate the nearest character to a display position
