@@ -9,10 +9,12 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/shaders/shader/shader.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/layers/layerstack/layerstack.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/renderer.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/camera/orthographic_camera.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/entitymanager.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/demo/demo.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/component.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/gameobject.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/demo/gom.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/game.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/inputhandler/inputhandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
@@ -56,9 +58,15 @@ message(STATUS "Compiling & Linking GLM")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/glm")
 target_link_libraries(Viper PUBLIC glm)
 
+# Add spldog subdirectory and link it
 message(STATUS "Compiling & Linking SPDLOG")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/spdlog")
 target_link_libraries(Viper PUBLIC spdlog)
+
+# Add nlohmann/json subdirectory and link it
+message(STATUS "Compiling & Linking json")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/json")
+target_link_libraries(Viper PUBLIC json)
 
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
@@ -83,6 +91,7 @@ target_link_libraries(Sandbox PUBLIC ${CMAKE_BINARY_DIR}/lib/libViper.a)
 target_link_libraries(Sandbox PUBLIC glfw)
 target_link_libraries(Sandbox PUBLIC glm)
 target_link_libraries(Sandbox PUBLIC spdlog)
+
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/resources/
         DESTINATION ${CMAKE_BINARY_DIR}/bin/resources/)
