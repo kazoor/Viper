@@ -14,12 +14,12 @@ namespace Viper::Renderer {
         void DrawQuadRotated( const glm::vec2& pos, float radians, RendererAPI::Color color );
         void DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color );
 
-        void FboBegin();
-        void FboEnd();
-        
         void Begin( const OrthoGraphicCamera& camera );
         void Flush();
         void End();
+
+        void BindFramebuffer();
+        void UnbindFramebuffer();
 
         uint32_t GetFramebufferID() { return m_Fbo; };
         uint32_t GetTexturebufferID() { return m_Tcb; };
@@ -39,5 +39,10 @@ namespace Viper::Renderer {
         uint32_t m_Fbo; // Viewport impl snart.
         uint32_t m_Tcb;
         OrthoGraphicCamera m_Camera;
+    };
+
+    class RenderCommand {
+    public:
+        static void DrawIndexed( uint32_t Vao, uint32_t IndexCount );
     };
 };
