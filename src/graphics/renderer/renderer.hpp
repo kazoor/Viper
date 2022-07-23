@@ -24,6 +24,8 @@ namespace Viper::Renderer {
         uint32_t GetFramebufferID() { return m_Fbo; };
         uint32_t GetTexturebufferID() { return m_Tcb; };
 
+        void ResizeFBO( int Width, int Height );
+
         // Stats.
         uint32_t GetVertexCount();
         uint32_t GetIndexCount();

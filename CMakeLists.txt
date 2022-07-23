@@ -19,6 +19,7 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/inputhandler/inputhandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/mouse/mouseevents.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/util/globals/global.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_demo.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_draw.cpp
@@ -95,3 +96,6 @@ target_link_libraries(Sandbox PUBLIC spdlog)
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/resources/
         DESTINATION ${CMAKE_BINARY_DIR}/bin/resources/)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/resources/imgui.ini
+    DESTINATION ${CMAKE_BINARY_DIR}/bin/)

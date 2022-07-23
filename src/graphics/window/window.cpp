@@ -57,7 +57,7 @@ namespace Viper::Graphics {
         SetEventSubscriptions();
         UpdateWindowEvents();
 
-        //PushLayer(new Viper::ImGuiEditor(this));
+        PushLayer(new Viper::ImGuiEditor(this));
         PushLayer(new Viper::Scene::Scene(this));
 
         while (!glfwWindowShouldClose(Context)) {
@@ -167,10 +167,14 @@ namespace Viper::Graphics {
     void Window::OnWindowFrameBufferSizeEvent(WindowFrameBufferSizeEvent *E) {
         spdlog::info("WindowFrameBufferSize Event triggered! Updated viewport to: {0}x{1}", E->Width, E->Height);
         glViewport(0, 0, E->Width, E->Height);
+        WindowParams.Width = E->Width; WindowParams.Height = E->Height;
+        Globals::Renderer2D->ResizeFBO(E->Width, E->Height);
     }
 
     void Window::OnWindowResizeEvent(WindowResizeEvent *E) {
         spdlog::info("WindowResize Event triggered! New size is {0}x{1}", E->Width, E->Height);
+        WindowParams.Width = E->Width; WindowParams.Height = E->Height;
+        Globals::Renderer2D->ResizeFBO(E->Width, E->Height);
     }
 
     void Window::OnWindowPositionEvent(WindowPositionEvent *E) {
