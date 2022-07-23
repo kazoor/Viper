@@ -64,6 +64,11 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/spdlog")
 target_link_libraries(Viper PUBLIC spdlog)
 
 # Add nlohmann/json subdirectory and link it
+message(STATUS "Compiling & Linking chai script")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/ChaiScript")
+target_link_libraries(Viper PUBLIC ChaiScript)
+
+# Add nlohmann/json subdirectory and link it
 message(STATUS "Compiling & Linking json")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/json")
 target_link_libraries(Viper PUBLIC json)

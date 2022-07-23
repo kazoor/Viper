@@ -13,3 +13,6 @@
 [submodule "external/json"]
 	path = external/json
 	url = git@github.com:nlohmann/json.git
+[submodule "external/ChaiScript"]
+	path = external/ChaiScript
+	url = git@github.com:ChaiScript/ChaiScript.git
