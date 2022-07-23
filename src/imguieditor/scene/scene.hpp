@@ -49,7 +49,7 @@ namespace Viper::Scene {
                     renderer->DrawQuad(glm::vec2(x, y), RendererAPI::Color(x * 50, 100 - ( y * 20 ), 255 - (x * 3), 255));
 
             renderer->DrawQuad(glm::vec2(0.25f, 0.76f), RendererAPI::Color::Green());
-
+            
             renderer->Flush();
             
             renderer->End();
