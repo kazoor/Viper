@@ -64,6 +64,8 @@ target_link_libraries(Viper PUBLIC spdlog)
 target_include_directories(Viper SYSTEM PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/external")
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
+
 # Sandbox
 set(SANDBOX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sandbox/)
 add_executable(Sandbox ${SANDBOX_DIR}/main.cpp)
