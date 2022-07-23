@@ -61,7 +61,7 @@ namespace Viper::Scene {
             posx = Lerp(posx, Globals::Editor::Position[0], io.DeltaTime * 3.0f );
             posy = Lerp(posy, Globals::Editor::Position[1], io.DeltaTime * 3.0f );
             rad = Lerp(rad, Globals::Editor::Radians, io.DeltaTime * 3.0f );
-            Globals::Renderer2D->DrawQuadRotated(glm::vec2(posx, posy), rad, RendererAPI::Color::Green());
+            Globals::Renderer2D->DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f/180.0f ), RendererAPI::Color::Green());
             
             Globals::Renderer2D->Flush();
             

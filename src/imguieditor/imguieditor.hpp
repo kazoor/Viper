@@ -60,8 +60,7 @@ namespace Viper {
 
             if(ImGui::Begin("Hierarchy")) {
                 ImGui::DragFloat("Zoom Level", &Globals::Editor::ZoomLevel, 1.0f, -200.0f, 200.0f);
-                ImGui::DragFloat("Rotated X", &Globals::Editor::Position[0], 1.0f, -200.0f, 200.0f);
-                ImGui::DragFloat("Rotated Y", &Globals::Editor::Position[1], 1.0f, -200.0f, 200.0f);
+                ImGui::DragFloat2("Position", Globals::Editor::Position, 1.0f, -100.0f, 100.0f);
                 ImGui::DragFloat("Radians", &Globals::Editor::Radians, 1.0f, -180.0f, 180.0f);
                 ImGui::End();
             };
