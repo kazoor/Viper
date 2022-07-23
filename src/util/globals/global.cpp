@@ -17,4 +17,10 @@ namespace Viper::Globals {
     void DestroyRenderingContext() {
         delete Renderer2D;
     };
+
+    namespace Editor {
+        float ZoomLevel = 2.25f;
+        float Position[3] = { 0.0f, 0.0f, 0.0f };
+        float Radians = 1.8f;
+    };
 };

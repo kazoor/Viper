@@ -63,8 +63,10 @@ namespace Viper::Graphics {
         while (!glfwWindowShouldClose(Context)) {
             ProcessInput(Context);
 
+            Globals::Renderer2D->BindFramebuffer();
             glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
+            Globals::Renderer2D->UnbindFramebuffer();
 
             for(auto Layer : *LayerStack) {
                 spdlog::info("Updating Layer {0}", Layer->GetLayerName());
