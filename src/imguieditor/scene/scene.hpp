@@ -5,12 +5,20 @@
 #include "../../graphics/window/window.hpp"
 #include "../../graphics/renderer/renderer.hpp"
 #include "../../graphics/renderer/camera/orthographic_camera.hpp"
+#include "../../components/demo/gom.hpp"
+#include "../../components/game.hpp"
 
 namespace Viper::Scene {
     class Scene : public Viper::Layers::Layer {
     public:
         Scene(Viper::Graphics::Window* Window) : Layer("Scene"), WindowContext(Window) {
            renderer = new Renderer::Renderer2D();
+           gom = new Components::GameObjectManager();
+           auto new_gob = std::make_unique< Components::GameObject >( );
+                    new_gob->AddComponent< Components::Game >( );
+           gom->OnAdd(std::move( new_gob ));
+           gom->OnAwake();
+
            AspectRatio = 0.0f;
            ZoomLevel = 5.0f;
         };
@@ -20,12 +28,15 @@ namespace Viper::Scene {
         };
 
         void Destroy() {
+            delete gom;
             delete renderer;
         };
 
         void OnUpdate() override {
             Viper::Graphics::WindowParams_t &WindowData = *(Viper::Graphics::WindowParams_t *) glfwGetWindowUserPointer(
                     WindowContext->Ctx());
+
+            gom->OnUpdate();
 
             auto Ratio = GetCurrentWindowSize( );
 
@@ -55,7 +66,8 @@ namespace Viper::Scene {
         }
     private:
         Renderer::Renderer2D* renderer;
-        Viper::Graphics::Window* WindowContext;
+        Graphics::Window* WindowContext;
+        Components::GameObjectManager* gom;
     private:
         float AspectRatio;
         float ZoomLevel;
