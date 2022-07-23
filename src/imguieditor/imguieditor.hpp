@@ -7,6 +7,7 @@
 #include "../layers/layer/layer.hpp"
 #include "../events/event/event.hpp"
 #include "../graphics/window/window.hpp"
+#include "../util/globals/global.hpp"
 
 namespace Viper {
     struct OnLayerUpdateEvent : public Viper::Events::Event {
@@ -17,10 +18,14 @@ namespace Viper {
     public:
         ImGuiEditor(Viper::Graphics::Window *Window) : Layer("ImGui Editor"), WindowContext(Window) {
             ImGui::CreateContext();
-            ImGuiIO &Io = ImGui::GetIO();
-            Io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+            ImGuiIO& io = ImGui::GetIO();
+            ImGuiStyle& style = ImGui::GetStyle();
+            io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
             ImGui_ImplGlfw_InitForOpenGL(WindowContext->Ctx(), true);
             ImGui_ImplOpenGL3_Init("#version 130");
+            ImGui::StyleColorsDark();
+
+            WindowPaddingReserved = style.WindowPadding;
         }
 
         ~ImGuiEditor() {
@@ -44,7 +49,19 @@ namespace Viper {
                 ImGui::DockSpace(m_dock_space, ImVec2(0, 0));
                 ImGui::End();
             }
-            ImGui::ShowDemoWindow();
+
+            if(ImGui::Begin("Scene")) {
+                ImVec2 SceneSize = ImGui::GetContentRegionAvail();
+                ImGui::GetStyle().WindowPadding = ImVec2(0.0f, 0.0f);
+                ImGui::Image((void*)Globals::Renderer2D->GetTexturebufferID(), ImVec2(SceneSize.x,SceneSize.y));
+                ImGui::GetStyle().WindowPadding = WindowPaddingReserved;
+                ImGui::End();
+            };
+
+            if(ImGui::Begin("Hierarchy")) {
+                
+                ImGui::End();
+            };
 
             ImGui::EndFrame();
             ImGui::Render();
@@ -63,5 +80,6 @@ namespace Viper {
 
     private:
         Viper::Graphics::Window *WindowContext;
+        ImVec2 WindowPaddingReserved;
     };
 }

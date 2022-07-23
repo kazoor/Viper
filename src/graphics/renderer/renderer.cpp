@@ -17,6 +17,9 @@ struct RendererData {
     uint32_t m_VertexCount = 0;
 
     Viper::Graphics::Shader* m_QuadShader = nullptr;
+
+    int m_FboWidth = 1280;
+    int m_FboHeight = 720;
 };
 
 RendererData s_Renderer;
@@ -70,7 +73,7 @@ namespace Viper::Renderer {
         // TESTING. (Skapa textur.)
         glGenTextures(1, &m_Tcb);
         glBindTexture(GL_TEXTURE_2D, m_Tcb);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 800, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1280, 720, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -97,6 +100,12 @@ namespace Viper::Renderer {
         GLsizeiptr size_ptr = reinterpret_cast< uint8_t* >( s_Renderer.m_VertexBufferPtr ) - reinterpret_cast< uint8_t* >( s_Renderer.m_VertexBuffer );
         glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, size_ptr, s_Renderer.m_VertexBuffer );
+    }
+
+    void Renderer2D::ResizeFBO( int Width, int Height ) {
+        glBindTexture(GL_TEXTURE_2D, m_Tcb);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     void Renderer2D::DrawQuad( const glm::vec2& pos, RendererAPI::Color color ) {
@@ -146,7 +155,7 @@ namespace Viper::Renderer {
 
     void Renderer2D::Begin( const OrthoGraphicCamera& camera ) {
         s_Renderer.m_VertexBufferPtr = s_Renderer.m_VertexBuffer;
-        //glBindFramebuffer(GL_FRAMEBUFFER, m_Fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_Fbo);
 
         m_Camera = camera;
     };
@@ -159,9 +168,9 @@ namespace Viper::Renderer {
         s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", m_Camera.GetViewProjectionMatrix());
 
         glBindVertexArray(m_Vao);
-        //glBindTexture(GL_TEXTURE_2D, m_Tcb);
+        glBindTexture(GL_TEXTURE_2D, m_Tcb);
         glDrawElements(GL_TRIANGLES, s_Renderer.m_IndexCount, GL_UNSIGNED_INT, nullptr );
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         s_Renderer.m_IndexCount = 0;
         s_Renderer.m_QuadCount = 0;
