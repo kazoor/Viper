@@ -188,6 +188,14 @@ namespace Viper::Renderer {
         return m_Camera;
     }
 
+    void Renderer2D::PushVec2( const std::string& s, const glm::vec2& v ) {
+        s_Renderer.m_QuadShader->SetVector2(s, v);
+    };
+
+    void Renderer2D::PushFloat( const std::string& s, float v ) {
+        s_Renderer.m_QuadShader->SetFloat(s, v);
+    };
+
     uint32_t Renderer2D::GetVertexCount() { return s_Renderer.m_VertexCount; }
     uint32_t Renderer2D::GetIndexCount() { return s_Renderer.m_IndexCount; }
     uint32_t Renderer2D::GetQuadCount() { return s_Renderer.m_QuadCount; }
