@@ -65,6 +65,10 @@ namespace Viper::Graphics {
         glUniformMatrix4fv(glGetUniformLocation(ProgramID, Name.c_str()), 1, GL_FALSE, glm::value_ptr(Value));
     }
 
+    void Shader::SetVector3(const std::string &Name, const glm::vec3 &Value) const {
+        glUniform3f(glGetUniformLocation(ProgramID, Name.c_str()), Value.x, Value.y, Value.z);
+    }
+
     void Shader::CheckCompileErrors(unsigned int Shader, const std::string &Type) {
         int success;
         char InfoLog[1024];
