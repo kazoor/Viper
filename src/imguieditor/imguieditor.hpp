@@ -54,7 +54,7 @@ namespace Viper {
             if(ImGui::Begin("Scene")) {
                 ImVec2 SceneSize = ImGui::GetContentRegionAvail();
                 ImGui::GetStyle().WindowPadding = ImVec2(0.0f, 0.0f);
-                ImGui::Image((void*)Globals::Renderer2D->GetTexturebufferID(), ImVec2(SceneSize.x,SceneSize.y));
+                ImGui::Image(reinterpret_cast< ImTextureID* >( Globals::Renderer2D->GetTexturebufferID() ), ImVec2(SceneSize.x,SceneSize.y));
                 ImGui::GetStyle().WindowPadding = WindowPaddingReserved;
                 ImGui::End();
             };
@@ -63,6 +63,16 @@ namespace Viper {
                 ImGui::DragFloat("Zoom Level", &Globals::Editor::ZoomLevel, 1.0f, -200.0f, 200.0f);
                 ImGui::DragFloat2("Position", Globals::Editor::Position, 1.0f, -100.0f, 100.0f);
                 ImGui::DragFloat("Radians", &Globals::Editor::Radians, 1.0f, -180.0f, 180.0f);
+                ImGui::DragFloat("Light Density", &Globals::Editor::LightDensity, 1.0f, -180.0f, 180.0f);
+                ImGui::End();
+            };
+
+            if(ImGui::Begin("Debug Console")) {
+                for( auto info : Globals::Editor::m_Errors ) {
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), info.StringType.c_str( ) );
+                    ImGui::Text(info.ConsoleMessage.c_str( ) );
+                    ImGui::Separator();
+                }
                 ImGui::End();
             };
 

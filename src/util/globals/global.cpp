@@ -32,5 +32,8 @@ namespace Viper::Globals {
         float ZoomLevel = 2.25f;
         float Position[3] = { 0.0f, 0.0f, 0.0f };
         float Radians = 1.8f;
+        float LightDensity = 1.0f;
+
+        std::vector< Console_t > m_Errors{};
     };
 };

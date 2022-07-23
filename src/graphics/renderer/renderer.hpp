@@ -2,7 +2,7 @@
 #include "api/vertex.hpp" // vec3 redan inkluderad inuti vertex.hpp
 #include <glm/vec2.hpp>
 #include "camera/orthographic_camera.hpp"
-
+#include <string>
 namespace Viper::Renderer {
     class Renderer2D {
     public:
@@ -25,6 +25,9 @@ namespace Viper::Renderer {
         uint32_t GetTexturebufferID() { return m_Tcb; };
 
         void ResizeFBO( int Width, int Height );
+
+        void PushVec2( const std::string& s, const glm::vec2& v );
+        void PushFloat( const std::string& s, float v );
 
         // Stats.
         uint32_t GetVertexCount();
