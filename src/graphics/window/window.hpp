@@ -114,7 +114,5 @@ namespace Viper::Graphics {
         Events::EventBus *WindowEvents;
 
         bool isClosed;
-
-        float AspectRatio;
     };
 }
