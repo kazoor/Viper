@@ -58,9 +58,15 @@ message(STATUS "Compiling & Linking GLM")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/glm")
 target_link_libraries(Viper PUBLIC glm)
 
+# Add spldog subdirectory and link it
 message(STATUS "Compiling & Linking SPDLOG")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/spdlog")
 target_link_libraries(Viper PUBLIC spdlog)
+
+# Add nlohmann/json subdirectory and link it
+message(STATUS "Compiling & Linking json")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/json")
+target_link_libraries(Viper PUBLIC json)
 
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
@@ -85,6 +91,7 @@ target_link_libraries(Sandbox PUBLIC ${CMAKE_BINARY_DIR}/lib/libViper.a)
 target_link_libraries(Sandbox PUBLIC glfw)
 target_link_libraries(Sandbox PUBLIC glm)
 target_link_libraries(Sandbox PUBLIC spdlog)
+
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/resources/
         DESTINATION ${CMAKE_BINARY_DIR}/bin/resources/)
