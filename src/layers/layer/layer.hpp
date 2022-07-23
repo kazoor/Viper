@@ -17,6 +17,5 @@ namespace Viper::Layers {
         inline const std::string &GetLayerName() const { return LayerName; }
     protected:
         std::string LayerName;
-        Viper::Events::EventBus *LayerEventHandler;
     };
 }

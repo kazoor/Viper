@@ -4,7 +4,6 @@
 #include <string>
 #include <glfw/glfw3.h>
 #include "../../events/event/event.hpp"
-#include "../../events/eventhandler/eventhandler.hpp"
 #include "../../util/input/mouse/mouseevents.hpp"
 #include "../../layers/layer/layer.hpp"
 #include "../../layers/layerstack/layerstack.hpp"
@@ -16,7 +15,6 @@ namespace Viper::Graphics {
         std::string Title;    // Window title.
         GLFWmonitor *Monitor; // The monitor to use for full screen mode, or `NULL` for windowed mode.
         GLFWwindow *Share;    // The window whose context to share resources with, or `NULL` to not share resources.
-        Events::EventBus *EventCallback;
     };
 
     struct WindowFrameBufferSizeEvent : public Viper::Events::Event {
@@ -110,8 +108,6 @@ namespace Viper::Graphics {
         GLFWwindow *Context;
 
         Layers::LayerStack *LayerStack;
-
-        Events::EventBus *WindowEvents;
 
         bool isClosed;
     };
