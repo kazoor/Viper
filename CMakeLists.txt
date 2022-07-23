@@ -9,6 +9,7 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/shaders/shader/shader.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/layers/layerstack/layerstack.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/renderer.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/camera/orthographic_camera.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/entity.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/entitymanager.cpp

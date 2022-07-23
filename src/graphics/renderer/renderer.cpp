@@ -1,6 +1,8 @@
 #include "renderer.hpp"
 #include <glm/mat4x4.hpp>
 #include <glad/glad.h>
+#include <glm/gtc/matrix_transform.hpp> // ortho
+#include "../../src/graphics/shaders/shader/shader.hpp"
 
 constexpr uint32_t max_quad_count = 32000;
 constexpr uint32_t max_vertices_count = max_quad_count * 4;
@@ -13,9 +15,11 @@ struct RendererData {
     uint32_t m_IndexCount = 0;
     uint32_t m_QuadCount = 0;
     uint32_t m_VertexCount = 0;
-};
-RendererData s_Renderer;
 
+    Viper::Graphics::Shader* m_QuadShader = nullptr;
+};
+
+RendererData s_Renderer;
 namespace Viper::Renderer {
     Renderer2D::Renderer2D()
     {
@@ -73,10 +77,13 @@ namespace Viper::Renderer {
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Tcb, 0);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        s_Renderer.m_QuadShader = new Graphics::Shader("resources/test.vert", "resources/test.frag");
     }
 
     Renderer2D::~Renderer2D()
     {
+        delete s_Renderer.m_QuadShader;
         delete[] s_Renderer.m_VertexBuffer;
         glDeleteFramebuffers(1, &m_Fbo);
         glDeleteVertexArrays(1, &m_Vao);
@@ -137,13 +144,20 @@ namespace Viper::Renderer {
     void Renderer2D::DrawQuadRotated( const glm::vec2& pos, float radians, RendererAPI::Color color ) {};
     void Renderer2D::DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color ) {};
 
-    void Renderer2D::Begin() {
+    void Renderer2D::Begin( const OrthoGraphicCamera& camera ) {
         s_Renderer.m_VertexBufferPtr = s_Renderer.m_VertexBuffer;
         //glBindFramebuffer(GL_FRAMEBUFFER, m_Fbo);
+
+        m_Camera = camera;
     };
 
     void Renderer2D::End() {
+        s_Renderer.m_QuadShader->Use();
+        auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         
+        s_Renderer.m_QuadShader->SetUniformMat4("u_Transform", m_Transform);
+        s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", m_Camera.GetViewProjectionMatrix());
+
         glBindVertexArray(m_Vao);
         //glBindTexture(GL_TEXTURE_2D, m_Tcb);
         glDrawElements(GL_TRIANGLES, s_Renderer.m_IndexCount, GL_UNSIGNED_INT, nullptr );
@@ -158,6 +172,10 @@ namespace Viper::Renderer {
     }
 
     void Renderer2D::FboEnd() {
+    }
+
+    OrthoGraphicCamera Renderer2D::GetCamera() const {
+        return m_Camera;
     }
 
     uint32_t Renderer2D::GetVertexCount() { return s_Renderer.m_VertexCount; }

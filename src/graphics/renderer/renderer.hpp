@@ -1,6 +1,7 @@
 #pragma once
 #include "api/vertex.hpp" // vec3 redan inkluderad inuti vertex.hpp
 #include <glm/vec2.hpp>
+#include "camera/orthographic_camera.hpp"
 
 namespace Viper::Renderer {
     class Renderer2D {
@@ -16,7 +17,7 @@ namespace Viper::Renderer {
         void FboBegin();
         void FboEnd();
         
-        void Begin();
+        void Begin( const OrthoGraphicCamera& camera );
         void Flush();
         void End();
 
@@ -27,11 +28,14 @@ namespace Viper::Renderer {
         uint32_t GetVertexCount();
         uint32_t GetIndexCount();
         uint32_t GetQuadCount();
+
+        OrthoGraphicCamera GetCamera() const;
     private:
         uint32_t m_Vao;
         uint32_t m_Vbo;
         uint32_t m_Ibo;
         uint32_t m_Fbo; // Viewport impl snart.
         uint32_t m_Tcb;
+        OrthoGraphicCamera m_Camera;
     };
 };
