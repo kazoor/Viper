@@ -15,13 +15,9 @@ namespace Viper::Components {
         glm::vec3 scale;
         glm::vec3 rotation;
 
-        void OnAwake() override {
-
-        };
+        void OnAwake() override;
         
-        void OnUpdate() override {
-
-        };
+        void OnUpdate() override ;
 
         void OnEditor() override;
     };
