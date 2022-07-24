@@ -12,6 +12,7 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/camera/orthographic_camera.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/component.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/spriterenderer.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/gameobject.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/gom.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/boxcollision2d.cpp
