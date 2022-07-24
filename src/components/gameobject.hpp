@@ -36,6 +36,11 @@ namespace Viper::Components {
             for( auto& c : m_Components )
                 c->OnAwake();
         };
+
+        void OnEditor() {
+            for( auto& c : m_Components )
+                c->OnEditor();
+        };
     private:
         std::vector< std::unique_ptr< Component > > m_Components;
     };

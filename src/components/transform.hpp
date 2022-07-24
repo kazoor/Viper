@@ -22,5 +22,7 @@ namespace Viper::Components {
         void OnUpdate() override {
 
         };
+
+        void OnEditor() override;
     };
 };
