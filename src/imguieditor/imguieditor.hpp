@@ -64,6 +64,17 @@ namespace Viper {
                 ImGui::DragFloat2("Position", Globals::Editor::Position, 1.0f, -100.0f, 100.0f);
                 ImGui::DragFloat("Radians", &Globals::Editor::Radians, 1.0f, -180.0f, 180.0f);
                 ImGui::DragFloat("Light Density", &Globals::Editor::LightDensity, 1.0f, -180.0f, 180.0f);
+
+                ImGui::Separator();
+                if( ImGui::Button("New GameObject")) {
+                    auto go = std::make_unique< Viper::Components::GameObject >( );
+                    go->AddComponent< Viper::Components::Transform >( glm::vec3(1.0f,2.0f,3.0f) );
+                    Globals::Gom->OnAdd( std::move( go ) );
+
+                    Globals::Editor::m_Errors.push_back({ "GameObject", "A new gameobject has been added."});
+                };
+                
+                ImGui::Text("GameObjects: %i", Globals::Gom->GameObjectSize());
                 ImGui::End();
             };
 
@@ -73,6 +84,14 @@ namespace Viper {
                     ImGui::Text(info.ConsoleMessage.c_str( ) );
                     ImGui::Separator();
                 }
+                ImGui::End();
+            };
+
+            if(ImGui::Begin("Inspector")) {
+                for( auto& go : Globals::Gom->m_GameObjects ) {
+                    auto& tr = go->GetComponent< Components::Transform >( );
+                    ImGui::Text("%.2f %.2f %.2f", tr.position.x, tr.position.y, tr.position.z);
+                };
                 ImGui::End();
             };
 

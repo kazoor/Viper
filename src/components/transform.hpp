@@ -4,6 +4,7 @@
 
 namespace Viper::Components {
     class Transform : public Component {
+        VIPER_CLASS_DECLARATION( Transform )
     public:
         Transform();
         Transform(glm::vec3 pos);
@@ -13,17 +14,11 @@ namespace Viper::Components {
         glm::vec3 position;
         glm::vec3 scale;
         glm::vec3 rotation;
-        
-        bool IsComponentType( const std::size_t compType ) const {
-            if( compType == Transform::Type )
-                return true;
-
-            return Component::IsComponentType( compType );
-        };
 
         void OnAwake() override {
 
         };
+        
         void OnUpdate() override {
 
         };
