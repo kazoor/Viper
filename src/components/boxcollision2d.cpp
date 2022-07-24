@@ -24,7 +24,6 @@ namespace Viper::Components {
         for (auto &Objects: Globals::GlobalsContext::Gom->m_GameObjects) {
             if (IsColliding(Objects.get())) {
                 Globals::ConsoleContext::AddLog("BoxCollision2D", "Collision Detected!");
-
                 // TODO: Handle this somewhere, right now its just getting sent out but not handled.
                 Globals::GlobalsContext::EventHandler->Commit(new BoxCollision2DEvent(Box1, Objects.get()));
             }
@@ -32,7 +31,7 @@ namespace Viper::Components {
     }
 
     void BoxCollision2D::OnEditor() {
-        ImGui::Text("BoxCollision2D");
+
     }
 
     bool BoxCollision2D::IsColliding(GameObject *Box2) {
