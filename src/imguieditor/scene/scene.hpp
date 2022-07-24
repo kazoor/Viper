@@ -63,12 +63,15 @@ namespace Viper::Scene {
             posy = Lerp(posy, Globals::Editor::Position[1], GetDeltaTime() * 3.0f );
             rad = Lerp(rad, Globals::Editor::Radians, GetDeltaTime() * 3.0f );
             
-            Globals::Renderer2D->DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f/180.0f ), RendererAPI::Color::Green());
+            Globals::Renderer2D->DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
+
+            for(auto& go : Globals::Gom->m_GameObjects ) {
+                auto& tr = go->GetComponent< Components::Transform >( );
+                Globals::Renderer2D->DrawQuad(glm::vec2(tr.position.x, tr.position.y), glm::vec2(tr.scale.x, tr.scale.y ), RendererAPI::Color::Red());
+            };
 
             Globals::Renderer2D->Flush();
-            
             Globals::Renderer2D->End();
-
             Globals::Renderer2D->UnbindFramebuffer();
         }
 

@@ -8,11 +8,51 @@
 #include "../events/event/event.hpp"
 #include "../graphics/window/window.hpp"
 #include "../util/globals/global.hpp"
-#include "../util/globals/global.hpp"
 
 namespace Viper {
     struct OnLayerUpdateEvent : public Viper::Events::Event {
         OnLayerUpdateEvent() {}
+    };
+
+    static void ImGuiTransform3F(const std::string& string, glm::vec3& values, float reset_value = 0.0f) {
+            ImGui::Columns(2);
+            ImGui::SetColumnWidth(0, 100.0f);
+            ImGui::Text(string.c_str());
+            ImGui::NextColumn();
+
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+            if(ImGui::Button("X"))
+                values.x = reset_value;
+            ImGui::PopStyleColor();
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(40.0f);
+            ImGui::DragFloat(std::string( "##" ).append( string ).append( "##X" ).c_str( ), &values.x, 0.1f);
+            ImGui::PopItemWidth();
+            ImGui::SameLine();
+
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+            if(ImGui::Button("Y"))
+                values.y = reset_value;
+            ImGui::PopStyleColor();
+
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(40.0f);
+            ImGui::DragFloat(std::string( "##" ).append( string ).append( "##Y" ).c_str( ), &values.y, 0.1f);
+            ImGui::PopItemWidth();
+            ImGui::SameLine();
+
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 1.0f, 1.0f));
+            if(ImGui::Button("Z"))
+                values.z = reset_value;
+            ImGui::PopStyleColor();
+
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(40.0f);
+            ImGui::DragFloat(std::string( "##" ).append( string ).append( "##Z" ).c_str( ), &values.z, 0.1f);
+            ImGui::PopItemWidth();
+            ImGui::PopStyleVar();
+            ImGui::Columns(1);
     };
 
     class ImGuiEditor : public Layers::Layer {
@@ -51,13 +91,13 @@ namespace Viper {
                 ImGui::End();
             }
 
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
             if(ImGui::Begin("Scene")) {
                 ImVec2 SceneSize = ImGui::GetContentRegionAvail();
-                ImGui::GetStyle().WindowPadding = ImVec2(0.0f, 0.0f);
                 ImGui::Image(reinterpret_cast< ImTextureID* >( Globals::Renderer2D->GetTexturebufferID() ), ImVec2(SceneSize.x,SceneSize.y));
-                ImGui::GetStyle().WindowPadding = WindowPaddingReserved;
                 ImGui::End();
             };
+            ImGui::PopStyleVar();
 
             if(ImGui::Begin("Hierarchy")) {
                 ImGui::DragFloat("Zoom Level", &Globals::Editor::ZoomLevel, 1.0f, -200.0f, 200.0f);
@@ -90,7 +130,14 @@ namespace Viper {
             if(ImGui::Begin("Inspector")) {
                 for( auto& go : Globals::Gom->m_GameObjects ) {
                     auto& tr = go->GetComponent< Components::Transform >( );
-                    ImGui::Text("%.2f %.2f %.2f", tr.position.x, tr.position.y, tr.position.z);
+                    //ImGui::Text("%.2f %.2f %.2f", tr.position.x, tr.position.y, tr.position.z);
+                    if( ImGui::TreeNode( "Transform Component" ) ) {
+
+                        ImGuiTransform3F("Position", tr.position );
+                        ImGuiTransform3F("Rotation", tr.rotation );
+                        ImGuiTransform3F("Scale", tr.scale );
+                        ImGui::TreePop();
+                    };
                 };
                 ImGui::End();
             };
