@@ -108,14 +108,16 @@ namespace Viper {
                 ImGui::PopItemWidth();
                 ImGui::SameLine();
 
-                if( ImGui::Button("Add GameObject")) {
-                    if( strlen( buff ) > 1 ) {
-                        auto go = std::make_unique< Viper::Components::GameObject >( buff );
+                if (ImGui::Button("Add GameObject")) {
+                    if (strlen(buff) > 1) {
+                        auto go = std::make_unique<Viper::Components::GameObject>(buff);
 
-                        [&](Components::GameObject* c ) {
+                        [&](Components::GameObject *c) {
 
-                            c->AddComponent< Viper::Components::Transform >( glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3( 1.0f, 1.0f, 0.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) );
-                            c->AddComponent< Viper::Components::SpriteRenderer >( c, glm::vec4(1.0f, 0.8f, 0.3f, 1.0f));
+                            c->AddComponent<Viper::Components::Transform>(glm::vec3(0.0f, 0.0f, 0.0f),
+                                                                          glm::vec3(1.0f, 1.0f, 0.0f),
+                                                                          glm::vec3(0.0f, 0.0f, 0.0f));
+                            c->AddComponent<Viper::Components::SpriteRenderer>(c, glm::vec4(1.0f, 0.8f, 0.3f, 1.0f));
 
                         }(go.get());
 
@@ -174,28 +176,23 @@ namespace Viper {
                         ImGui::Separator();
                         if (ImGui::Button("Remove Transform"))
                             go->RemoveComponent<Components::Transform>();
+                    }
 
-                    if( go->HasComponent< Components::Transform >( ) ) {
+                    if (go->HasComponent<Components::Transform>()) {
+                    }
+
+                    if (go->HasComponent<Components::SpriteRenderer>()) {
+                        ImGui::Separator();
+                        if (ImGui::Button("Remove SpriteRenderer"))
+                            go->RemoveComponent<Components::SpriteRenderer>();
                         ImGui::Separator();
                     }
-                    
-                    if( go->HasComponent< Components::SpriteRenderer >( ) ) {
-                        ImGui::Separator();
-                        if( ImGui::Button( "Remove SpriteRenderer" ) )
-                            go->RemoveComponent< Components::SpriteRenderer >( );
-                       
-                    }
-                    
-                    ImGuiTreeNodeFlags t =
-                            ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-                    if (ImGui::TreeNodeEx("BoxCollision2D", t)) {
-                        if (!go->HasComponent<Components::BoxCollision2D>() && ImGui::Button("Add BoxCollision2D")) {
-                            auto &go = Globals::GlobalsContext::Gom->m_GameObjects.at(Globals::Editor::SelectedObject);
-                            go->AddComponent<Components::BoxCollision2D>(go.get());
-                        } else if (go->HasComponent<Components::BoxCollision2D>() && ImGui::Button("Remove")) {
-                            go->RemoveComponent<Components::BoxCollision2D>();
-                        }
-                        ImGui::TreePop();
+
+                    if (!go->HasComponent<Components::BoxCollision2D>() && ImGui::Button("Add BoxCollision2D")) {
+                        auto &go = Globals::GlobalsContext::Gom->m_GameObjects.at(Globals::Editor::SelectedObject);
+                        go->AddComponent<Components::BoxCollision2D>(go.get());
+                    } else if (go->HasComponent<Components::BoxCollision2D>() && ImGui::Button("Remove BoxCollision2D")) {
+                        go->RemoveComponent<Components::BoxCollision2D>();
                     }
                     ImGui::Separator();
                 }
