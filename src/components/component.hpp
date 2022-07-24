@@ -26,6 +26,8 @@ namespace Viper::Components {
         virtual bool IsComponentType( const std::size_t compType ) const {
             return compType == Type;
         };
+
+        virtual void OnEditor() = 0;
         
         static const std::size_t Type;
     };

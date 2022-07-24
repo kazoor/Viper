@@ -1,5 +1,47 @@
 #include <string>
 #include "transform.hpp"
+#include <ImGui/imgui.h>
+
+static void ImGuiTransform3F(const std::string& string, glm::vec3& values, float reset_value = 0.0f) {
+    ImGui::Columns(2);
+    ImGui::SetColumnWidth(0, 100.0f);
+    ImGui::Text(string.c_str());
+    ImGui::NextColumn();
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    if(ImGui::Button("X"))
+        values.x = reset_value;
+    ImGui::PopStyleColor();
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(40.0f);
+    ImGui::DragFloat(std::string( "##" ).append( string ).append( "##X" ).c_str( ), &values.x, 0.1f);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+    if(ImGui::Button("Y"))
+        values.y = reset_value;
+    ImGui::PopStyleColor();
+
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(40.0f);
+    ImGui::DragFloat(std::string( "##" ).append( string ).append( "##Y" ).c_str( ), &values.y, 0.1f);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 1.0f, 1.0f));
+    if(ImGui::Button("Z"))
+        values.z = reset_value;
+    ImGui::PopStyleColor();
+
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(40.0f);
+    ImGui::DragFloat(std::string( "##" ).append( string ).append( "##Z" ).c_str( ), &values.z, 0.1f);
+    ImGui::PopItemWidth();
+    ImGui::PopStyleVar();
+    ImGui::Columns(1);
+};
 
 namespace Viper::Components {
     VIPER_CLASS_DEFINE(Component, Transform)
@@ -26,5 +68,14 @@ namespace Viper::Components {
         position = pos;
         scale = sc;
         rotation = rot;
+    };
+
+    void Transform::OnEditor() {
+        if(ImGui::TreeNode("Transform")) {
+            ImGuiTransform3F("Position", position);
+            ImGuiTransform3F("Rotation", rotation);
+            ImGuiTransform3F("Scale", scale);
+        };
+        ImGui::TreePop();
     };
 };
