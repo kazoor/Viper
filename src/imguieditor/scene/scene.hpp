@@ -64,7 +64,7 @@ namespace Viper::Scene {
             for(auto& go : Globals::GlobalsContext::Gom->m_GameObjects ) {
                 if( go->HasComponent< Components::Transform >( ) ) {
                     auto& tr = go->GetComponent< Components::Transform >( );
-                    Globals::GlobalsContext::Renderer2D->DrawQuad(glm::vec2(tr.position.x, tr.position.y), glm::vec2(tr.scale.x, tr.scale.y), RendererAPI::Color::Red());
+                    Globals::GlobalsContext::Renderer2D->DrawQuadRotated(glm::vec2(tr.position.x, tr.position.y), glm::vec2(tr.scale.x, tr.scale.y), tr.rotation.z, RendererAPI::Color::Red());
                 };
             };
 

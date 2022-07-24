@@ -4,7 +4,7 @@
 
 static void ImGuiTransform3F(const std::string& string, glm::vec3& values, float reset_value = 0.0f) {
     ImGui::Columns(2);
-    ImGui::SetColumnWidth(0, 100.0f);
+    ImGui::SetColumnWidth(0, 70.0f);
     ImGui::Text(string.c_str());
     ImGui::NextColumn();
 
@@ -14,7 +14,7 @@ static void ImGuiTransform3F(const std::string& string, glm::vec3& values, float
         values.x = reset_value;
     ImGui::PopStyleColor();
     ImGui::SameLine();
-    ImGui::SetNextItemWidth(40.0f);
+    ImGui::SetNextItemWidth(60.0f);
     ImGui::DragFloat(std::string( "##" ).append( string ).append( "##X" ).c_str( ), &values.x, 0.1f);
     ImGui::PopItemWidth();
     ImGui::SameLine();
@@ -25,7 +25,7 @@ static void ImGuiTransform3F(const std::string& string, glm::vec3& values, float
     ImGui::PopStyleColor();
 
     ImGui::SameLine();
-    ImGui::SetNextItemWidth(40.0f);
+    ImGui::SetNextItemWidth(60.0f);
     ImGui::DragFloat(std::string( "##" ).append( string ).append( "##Y" ).c_str( ), &values.y, 0.1f);
     ImGui::PopItemWidth();
     ImGui::SameLine();
@@ -36,7 +36,7 @@ static void ImGuiTransform3F(const std::string& string, glm::vec3& values, float
     ImGui::PopStyleColor();
 
     ImGui::SameLine();
-    ImGui::SetNextItemWidth(40.0f);
+    ImGui::SetNextItemWidth(60.0f);
     ImGui::DragFloat(std::string( "##" ).append( string ).append( "##Z" ).c_str( ), &values.z, 0.1f);
     ImGui::PopItemWidth();
     ImGui::PopStyleVar();
@@ -75,7 +75,7 @@ namespace Viper::Components {
     void Transform::OnUpdate() { };
 
     void Transform::OnEditor() {
-        ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen;
+        ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
         if(ImGui::TreeNodeEx("Transform", t)) {
             ImGuiTransform3F("Position", position);
             ImGuiTransform3F("Rotation", rotation);
