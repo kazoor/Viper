@@ -22,7 +22,6 @@ namespace Viper::Globals {
 
     void DestroyRenderingContext() {
         delete Renderer2D;
-        delete EventHandler;
     };
 
     void DestroyEventHandlerContext() {
