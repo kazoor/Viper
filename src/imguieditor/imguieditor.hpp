@@ -81,7 +81,7 @@ namespace Viper {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
             if(ImGui::Begin("Scene")) {
                 ImVec2 SceneSize = ImGui::GetContentRegionAvail();
-                ImGui::Image(reinterpret_cast< ImTextureID* >( Globals::Renderer2D->GetTexturebufferID() ), ImVec2(SceneSize.x,SceneSize.y));
+                ImGui::Image(reinterpret_cast< ImTextureID* >( Globals::GlobalsContext::Renderer2D->GetTexturebufferID() ), ImVec2(SceneSize.x,SceneSize.y));
                 ImGui::End();
             };
             ImGui::PopStyleVar();
@@ -93,20 +93,48 @@ namespace Viper {
                 ImGui::DragFloat("Light Density", &Globals::Editor::LightDensity, 1.0f, -180.0f, 180.0f);
 
                 ImGui::Separator();
-                if( ImGui::Button("New GameObject")) {
-                    auto go = std::make_unique< Viper::Components::GameObject >( );
-                    go->AddComponent< Viper::Components::Transform >( glm::vec3(1.0f,2.0f,3.0f) );
-                    Globals::Gom->OnAdd( std::move( go ) );
+                static char buff[ 80 ];
+                ImGui::SetNextItemWidth(100.0f);
+                ImGui::InputText( "##GameObjectName", buff, 80 );
+                ImGui::PopItemWidth();
+                ImGui::SameLine();
+                if( ImGui::Button("Add GameObject")) {
+                    if( strlen( buff ) > 1 ) {
+                        auto go = std::make_unique< Viper::Components::GameObject >( buff );
+                        go->AddComponent< Viper::Components::Transform >( glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3( 1.0f, 1.0f, 0.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) );
 
-                    Globals::Editor::m_Errors.push_back({ "GameObject", "A new gameobject has been added."});
+                        Globals::GlobalsContext::Gom->OnAdd( std::move( go ) );
+
+                        Globals::ConsoleContext::AddLog( "GameObject", "A new gameobject has been added." );
+                        buff[0] = '\0';
+                    };
+                };
+
+                ImGui::Separator();
+
+                std::size_t goSize = 0;
+                for( auto& go : Globals::GlobalsContext::Gom->m_GameObjects ) {
+                    ImGuiTreeNodeFlags flag = (( Globals::Editor::SelectedObject == goSize ) ? ImGuiTreeNodeFlags_Selected : 0 ) | ImGuiTreeNodeFlags_OpenOnArrow;
+                    bool is_open = ImGui::TreeNodeEx(go->tag.c_str( ), flag, go->tag.c_str( ) );
+                    if( ImGui::IsItemClicked())
+                        Globals::Editor::SelectedObject = goSize;
+
+                    if( is_open ) {
+                        if(ImGui::Button(std::string( "Remove ").append(go->tag).c_str( ))) {
+                            Globals::GlobalsContext::Gom->m_GameObjects.erase(Globals::GlobalsContext::Gom->m_GameObjects.begin() + ( goSize + 1 ) );
+                            Globals::Editor::SelectedObject = -1;
+                        }
+                        ImGui::TreePop();
+                    }
+                    goSize++;
                 };
                 
-                ImGui::Text("GameObjects: %i", Globals::Gom->GameObjectSize());
+                ImGui::Text("GameObjects: %i", Globals::GlobalsContext::Gom->GameObjectSize());
                 ImGui::End();
             };
 
             if(ImGui::Begin("Debug Console")) {
-                for( auto info : Globals::Editor::m_Errors ) {
+                for( auto info : Globals::ConsoleContext::GetLogs( ) ) {
                     ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), info.StringType.c_str( ) );
                     ImGui::Text(info.ConsoleMessage.c_str( ) );
                     ImGui::Separator();
@@ -115,12 +143,15 @@ namespace Viper {
             };
 
             if(ImGui::Begin("Inspector")) {
-                for( auto& go : Globals::Gom->m_GameObjects ) {
+                if( Globals::Editor::SelectedObject != -1 ) {
+                    auto& go = Globals::GlobalsContext::Gom->m_GameObjects.at( Globals::Editor::SelectedObject );
+
                     go->OnEditor();
-                    if( go->HasComponent< Components::Transform >( ) )
-                        if( ImGui::Button( "Remove Transform" ) )
+                        if( go->HasComponent< Components::Transform >( ) )
+                         if( ImGui::Button( "Remove Transform" ) )
                             go->RemoveComponent< Components::Transform >( );
-                };
+                }
+             
                 ImGui::End();
             };
 
@@ -130,7 +161,7 @@ namespace Viper {
         }
 
         void OnEvent(Viper::Events::Event *Event) override {
-            Viper::Globals::EventHandler->Commit(new OnLayerUpdateEvent());
+            Globals::GlobalsContext::EventHandler->Commit(new OnLayerUpdateEvent());
         }
 
         void Destroy() {

@@ -12,7 +12,7 @@ namespace Viper::Input {
         auto Ctx = glfwGetCurrentContext();
 
         glfwSetCursorPosCallback(Ctx, [](GLFWwindow *Window, double XPos, double YPos) {
-            Viper::Globals::EventHandler->Commit(new MouseCursorPositionEvent(XPos, YPos));
+            Globals::GlobalsContext::EventHandler->Commit(new MouseCursorPositionEvent(XPos, YPos));
         });
     }
 
