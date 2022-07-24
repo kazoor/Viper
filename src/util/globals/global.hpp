@@ -3,6 +3,7 @@
 #include <vector>
 #include "../../graphics/renderer/renderer.hpp"
 #include "../../components/gom.hpp"
+#include "../../events/eventhandler/eventhandler.hpp"
 
 namespace Viper::Globals {
     void CreateContext();
@@ -14,8 +15,12 @@ namespace Viper::Globals {
     void CreateGomContext();
     void DestroyGomContext();
 
-    extern Renderer::Renderer2D* Renderer2D;
     extern Components::GameObjectManager* Gom;
+    extern Renderer::Renderer2D* Renderer2D;
+    extern Events::EventBus* EventHandler;
+    
+    void CreateEventHandlerContext();
+    void DestroyEventHandlerContext();
 
     struct Console_t {
         std::string StringType;

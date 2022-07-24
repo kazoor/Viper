@@ -8,6 +8,7 @@
 #include "../events/event/event.hpp"
 #include "../graphics/window/window.hpp"
 #include "../util/globals/global.hpp"
+#include "../util/globals/global.hpp"
 
 namespace Viper {
     struct OnLayerUpdateEvent : public Viper::Events::Event {
@@ -100,7 +101,7 @@ namespace Viper {
         }
 
         void OnEvent(Viper::Events::Event *Event) override {
-            LayerEventHandler->Commit(new OnLayerUpdateEvent());
+            Viper::Globals::EventHandler->Commit(new OnLayerUpdateEvent());
         }
 
         void Destroy() {

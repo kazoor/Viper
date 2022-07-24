@@ -3,6 +3,7 @@
 #include <utility>
 #include "mouseevents.hpp"
 #include "../../../graphics/window/window.hpp"
+#include "../../globals/global.hpp"
 
 double MousePosX, MousePosY;
 
@@ -11,13 +12,11 @@ namespace Viper::Input {
         auto Ctx = glfwGetCurrentContext();
 
         glfwSetCursorPosCallback(Ctx, [](GLFWwindow *Window, double XPos, double YPos) {
-            Graphics::WindowParams_t &WindowData = *(Graphics::WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new MouseCursorPositionEvent(XPos, YPos));
+            Viper::Globals::EventHandler->Commit(new MouseCursorPositionEvent(XPos, YPos));
         });
     }
 
     void MouseEvents::OnMouseCursorPositionEvent(MouseCursorPositionEvent *E) {
-        // spdlog::info("MouseCursorPosition Event triggered! New position is X: {0} : Y: {1}", E->XPos, E->YPos);
         MousePosX = E->XPos;
         MousePosY = E->YPos;
     }
