@@ -3,6 +3,7 @@
 
 namespace Viper::Components {
     VIPER_CLASS_DEFINE(Component, Transform)
+    
     Transform::Transform() {
         position = glm::vec3(0.0f);
         scale = glm::vec3(0.0f);
