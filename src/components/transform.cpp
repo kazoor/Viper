@@ -3,43 +3,38 @@
 #include <ImGui/imgui.h>
 
 static void ImGuiTransform3F(const std::string& string, glm::vec3& values, float reset_value = 0.0f) {
-    ImGui::Columns(2);
+    ImGui::Columns(2, std::string("##").append(string).c_str( ), false);
     ImGui::SetColumnWidth(0, 70.0f);
-    ImGui::Text(string.c_str());
+    ImGui::Text( string.c_str( ) );
     ImGui::NextColumn();
-
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-    if(ImGui::Button("X"))
+    
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(230,53,97));
+    if( ImGui::Button("X"))
         values.x = reset_value;
-    ImGui::PopStyleColor();
+    ImGui::PopStyleColor(1);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(60.0f);
     ImGui::DragFloat(std::string( "##" ).append( string ).append( "##X" ).c_str( ), &values.x, 0.1f);
-    ImGui::PopItemWidth();
+
     ImGui::SameLine();
-
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
-    if(ImGui::Button("Y"))
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(37,206,113));
+    if( ImGui::Button("Y"))
         values.y = reset_value;
-    ImGui::PopStyleColor();
-
+    ImGui::PopStyleColor(1);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(60.0f);
     ImGui::DragFloat(std::string( "##" ).append( string ).append( "##Y" ).c_str( ), &values.y, 0.1f);
-    ImGui::PopItemWidth();
+
     ImGui::SameLine();
-
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 1.0f, 1.0f));
-    if(ImGui::Button("Z"))
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(41,105,169));
+    if( ImGui::Button("Z"))
         values.z = reset_value;
-    ImGui::PopStyleColor();
-
+    ImGui::PopStyleColor(1);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(60.0f);
     ImGui::DragFloat(std::string( "##" ).append( string ).append( "##Z" ).c_str( ), &values.z, 0.1f);
-    ImGui::PopItemWidth();
-    ImGui::PopStyleVar();
+    ImGui::PopStyleVar(1);
     ImGui::Columns(1);
 };
 

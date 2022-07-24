@@ -3,6 +3,7 @@
 #include <memory>
 #include "gameobject.hpp"
 #include "transform.hpp"
+#include "spriterenderer.hpp"
 
 namespace Viper::Components {
     class GameObjectManager : public GameObject {
