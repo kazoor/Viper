@@ -22,7 +22,7 @@ namespace Viper {
             ImGuiStyle& style = ImGui::GetStyle();
             io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
             ImGui_ImplGlfw_InitForOpenGL(WindowContext->Ctx(), true);
-            ImGui_ImplOpenGL3_Init("#version 130");
+            ImGui_ImplOpenGL3_Init("#version 410");
             ImGui::StyleColorsDark();
 
             style.Colors[ ImGuiCol_Button ] = ImColor(35, 35, 35, 255 );
@@ -82,6 +82,8 @@ namespace Viper {
             if(ImGui::Begin("Scene")) {
                 ImVec2 SceneSize = ImGui::GetContentRegionAvail();
                 ImGui::Image(reinterpret_cast< ImTextureID* >( Globals::GlobalsContext::Renderer2D->GetTexturebufferID() ), ImVec2(SceneSize.x,SceneSize.y));
+                if( ImGui::IsItemClicked())
+                        Globals::Editor::SelectedObject = -1;
                 ImGui::End();
             };
             ImGui::PopStyleVar();
@@ -90,7 +92,7 @@ namespace Viper {
                 ImGui::DragFloat("Zoom Level", &Globals::Editor::ZoomLevel, 1.0f, -200.0f, 200.0f);
                 ImGui::DragFloat2("Position", Globals::Editor::Position, 1.0f, -100.0f, 100.0f);
                 ImGui::DragFloat("Radians", &Globals::Editor::Radians, 1.0f, -180.0f, 180.0f);
-                ImGui::DragFloat("Light Density", &Globals::Editor::LightDensity, 1.0f, -180.0f, 180.0f);
+                ImGui::DragFloat("Light Density", &Globals::Editor::LightDensity, 0.1f, -10.0f, 10.0f);
 
                 ImGui::Separator();
                 static char buff[ 80 ];
@@ -107,6 +109,7 @@ namespace Viper {
 
                         Globals::ConsoleContext::AddLog( "GameObject", "A new gameobject has been added." );
                         buff[0] = '\0';
+                        Globals::Editor::SelectedObject++;
                     };
                 };
 
@@ -130,6 +133,7 @@ namespace Viper {
                 };
                 
                 ImGui::Text("GameObjects: %i", Globals::GlobalsContext::Gom->GameObjectSize());
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1.0f / Globals::Editor::DeltaTime, 1000.0f * Globals::Editor::DeltaTime);
                 ImGui::End();
             };
 
@@ -147,9 +151,9 @@ namespace Viper {
                     auto& go = Globals::GlobalsContext::Gom->m_GameObjects.at( Globals::Editor::SelectedObject );
 
                     go->OnEditor();
-                        if( go->HasComponent< Components::Transform >( ) )
-                         if( ImGui::Button( "Remove Transform" ) )
-                            go->RemoveComponent< Components::Transform >( );
+                    if( go->HasComponent< Components::Transform >( ) )
+                     if( ImGui::Button( "Remove Transform" ) )
+                        go->RemoveComponent< Components::Transform >( );
                 }
              
                 ImGui::End();

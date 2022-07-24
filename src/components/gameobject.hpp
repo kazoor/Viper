@@ -13,7 +13,7 @@ namespace Viper::Components {
         std::string tag;
 
         template< class T = Component, typename... TArgs >
-        inline void AddComponent( TArgs&&... args ) {
+        void AddComponent( TArgs&&... args ) {
             m_Components.push_back( std::make_unique< T >( std::forward< TArgs >( args )... ) );
         };
 

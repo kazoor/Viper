@@ -70,8 +70,13 @@ namespace Viper::Components {
         rotation = rot;
     };
 
+    void Transform::OnAwake() { };
+        
+    void Transform::OnUpdate() { };
+
     void Transform::OnEditor() {
-        if(ImGui::TreeNode("Transform")) {
+        ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen;
+        if(ImGui::TreeNodeEx("Transform", t)) {
             ImGuiTransform3F("Position", position);
             ImGuiTransform3F("Rotation", rotation);
             ImGuiTransform3F("Scale", scale, 1.0f);
