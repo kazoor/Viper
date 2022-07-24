@@ -47,5 +47,8 @@ namespace Viper::Renderer {
     class RenderCommand {
     public:
         static void DrawIndexed( uint32_t Vao, uint32_t IndexCount );
+        static void BindFramebuffer( uint32_t Framebuffer );
+        static void UnbindFramebuffer( );
+        static void ResizeTexture( uint32_t TextureID, int Width, int Height );
     };
 };

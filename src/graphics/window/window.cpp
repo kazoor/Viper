@@ -51,7 +51,7 @@ namespace Viper::Graphics {
         }
 
         LayerStack = new Viper::Layers::LayerStack();
-        Globals::CreateEventHandlerContext();
+        Globals::GlobalsContext::CreateContext();
 
         SetEventSubscriptions();
         UpdateWindowEvents();
@@ -67,9 +67,9 @@ namespace Viper::Graphics {
             Globals::Editor::DeltaTime = current_delta - previous_delta;
             previous_delta = current_delta;
 
-            Globals::Renderer2D->BindFramebuffer();
+            Globals::GlobalsContext::Renderer2D->BindFramebuffer();
             glClear(GL_COLOR_BUFFER_BIT);
-            Globals::Renderer2D->UnbindFramebuffer();
+            Globals::GlobalsContext::Renderer2D->UnbindFramebuffer();
 
             for (auto Layer: *LayerStack) {
                 spdlog::info("Updating Layer {0}", Layer->GetLayerName());
@@ -84,6 +84,7 @@ namespace Viper::Graphics {
             Update();
         }
 
+        Globals::GlobalsContext::DestroyContext();
         delete LayerStack;
 
         glfwDestroyWindow(Context);
@@ -97,48 +98,48 @@ namespace Viper::Graphics {
 
     void Window::SetEventSubscriptions() {
         // WindowEvents subscriptions.
-        Globals::EventHandler->Subscribe(this, &Window::OnWindowFrameBufferSizeEvent);
-        Globals::EventHandler->Subscribe(this, &Window::OnWindowResizeEvent);
-        Globals::EventHandler->Subscribe(this, &Window::OnWindowPositionEvent);
-        Globals::EventHandler->Subscribe(this, &Window::OnWindowContentScaleEvent);
-        Globals::EventHandler->Subscribe(this, &Window::OnWindowMaximizationEvent);
-        Globals::EventHandler->Subscribe(this, &Window::OnWindowFocusEvent);
-        Globals::EventHandler->Subscribe(this, &Window::OnWindowCloseEvent);
-        Globals::EventHandler->Subscribe(new Viper::Input::MouseEvents(),
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowFrameBufferSizeEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowResizeEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowPositionEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowContentScaleEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowMaximizationEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowFocusEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowCloseEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(new Viper::Input::MouseEvents(),
                                          &Input::MouseEvents::OnMouseCursorPositionEvent);
 
         for (auto It = LayerStack->end(); It != LayerStack->begin();) {
-            Globals::EventHandler->Subscribe((*--It), &Viper::Layers::Layer::OnEvent);
+            Globals::GlobalsContext::EventHandler->Subscribe((*--It), &Viper::Layers::Layer::OnEvent);
         }
     }
 
     void Window::UpdateWindowEvents() {
         glfwSetFramebufferSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
-            Globals::EventHandler->Commit(new WindowFrameBufferSizeEvent(Width, Height));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowFrameBufferSizeEvent(Width, Height));
         });
 
         glfwSetWindowSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
-            Globals::EventHandler->Commit(new WindowResizeEvent(Width, Height));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowResizeEvent(Width, Height));
         });
 
         glfwSetWindowPosCallback(Context, [](GLFWwindow *Window, int X, int Y) {
-            Globals::EventHandler->Commit(new WindowPositionEvent(X, Y));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowPositionEvent(X, Y));
         });
 
         glfwSetWindowContentScaleCallback(Context, [](GLFWwindow *Window, float XScale, float YScale) {
-            Globals::EventHandler->Commit(new WindowContentScaleEvent(XScale, YScale));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowContentScaleEvent(XScale, YScale));
         });
 
         glfwSetWindowMaximizeCallback(Context, [](GLFWwindow *Window, int Maximized) {
-            Globals::EventHandler->Commit(new WindowMaximizationEvent(Maximized));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowMaximizationEvent(Maximized));
         });
 
         glfwSetWindowFocusCallback(Context, [](GLFWwindow *Window, int Focused) {
-            Globals::EventHandler->Commit(new WindowFocusEvent(Focused));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowFocusEvent(Focused));
         });
 
         glfwSetWindowCloseCallback(Context, [](GLFWwindow *Window) {
-            Globals::EventHandler->Commit(new WindowCloseEvent());
+            Globals::GlobalsContext::EventHandler->Commit(new WindowCloseEvent());
         });
     }
 
@@ -169,14 +170,14 @@ namespace Viper::Graphics {
         glViewport(0, 0, E->Width, E->Height);
         WindowParams.Width = E->Width;
         WindowParams.Height = E->Height;
-        Globals::Renderer2D->ResizeFBO(E->Width, E->Height);
+        Globals::GlobalsContext::Renderer2D->ResizeFBO(E->Width, E->Height);
     }
 
     void Window::OnWindowResizeEvent(WindowResizeEvent *E) {
         spdlog::info("WindowResize Event triggered! New size is {0}x{1}", E->Width, E->Height);
         WindowParams.Width = E->Width;
         WindowParams.Height = E->Height;
-        Globals::Renderer2D->ResizeFBO(E->Width, E->Height);
+        Globals::GlobalsContext::Renderer2D->ResizeFBO(E->Width, E->Height);
     }
 
     void Window::OnWindowPositionEvent(WindowPositionEvent *E) {
@@ -197,6 +198,5 @@ namespace Viper::Graphics {
 
     void Window::OnWindowCloseEvent(WindowCloseEvent *E) {
         spdlog::info("WindowCloseEvent Event triggered!");
-        Globals::DestroyEventHandlerContext();
     }
 }

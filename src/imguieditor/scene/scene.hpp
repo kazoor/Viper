@@ -10,9 +10,6 @@ namespace Viper::Scene {
     class Scene : public Viper::Layers::Layer {
     public:
         Scene(Viper::Graphics::Window* Window) : Layer("Scene"), WindowContext(Window) {
-            Globals::CreateRenderingContext();
-            Globals::CreateGomContext();
-
            //gom = new Components::GameObjectManager();
            //auto new_gob = std::make_unique< Components::GameObject >( );
            //         new_gob->AddComponent< Components::Game >( );
@@ -27,33 +24,32 @@ namespace Viper::Scene {
         };
 
         void Destroy() {
-            Globals::DestroyRenderingContext();
-            Globals::DestroyGomContext();
+            
         };
 
         void OnUpdate() override {
             Viper::Graphics::WindowParams_t &WindowData = *(Viper::Graphics::WindowParams_t *) glfwGetWindowUserPointer(
                     WindowContext->Ctx());
 
-            Globals::Gom->OnUpdate();
+            Globals::GlobalsContext::Gom->OnUpdate();
 
             auto Ratio = GetCurrentWindowSize( );
 
             AspectRatio = ( float )Ratio.first / ( float )Ratio.second;
             
-            Globals::Renderer2D->BindFramebuffer();
+            Globals::GlobalsContext::Renderer2D->BindFramebuffer();
             
             static float zoom = 0.0f;
             zoom = Lerp( zoom, Globals::Editor::ZoomLevel, GetDeltaTime() * 4.0f );
-            Globals::Renderer2D->Begin(Renderer::OrthoGraphicCamera(-AspectRatio * zoom, AspectRatio * zoom, 
+            Globals::GlobalsContext::Renderer2D->Begin(Renderer::OrthoGraphicCamera(-AspectRatio * zoom, AspectRatio * zoom, 
                 zoom, -zoom, 1.0f, -1.0f));
 
-            Globals::Renderer2D->PushVec2("u_LightPos", glm::vec2(1.0f,1.0f));
-            Globals::Renderer2D->PushFloat("u_LightDensity", Globals::Editor::LightDensity);
+            Globals::GlobalsContext::Renderer2D->PushVec2("u_LightPos", glm::vec2(1.0f,1.0f));
+            Globals::GlobalsContext::Renderer2D->PushFloat("u_LightDensity", Globals::Editor::LightDensity);
 
             for( int y = -50; y < 30; y++ )
                 for( int x = -50; x < 30; x++ )
-                    Globals::Renderer2D->DrawQuad(glm::vec2(x, y), RendererAPI::Color::White());
+                    Globals::GlobalsContext::Renderer2D->DrawQuad(glm::vec2(x, y), RendererAPI::Color::White());
 
             static float posx = 0.0f;
             static float posy = 0.0f;
@@ -63,18 +59,18 @@ namespace Viper::Scene {
             posy = Lerp(posy, Globals::Editor::Position[1], GetDeltaTime() * 3.0f );
             rad = Lerp(rad, Globals::Editor::Radians, GetDeltaTime() * 3.0f );
             
-            Globals::Renderer2D->DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
+            Globals::GlobalsContext::Renderer2D->DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
-            for(auto& go : Globals::Gom->m_GameObjects ) {
+            for(auto& go : Globals::GlobalsContext::Gom->m_GameObjects ) {
                 if( go->HasComponent< Components::Transform >( ) ) {
                     auto& tr = go->GetComponent< Components::Transform >( );
-                    Globals::Renderer2D->DrawQuad(glm::vec2(tr.position.x, tr.position.y), glm::vec2(tr.scale.x, tr.scale.y ), RendererAPI::Color::Red());
+                    Globals::GlobalsContext::Renderer2D->DrawQuad(glm::vec2(tr.position.x, tr.position.y), glm::vec2(tr.scale.x, tr.scale.y ), RendererAPI::Color::Red());
                 }
             };
 
-            Globals::Renderer2D->Flush();
-            Globals::Renderer2D->End();
-            Globals::Renderer2D->UnbindFramebuffer();
+            Globals::GlobalsContext::Renderer2D->Flush();
+            Globals::GlobalsContext::Renderer2D->End();
+            Globals::GlobalsContext::Renderer2D->UnbindFramebuffer();
         }
 
         std::pair< float, float > GetCurrentWindowSize() const {
