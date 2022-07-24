@@ -108,9 +108,7 @@ namespace Viper::Renderer {
     }
 
     void Renderer2D::ResizeFBO( int Width, int Height ) {
-        glBindTexture(GL_TEXTURE_2D, m_Tcb);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        RenderCommand::ResizeTexture( m_Tcb, Width, Height );
     }
 
     void Renderer2D::DrawQuad( const glm::vec2& pos, RendererAPI::Color color ) {
@@ -177,11 +175,11 @@ namespace Viper::Renderer {
     };
 
     void Renderer2D::BindFramebuffer() {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_Fbo);
+        RenderCommand::BindFramebuffer(m_Fbo);
     };
 
     void Renderer2D::UnbindFramebuffer() {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        RenderCommand::UnbindFramebuffer();
     };
 
     OrthoGraphicCamera Renderer2D::GetCamera() const {
@@ -205,5 +203,19 @@ namespace Viper::Renderer {
     void RenderCommand::DrawIndexed( uint32_t Vao, uint32_t IndexCount ) {
         glBindVertexArray(Vao);
         glDrawElements(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, nullptr );
+    };
+
+    void RenderCommand::BindFramebuffer( uint32_t Framebuffer ) {
+        glBindFramebuffer(GL_FRAMEBUFFER, Framebuffer);
+    };
+
+    void RenderCommand::UnbindFramebuffer( ) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    };
+
+    void RenderCommand::ResizeTexture( uint32_t TextureID, int Width, int Height ) {
+        glBindTexture(GL_TEXTURE_2D, TextureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
     };
 };

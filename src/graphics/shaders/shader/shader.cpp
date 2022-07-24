@@ -84,14 +84,14 @@ namespace Viper::Graphics {
             if (!success) {
                 glGetShaderInfoLog(Shader, 1024, NULL, InfoLog);
                 spdlog::error("ERROR::SHADER_COMPILATION_ERROR of type: ", Type, "\n", InfoLog);
-                Globals::Editor::m_Errors.push_back({"ERROR::SHADER_COMPILATION_ERROR of type: Vertex", InfoLog});
+                Globals::ConsoleContext::AddLog( "ERROR::SHADER_COMPILATION_ERROR!", InfoLog );
             }
         } else {
             glGetProgramiv(Shader, GL_LINK_STATUS, &success);
             if (!success) {
                 glGetProgramInfoLog(Shader, 1024, NULL, InfoLog);
                 spdlog::error("ERROR::PROGRAM_LINKING_ERROR of type: ", Type, "\n", InfoLog);
-                Globals::Editor::m_Errors.push_back({"ERROR::SHADER_COMPILATION_ERROR of type: Fragment", InfoLog});
+                Globals::ConsoleContext::AddLog( "ERROR::SHADER_COMPILATION_ERROR!", InfoLog );
             }
         }
     }

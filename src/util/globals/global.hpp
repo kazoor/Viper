@@ -6,25 +6,27 @@
 #include "../../events/eventhandler/eventhandler.hpp"
 
 namespace Viper::Globals {
-    void CreateContext();
-    void DestroyContext();
+    class GlobalsContext {
+    public:
+        static void CreateContext();
+        static void DestroyContext();
 
-    void CreateRenderingContext();
-    void DestroyRenderingContext();
-
-    void CreateGomContext();
-    void DestroyGomContext();
-
-    extern Components::GameObjectManager* Gom;
-    extern Renderer::Renderer2D* Renderer2D;
-    extern Events::EventBus* EventHandler;
-    
-    void CreateEventHandlerContext();
-    void DestroyEventHandlerContext();
+        static Renderer::Renderer2D* Renderer2D;
+        static Components::GameObjectManager* Gom;
+        static Events::EventBus* EventHandler;
+    };
 
     struct Console_t {
         std::string StringType;
         std::string ConsoleMessage;
+    };
+
+    class ConsoleContext {
+    public:
+        static void AddLog( const std::string& title, const std::string& log );
+        static std::vector< Console_t > GetLogs();
+    private:
+        static std::vector< Console_t > m_errors;
     };
 
     namespace Editor { // Debugging.
@@ -33,6 +35,6 @@ namespace Viper::Globals {
         extern float Radians;
         extern float LightDensity;
         extern double DeltaTime;
-        extern std::vector< Console_t > m_Errors;
+        extern int SelectedObject;
     };
 };
