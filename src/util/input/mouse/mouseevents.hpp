@@ -1,7 +1,6 @@
 #pragma once
 #include <utility>
 #include "../../../events/event/event.hpp"
-#include "../../../events/eventhandler/eventhandler.hpp"
 
 namespace Viper::Input {
 
@@ -18,8 +17,5 @@ namespace Viper::Input {
         void OnMouseCursorPositionEvent(MouseCursorPositionEvent *E);
 
         static std::pair<double, double> GetMousePosition();
-
-    private:
-        Events::EventBus *MouseEventHandler;
     };
 }

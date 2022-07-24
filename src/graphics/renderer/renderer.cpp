@@ -1,6 +1,8 @@
 #include "renderer.hpp"
 #include <glm/mat4x4.hpp>
 #include <glad/glad.h>
+#include <glm/gtc/matrix_transform.hpp> // ortho
+#include "../../src/graphics/shaders/shader/shader.hpp"
 
 constexpr uint32_t max_quad_count = 32000;
 constexpr uint32_t max_vertices_count = max_quad_count * 4;
@@ -9,13 +11,19 @@ constexpr uint32_t max_indices_count = max_quad_count * 6;
 struct RendererData {
     Viper::RendererAPI::Vertex_t* m_VertexBuffer = nullptr;
     Viper::RendererAPI::Vertex_t* m_VertexBufferPtr = nullptr;
+    Viper::Graphics::Shader* m_QuadShader = nullptr;
 
     uint32_t m_IndexCount = 0;
     uint32_t m_QuadCount = 0;
     uint32_t m_VertexCount = 0;
-};
-RendererData s_Renderer;
 
+    int m_FboWidth = 1280;
+    int m_FboHeight = 720;
+
+    glm::vec4 m_QuadTransform[ 4 ];
+};
+
+RendererData s_Renderer;
 namespace Viper::Renderer {
     Renderer2D::Renderer2D()
     {
@@ -66,17 +74,24 @@ namespace Viper::Renderer {
         // TESTING. (Skapa textur.)
         glGenTextures(1, &m_Tcb);
         glBindTexture(GL_TEXTURE_2D, m_Tcb);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 800, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1280, 720, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D, 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Tcb, 0);
-
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        s_Renderer.m_QuadShader = new Graphics::Shader("resources/test.vert", "resources/test.frag");
+
+        s_Renderer.m_QuadTransform[0] = glm::vec4( -0.5f, -0.5f, 0.0f, 1.0f );
+	    s_Renderer.m_QuadTransform[1] = glm::vec4(  0.5f, -0.5f, 0.0f, 1.0f );
+	    s_Renderer.m_QuadTransform[2] = glm::vec4(  0.5f,  0.5f, 0.0f, 1.0f );
+	    s_Renderer.m_QuadTransform[3] = glm::vec4( -0.5f,  0.5f, 0.0f, 1.0f );
     }
 
     Renderer2D::~Renderer2D()
     {
+        delete s_Renderer.m_QuadShader;
         delete[] s_Renderer.m_VertexBuffer;
         glDeleteFramebuffers(1, &m_Fbo);
         glDeleteVertexArrays(1, &m_Vao);
@@ -92,75 +107,127 @@ namespace Viper::Renderer {
         glBufferSubData(GL_ARRAY_BUFFER, 0, size_ptr, s_Renderer.m_VertexBuffer );
     }
 
+    void Renderer2D::ResizeFBO( int Width, int Height ) {
+        RenderCommand::ResizeTexture( m_Tcb, Width, Height );
+    }
+
     void Renderer2D::DrawQuad( const glm::vec2& pos, RendererAPI::Color color ) {
-        s_Renderer.m_VertexBufferPtr->position = glm::vec3(pos.x, pos.y, 0.0f);
-        s_Renderer.m_VertexBufferPtr->color = color;
-        s_Renderer.m_VertexBufferPtr++;
-
-        s_Renderer.m_VertexBufferPtr->position = glm::vec3(pos.x + 1.0f, pos.y, 0.0f);
-        s_Renderer.m_VertexBufferPtr->color = color;
-        s_Renderer.m_VertexBufferPtr++;
-        
-        s_Renderer.m_VertexBufferPtr->position = glm::vec3(pos.x + 1.0f, pos.y + 1.0f, 0.0f);
-        s_Renderer.m_VertexBufferPtr->color = color;
-        s_Renderer.m_VertexBufferPtr++;
-
-        s_Renderer.m_VertexBufferPtr->position = glm::vec3(pos.x, pos.y + 1.0f, 0.0f);
-        s_Renderer.m_VertexBufferPtr->color = color;
-        s_Renderer.m_VertexBufferPtr++;
+        auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f)) 
+            * glm::scale(glm::mat4(1.0f), { 1.0f, 1.0f, 1.0f } );
+            
+        for( int i = 0; i < 4; i++ ) {
+            s_Renderer.m_VertexBufferPtr->position = m_Transform * s_Renderer.m_QuadTransform[ i ];
+            s_Renderer.m_VertexBufferPtr->color = color;
+            s_Renderer.m_VertexBufferPtr++;
+        };
 
         s_Renderer.m_IndexCount += 6;
         s_Renderer.m_QuadCount++;
     };
     
     void Renderer2D::DrawQuad( const glm::vec2& pos, const glm::vec2& size, RendererAPI::Color color ) {
-        s_Renderer.m_VertexBufferPtr->position = glm::vec3(pos.x, pos.y, 0.0f);
-        s_Renderer.m_VertexBufferPtr->color = color;
-        s_Renderer.m_VertexBufferPtr++;
+        auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f)) 
+            * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f } );
 
-        s_Renderer.m_VertexBufferPtr->position = glm::vec3(pos.x + size.x, pos.y, 0.0f);
-        s_Renderer.m_VertexBufferPtr->color = color;
-        s_Renderer.m_VertexBufferPtr++;
-        
-        s_Renderer.m_VertexBufferPtr->position = glm::vec3(pos.x + size.x, pos.y + size.y, 0.0f);
-        s_Renderer.m_VertexBufferPtr->color = color;
-        s_Renderer.m_VertexBufferPtr++;
-
-        s_Renderer.m_VertexBufferPtr->position = glm::vec3(pos.x, pos.y + size.y, 0.0f);
-        s_Renderer.m_VertexBufferPtr->color = color;
-        s_Renderer.m_VertexBufferPtr++;
+        for( int i = 0; i < 4; i++ ) {
+            s_Renderer.m_VertexBufferPtr->position = m_Transform * s_Renderer.m_QuadTransform[ i ];
+            s_Renderer.m_VertexBufferPtr->color = color;
+            s_Renderer.m_VertexBufferPtr++;
+        };
 
         s_Renderer.m_IndexCount += 6;
         s_Renderer.m_QuadCount++;
     };
 
-    void Renderer2D::DrawQuadRotated( const glm::vec2& pos, float radians, RendererAPI::Color color ) {};
-    void Renderer2D::DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color ) {};
+    void Renderer2D::DrawQuadRotated( const glm::vec2& pos, float radians, RendererAPI::Color color ) {
+        auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f)) 
+            * glm::rotate(glm::mat4(1.0f), radians, glm::vec3(0.0f, 0.0f, 1.0f))
+            * glm::scale(glm::mat4(1.0f), { 1.0f, 1.0f, 1.0f } );
+        for( int i = 0; i < 4; i++ ) {
+            s_Renderer.m_VertexBufferPtr->position = m_Transform * s_Renderer.m_QuadTransform[ i ];
+            s_Renderer.m_VertexBufferPtr->color = color;
+            s_Renderer.m_VertexBufferPtr++;
+        }
+        s_Renderer.m_IndexCount += 6;
+        s_Renderer.m_QuadCount++;
+    };
 
-    void Renderer2D::Begin() {
+    void Renderer2D::DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color ) {
+        auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f)) 
+            * glm::rotate(glm::mat4(1.0f), radians, glm::vec3(0.0f, 0.0f, 1.0f))
+            * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f } );
+            
+        for( int i = 0; i < 4; i++ ) {
+            s_Renderer.m_VertexBufferPtr->position = m_Transform * s_Renderer.m_QuadTransform[ i ];
+            s_Renderer.m_VertexBufferPtr->color = color;
+            s_Renderer.m_VertexBufferPtr++;
+        }
+        s_Renderer.m_IndexCount += 6;
+        s_Renderer.m_QuadCount++;
+    };
+
+    void Renderer2D::Begin( const OrthoGraphicCamera& camera ) {
         s_Renderer.m_VertexBufferPtr = s_Renderer.m_VertexBuffer;
-        //glBindFramebuffer(GL_FRAMEBUFFER, m_Fbo);
+
+        auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        m_Camera = camera;
+        s_Renderer.m_QuadShader->Use();
+        s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", m_Camera.GetViewProjectionMatrix());
+        s_Renderer.m_QuadShader->SetUniformMat4("u_Transform", m_Transform);
     };
 
     void Renderer2D::End() {
-        
-        glBindVertexArray(m_Vao);
-        //glBindTexture(GL_TEXTURE_2D, m_Tcb);
-        glDrawElements(GL_TRIANGLES, s_Renderer.m_IndexCount, GL_UNSIGNED_INT, nullptr );
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glBindTexture(GL_TEXTURE_2D, m_Tcb);
+        RenderCommand::DrawIndexed(m_Vao, s_Renderer.m_IndexCount );
 
         s_Renderer.m_IndexCount = 0;
         s_Renderer.m_QuadCount = 0;
         s_Renderer.m_VertexCount = 0;
     };
 
-    void Renderer2D::FboBegin() {
+    void Renderer2D::BindFramebuffer() {
+        RenderCommand::BindFramebuffer(m_Fbo);
+    };
+
+    void Renderer2D::UnbindFramebuffer() {
+        RenderCommand::UnbindFramebuffer();
+    };
+
+    OrthoGraphicCamera Renderer2D::GetCamera() const {
+        return m_Camera;
     }
 
-    void Renderer2D::FboEnd() {
-    }
+    void Renderer2D::PushVec2( const std::string& s, const glm::vec2& v ) {
+        s_Renderer.m_QuadShader->SetVector2(s, v);
+    };
+
+    void Renderer2D::PushFloat( const std::string& s, float v ) {
+        s_Renderer.m_QuadShader->SetFloat(s, v);
+    };
 
     uint32_t Renderer2D::GetVertexCount() { return s_Renderer.m_VertexCount; }
     uint32_t Renderer2D::GetIndexCount() { return s_Renderer.m_IndexCount; }
     uint32_t Renderer2D::GetQuadCount() { return s_Renderer.m_QuadCount; }
+
+    // == // == // == // == // == //
+
+    void RenderCommand::DrawIndexed( uint32_t Vao, uint32_t IndexCount ) {
+        glBindVertexArray(Vao);
+        glDrawElements(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, nullptr );
+    };
+
+    void RenderCommand::BindFramebuffer( uint32_t Framebuffer ) {
+        glBindFramebuffer(GL_FRAMEBUFFER, Framebuffer);
+    };
+
+    void RenderCommand::UnbindFramebuffer( ) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    };
+
+    void RenderCommand::ResizeTexture( uint32_t TextureID, int Width, int Height ) {
+        glBindTexture(GL_TEXTURE_2D, TextureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    };
 };

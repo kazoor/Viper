@@ -11,36 +11,31 @@
 #include <ImGui/imgui_impl_glfw.h>
 #include <ImGui/imgui_impl_opengl3.h>
 #include "window.hpp"
-#include <glm/gtc/matrix_transform.hpp> // ortho
-#include "../../graphics/shaders/shader/shader.hpp"
 #include "../../util/input/inputhandler/inputhandler.hpp"
 #include "../../imguieditor/imguieditor.hpp"
-#include "../../graphics/renderer/renderer.hpp"
+#include "../../imguieditor/scene/scene.hpp"
 #include "../../util/input/mouse/mouseevents.hpp"
 #include "../../layers/layer/layer.hpp"
 #include "../../layers/layerstack/layerstack.hpp"
+#include "../../util/globals/global.hpp"
 
 namespace Viper::Graphics {
 
     Window::Window(int Width, int Height, const std::string &WindowName) {
         glfwInit();
 
-        WindowEvents = new Events::EventBus();
-
         WindowParams = {
                 Width,
                 Height,
                 WindowName,
                 nullptr,
-                nullptr,
-                this->WindowEvents};
+                nullptr};
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         Context = CreateWindowEx(WindowParams);
-        AspectRatio = static_cast< float >( WindowParams.Width ) / static_cast< float >( WindowParams.Height );
         if (!Context) {
             spdlog::error("Failed to create GLFW window");
             glfwTerminate();
@@ -56,45 +51,30 @@ namespace Viper::Graphics {
         }
 
         LayerStack = new Viper::Layers::LayerStack();
+        Globals::GlobalsContext::CreateContext();
 
         SetEventSubscriptions();
         UpdateWindowEvents();
 
-        Shader Shader("resources/test.vert", "resources/test.frag");
-
-        Renderer::Renderer2D* Renderer = new Renderer::Renderer2D();
-
         PushLayer(new Viper::ImGuiEditor(this));
+        PushLayer(new Viper::Scene::Scene(this));
 
+        static double previous_delta = glfwGetTime();
         while (!glfwWindowShouldClose(Context)) {
             ProcessInput(Context);
 
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            double current_delta = glfwGetTime();
+            Globals::Editor::DeltaTime = current_delta - previous_delta;
+            previous_delta = current_delta;
+
+            Globals::GlobalsContext::Renderer2D->BindFramebuffer();
             glClear(GL_COLOR_BUFFER_BIT);
+            Globals::GlobalsContext::Renderer2D->UnbindFramebuffer();
 
-            Renderer->Begin();
-            
-            for( int y = -5; y < 20; y++ )
-                for( int x = -5; x < 20; x++ )
-                    Renderer->DrawQuad(glm::vec2(x, y), (x + y) % 2 ? RendererAPI::Color(0.1f, 0.1f, 0.1f, 1.0f) : RendererAPI::Color(1.0f, 1.0f, 1.0f, 1.0f));
-
-            Renderer->Flush();
-            auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-            auto m_ViewMatrix = glm::mat4(1.0f);
-
-            auto m_ProjectionMatrix = glm::ortho(-AspectRatio * 30.0f, AspectRatio * 30.0f, 30.0f, -30.0f, 1.0f, -1.0f);
-            auto m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
-
-            Shader.Use();
-            Shader.SetUniformMat4("u_Transform", m_Transform);
-            Shader.SetUniformMat4("u_ViewProjection", m_ViewProjectionMatrix);
-
-            for(auto Layer : *LayerStack) {
+            for (auto Layer: *LayerStack) {
                 spdlog::info("Updating Layer {0}", Layer->GetLayerName());
                 Layer->OnUpdate();
             }
-
-            Renderer->End();
 
             auto scrolldelta = Input::Input::GetScrollInput();
             auto mouse = Input::MouseEvents::GetMousePosition();
@@ -104,7 +84,7 @@ namespace Viper::Graphics {
             Update();
         }
 
-        delete Renderer;
+        Globals::GlobalsContext::DestroyContext();
         delete LayerStack;
 
         glfwDestroyWindow(Context);
@@ -118,54 +98,48 @@ namespace Viper::Graphics {
 
     void Window::SetEventSubscriptions() {
         // WindowEvents subscriptions.
-        WindowEvents->Subscribe(this, &Window::OnWindowFrameBufferSizeEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowResizeEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowPositionEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowContentScaleEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowMaximizationEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowFocusEvent);
-        WindowEvents->Subscribe(this, &Window::OnWindowCloseEvent);
-        WindowEvents->Subscribe(new Viper::Input::MouseEvents(), &Input::MouseEvents::OnMouseCursorPositionEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowFrameBufferSizeEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowResizeEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowPositionEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowContentScaleEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowMaximizationEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowFocusEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowCloseEvent);
+        Globals::GlobalsContext::EventHandler->Subscribe(new Viper::Input::MouseEvents(),
+                                         &Input::MouseEvents::OnMouseCursorPositionEvent);
 
-        for(auto It = LayerStack->end(); It != LayerStack->begin();) {
-            WindowEvents->Subscribe((*--It), &Viper::Layers::Layer::OnEvent);
+        for (auto It = LayerStack->end(); It != LayerStack->begin();) {
+            Globals::GlobalsContext::EventHandler->Subscribe((*--It), &Viper::Layers::Layer::OnEvent);
         }
     }
 
     void Window::UpdateWindowEvents() {
         glfwSetFramebufferSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowFrameBufferSizeEvent(Width, Height));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowFrameBufferSizeEvent(Width, Height));
         });
 
         glfwSetWindowSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowResizeEvent(Width, Height));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowResizeEvent(Width, Height));
         });
 
         glfwSetWindowPosCallback(Context, [](GLFWwindow *Window, int X, int Y) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowPositionEvent(X, Y));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowPositionEvent(X, Y));
         });
 
         glfwSetWindowContentScaleCallback(Context, [](GLFWwindow *Window, float XScale, float YScale) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowContentScaleEvent(XScale, YScale));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowContentScaleEvent(XScale, YScale));
         });
 
         glfwSetWindowMaximizeCallback(Context, [](GLFWwindow *Window, int Maximized) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowMaximizationEvent(Maximized));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowMaximizationEvent(Maximized));
         });
 
         glfwSetWindowFocusCallback(Context, [](GLFWwindow *Window, int Focused) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowFocusEvent(Focused));
+            Globals::GlobalsContext::EventHandler->Commit(new WindowFocusEvent(Focused));
         });
 
         glfwSetWindowCloseCallback(Context, [](GLFWwindow *Window) {
-            WindowParams_t &WindowData = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
-            WindowData.EventCallback->Commit(new WindowCloseEvent());
+            Globals::GlobalsContext::EventHandler->Commit(new WindowCloseEvent());
         });
     }
 
@@ -174,6 +148,7 @@ namespace Viper::Graphics {
         glfwPollEvents();
         Input::Input::ResetScroll();
     }
+
     void Window::PushLayer(Layers::Layer *Layer) {
         LayerStack->PushLayer(Layer);
     }
@@ -193,10 +168,16 @@ namespace Viper::Graphics {
     void Window::OnWindowFrameBufferSizeEvent(WindowFrameBufferSizeEvent *E) {
         spdlog::info("WindowFrameBufferSize Event triggered! Updated viewport to: {0}x{1}", E->Width, E->Height);
         glViewport(0, 0, E->Width, E->Height);
+        WindowParams.Width = E->Width;
+        WindowParams.Height = E->Height;
+        Globals::GlobalsContext::Renderer2D->ResizeFBO(E->Width, E->Height);
     }
 
     void Window::OnWindowResizeEvent(WindowResizeEvent *E) {
         spdlog::info("WindowResize Event triggered! New size is {0}x{1}", E->Width, E->Height);
+        WindowParams.Width = E->Width;
+        WindowParams.Height = E->Height;
+        Globals::GlobalsContext::Renderer2D->ResizeFBO(E->Width, E->Height);
     }
 
     void Window::OnWindowPositionEvent(WindowPositionEvent *E) {
@@ -217,6 +198,5 @@ namespace Viper::Graphics {
 
     void Window::OnWindowCloseEvent(WindowCloseEvent *E) {
         spdlog::info("WindowCloseEvent Event triggered!");
-        delete WindowEvents;
     }
 }

@@ -6,8 +6,12 @@ uniform mat4 u_Transform;
 uniform mat4 u_ViewProjection;
 
 out vec4 vColor;
+out vec4 pos;
+
 void main()
 {
     vColor = aColor;
     gl_Position = u_Transform * u_ViewProjection * vec4(aPos, 1.0);
+
+    pos = vec4(aPos, 1.0);
 }
