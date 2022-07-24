@@ -20,15 +20,14 @@ namespace Viper {
             ImGui::CreateContext();
             ImGuiIO& io = ImGui::GetIO();
             ImGuiStyle& style = ImGui::GetStyle();
-            io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-            ImGui_ImplGlfw_InitForOpenGL(WindowContext->Ctx(), true);
-            ImGui_ImplOpenGL3_Init("#version 410");
             ImGui::StyleColorsDark();
+
+            io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+            io.FontDefault = io.Fonts->AddFontFromFileTTF("resources/assets/fonts/JetBrainsMonoNL-Bold.ttf", 14.0f);
 
             style.Colors[ ImGuiCol_Button ] = ImColor(35, 35, 35, 255 );
             style.Colors[ ImGuiCol_ButtonHovered ] = ImColor(40, 40, 40, 255 );
             style.Colors[ ImGuiCol_ButtonActive ] = ImColor(45, 45, 45, 255 );
-
 
             style.Colors[ ImGuiCol_FrameBg ] = ImColor(35, 35, 35, 255 );
             style.Colors[ ImGuiCol_FrameBgHovered ] = ImColor(40, 40, 40, 255 );
@@ -50,6 +49,9 @@ namespace Viper {
 
             style.Colors[ ImGuiCol_SliderGrab ] = ImColor(50, 50, 50, 255 );
             style.Colors[ ImGuiCol_SliderGrabActive ] = ImColor(50, 50, 50, 255 );
+
+            ImGui_ImplGlfw_InitForOpenGL(WindowContext->Ctx(), true);
+            ImGui_ImplOpenGL3_Init("#version 410");
 
             style.GrabRounding = 2.0f;
 
@@ -151,13 +153,17 @@ namespace Viper {
                     auto& go = Globals::GlobalsContext::Gom->m_GameObjects.at( Globals::Editor::SelectedObject );
 
                     go->OnEditor();
-                    if( go->HasComponent< Components::Transform >( ) )
-                     if( ImGui::Button( "Remove Transform" ) )
-                        go->RemoveComponent< Components::Transform >( );
+                    if( go->HasComponent< Components::Transform >( ) ) {
+                        ImGui::Separator();
+                        if( ImGui::Button( "Remove Transform" ) )
+                            go->RemoveComponent< Components::Transform >( );
+                    }
                 }
              
                 ImGui::End();
             };
+
+            ImGui::ShowDemoWindow();
 
             ImGui::EndFrame();
             ImGui::Render();

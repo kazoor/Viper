@@ -152,7 +152,19 @@ namespace Viper::Renderer {
         s_Renderer.m_QuadCount++;
     };
 
-    void Renderer2D::DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color ) {};
+    void Renderer2D::DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color ) {
+        auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f)) 
+            * glm::rotate(glm::mat4(1.0f), radians, glm::vec3(0.0f, 0.0f, 1.0f))
+            * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f } );
+            
+        for( int i = 0; i < 4; i++ ) {
+            s_Renderer.m_VertexBufferPtr->position = m_Transform * s_Renderer.m_QuadTransform[ i ];
+            s_Renderer.m_VertexBufferPtr->color = color;
+            s_Renderer.m_VertexBufferPtr++;
+        }
+        s_Renderer.m_IndexCount += 6;
+        s_Renderer.m_QuadCount++;
+    };
 
     void Renderer2D::Begin( const OrthoGraphicCamera& camera ) {
         s_Renderer.m_VertexBufferPtr = s_Renderer.m_VertexBuffer;
