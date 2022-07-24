@@ -74,7 +74,7 @@ namespace Viper::Components {
         if(ImGui::TreeNode("Transform")) {
             ImGuiTransform3F("Position", position);
             ImGuiTransform3F("Rotation", rotation);
-            ImGuiTransform3F("Scale", scale);
+            ImGuiTransform3F("Scale", scale, 1.0f);
         };
         ImGui::TreePop();
     };

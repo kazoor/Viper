@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <typeindex>
+#include <algorithm>
 #include "component.hpp"
 
 namespace Viper::Components {
@@ -12,12 +12,12 @@ namespace Viper::Components {
         GameObject( const std::string& tagname );
         std::string tag;
 
-        template< typename T = Component, typename... TArgs >
+        template< class T = Component, typename... TArgs >
         inline void AddComponent( TArgs&&... args ) {
             m_Components.push_back( std::make_unique< T >( std::forward< TArgs >( args )... ) );
         };
 
-        template< class T >
+        template< class T = Component >
         T& GetComponent( ) {
             for( auto&& component : m_Components ) {
                 if( component->IsComponentType( T::Type ) ) {
@@ -25,6 +25,44 @@ namespace Viper::Components {
                 };
             };
             return *std::unique_ptr< T >( nullptr );
+        };
+
+        template< class T = Component >
+        bool RemoveComponent() {
+            if( m_Components.empty() )
+                return false;
+
+            auto index = std::find_if( 
+                m_Components.begin(),
+                m_Components.end(), 
+                [ classType = T::Type ]( auto& c) {
+                    return c->IsComponentType( classType );
+                });
+
+            bool ret = ( index != m_Components.end() );
+
+            if( ret )
+                m_Components.erase( index );
+            
+            return ret;
+        };
+
+        template< class T = Component >
+        bool HasComponent() {
+            if( m_Components.empty() )
+                return false;
+
+            auto index = std::find_if(
+                m_Components.begin(),
+                m_Components.end(),
+                [ classType = T::Type ]( auto& c ) {
+                    return c->IsComponentType( classType );
+                });
+
+
+            bool component_found = ( index != m_Components.end() );
+
+            return component_found;
         };
 
         void OnUpdate() {
