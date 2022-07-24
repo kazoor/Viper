@@ -8,6 +8,9 @@
 #include "../events/event/event.hpp"
 #include "../graphics/window/window.hpp"
 #include "../util/globals/global.hpp"
+#include "../components/boxcollision2d.hpp"
+#include "../util/input/input.hpp"
+#include "../util/input/keycodes.hpp"
 
 namespace Viper {
     struct OnLayerUpdateEvent : public Viper::Events::Event {
@@ -106,6 +109,7 @@ namespace Viper {
                     if( strlen( buff ) > 1 ) {
                         auto go = std::make_unique< Viper::Components::GameObject >( buff );
                         go->AddComponent< Viper::Components::Transform >( glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3( 1.0f, 1.0f, 0.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) );
+                        go->AddComponent<Components::BoxCollision2D>(go.get());
 
                         Globals::GlobalsContext::Gom->OnAdd( std::move( go ) );
 
@@ -114,6 +118,10 @@ namespace Viper {
                         Globals::Editor::SelectedObject++;
                     };
                 };
+
+                /*if( ImGui::Button("Add BoxCollision2D")) {
+                    auto& go = Globals::GlobalsContext::Gom->m_GameObjects.at( Globals::Editor::SelectedObject );
+                }*/
 
                 ImGui::Separator();
 
