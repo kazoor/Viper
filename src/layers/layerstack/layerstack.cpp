@@ -2,8 +2,6 @@
 #include <algorithm>
 #include "layerstack.hpp"
 #include "../layer/layer.hpp"
-#include "../../events/event/event.hpp"
-#include "../../events/eventhandler/eventhandler.hpp"
 
 namespace Viper::Layers {
 
@@ -12,7 +10,7 @@ namespace Viper::Layers {
     }
 
     LayerStack::~LayerStack() {
-        for(auto Layer : Layers)
+        for (auto Layer: Layers)
             delete Layer;
     }
 
@@ -26,7 +24,7 @@ namespace Viper::Layers {
 
     void LayerStack::PopLayer(Layer *Lay) {
         auto It = std::find(Layers.begin(), Layers.end(), Lay);
-        if(It != Layers.end()){
+        if (It != Layers.end()) {
             Layers.erase(It);
             LayerInsert--;
         }
@@ -34,7 +32,8 @@ namespace Viper::Layers {
 
     void LayerStack::PopOverlay(Layer *Overlay) {
         auto It = std::find(Layers.begin(), Layers.end(), Overlay);
-        if(It != Layers.end())
+        if (It != Layers.end()) {
             Layers.erase(It);
+        }
     }
 }
