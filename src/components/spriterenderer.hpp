@@ -12,6 +12,8 @@ namespace Viper::Components {
         
         SpriteRenderer(GameObject* obj);
 
+        SpriteRenderer(GameObject* obj, glm::vec4 col );
+
         void OnAwake() override;
         
         void OnUpdate() override;
