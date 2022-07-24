@@ -117,6 +117,9 @@ namespace Viper {
             if(ImGui::Begin("Inspector")) {
                 for( auto& go : Globals::Gom->m_GameObjects ) {
                     go->OnEditor();
+                    if( go->HasComponent< Components::Transform >( ) )
+                        if( ImGui::Button( "Remove Transform" ) )
+                            go->RemoveComponent< Components::Transform >( );
                 };
                 ImGui::End();
             };
