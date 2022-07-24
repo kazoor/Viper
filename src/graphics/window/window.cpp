@@ -60,11 +60,15 @@ namespace Viper::Graphics {
         PushLayer(new Viper::ImGuiEditor(this));
         PushLayer(new Viper::Scene::Scene(this));
 
+        static double previous_delta = glfwGetTime();
         while (!glfwWindowShouldClose(Context)) {
             ProcessInput(Context);
 
+            double current_delta = glfwGetTime();
+            Globals::Editor::DeltaTime = current_delta - previous_delta;
+            previous_delta = current_delta;
+
             Globals::Renderer2D->BindFramebuffer();
-            glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
             Globals::Renderer2D->UnbindFramebuffer();
 

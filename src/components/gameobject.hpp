@@ -17,9 +17,9 @@ namespace Viper::Components {
             m_Components.push_back( std::make_unique< T >( std::forward< TArgs >( args )... ) );
         };
 
-        template< typename T = Component >
+        template< class T >
         T& GetComponent( ) {
-            for( auto& component : m_Components ) {
+            for( auto&& component : m_Components ) {
                 if( component->IsComponentType( T::Type ) ) {
                     return *static_cast< T* >( component.get( ) );
                 };
