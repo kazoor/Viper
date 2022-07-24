@@ -121,8 +121,6 @@ namespace Viper {
                 ImGui::End();
             };
 
-            ImGui::ShowDemoWindow();
-
             ImGui::EndFrame();
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
