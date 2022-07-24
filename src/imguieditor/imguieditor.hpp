@@ -106,7 +106,7 @@ namespace Viper {
                     if( strlen( buff ) > 1 ) {
                         auto go = std::make_unique< Viper::Components::GameObject >( buff );
                         go->AddComponent< Viper::Components::Transform >( glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3( 1.0f, 1.0f, 0.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) );
-
+                        go->AddComponent< Viper::Components::SpriteRenderer >( go.get());
                         Globals::GlobalsContext::Gom->OnAdd( std::move( go ) );
 
                         Globals::ConsoleContext::AddLog( "GameObject", "A new gameobject has been added." );
@@ -153,10 +153,17 @@ namespace Viper {
                     auto& go = Globals::GlobalsContext::Gom->m_GameObjects.at( Globals::Editor::SelectedObject );
 
                     go->OnEditor();
+                    
                     if( go->HasComponent< Components::Transform >( ) ) {
                         ImGui::Separator();
                         if( ImGui::Button( "Remove Transform" ) )
                             go->RemoveComponent< Components::Transform >( );
+                    }
+
+                    if( go->HasComponent< Components::SpriteRenderer >( ) ) {
+                        ImGui::Separator();
+                        if( ImGui::Button( "Remove SpriteRenderer" ) )
+                            go->RemoveComponent< Components::SpriteRenderer >( );
                     }
                 }
              
