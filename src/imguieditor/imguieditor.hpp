@@ -195,8 +195,6 @@ namespace Viper {
                         ImGui::Separator();
                         if( ImGui::Button( "Remove SpriteRenderer" ) )
                             go->RemoveComponent< Components::SpriteRenderer >( );
-                        if (ImGui::Button("Remove SpriteRenderer"))
-                            go->RemoveComponent<Components::SpriteRenderer>();
                         ImGui::Separator();
                     }
 
