@@ -1041,6 +1041,7 @@ PFNGLVERTEXATTRIB3FPROC glad_glVertexAttrib3f = NULL;
 PFNGLVERTEXATTRIB3FVPROC glad_glVertexAttrib3fv = NULL;
 PFNGLVERTEXATTRIB3SPROC glad_glVertexAttrib3s = NULL;
 PFNGLVERTEXATTRIB3SVPROC glad_glVertexAttrib3sv = NULL;
+PFNGLBINDTEXTUREUNITPROC glad_glBindTextureUnit = NULL;
 PFNGLVERTEXATTRIB4NBVPROC glad_glVertexAttrib4Nbv = NULL;
 PFNGLVERTEXATTRIB4NIVPROC glad_glVertexAttrib4Niv = NULL;
 PFNGLVERTEXATTRIB4NSVPROC glad_glVertexAttrib4Nsv = NULL;
@@ -1674,6 +1675,7 @@ static void load_GL_VERSION_2_0(GLADloadproc load) {
 	glad_glVertexAttrib3fv = (PFNGLVERTEXATTRIB3FVPROC)load("glVertexAttrib3fv");
 	glad_glVertexAttrib3s = (PFNGLVERTEXATTRIB3SPROC)load("glVertexAttrib3s");
 	glad_glVertexAttrib3sv = (PFNGLVERTEXATTRIB3SVPROC)load("glVertexAttrib3sv");
+	glad_glBindTextureUnit = (PFNGLBINDTEXTUREUNITPROC)load("glBindTextureUnit");
 	glad_glVertexAttrib4Nbv = (PFNGLVERTEXATTRIB4NBVPROC)load("glVertexAttrib4Nbv");
 	glad_glVertexAttrib4Niv = (PFNGLVERTEXATTRIB4NIVPROC)load("glVertexAttrib4Niv");
 	glad_glVertexAttrib4Nsv = (PFNGLVERTEXATTRIB4NSVPROC)load("glVertexAttrib4Nsv");

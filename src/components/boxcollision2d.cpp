@@ -18,13 +18,13 @@ namespace Viper::Components {
 
     }
 
-    void BoxCollision2D::OnUpdate() {
+    void BoxCollision2D::OnUpdate(double deltatime) {
         Tr = Box1->GetComponent<Transform>();
+        auto& mod = Box1->GetComponent<Transform>();
 
         for (auto &Objects: Globals::GlobalsContext::Gom->m_GameObjects) {
             if (IsColliding(Objects.get())) {
                 Globals::ConsoleContext::AddLog("BoxCollision2D", "Collision Detected!");
-                // TODO: Handle this somewhere, right now its just getting sent out but not handled.
                 Globals::GlobalsContext::EventHandler->Commit(new BoxCollision2DEvent(Box1, Objects.get()));
             }
         }
@@ -36,6 +36,9 @@ namespace Viper::Components {
 
     bool BoxCollision2D::IsColliding(GameObject *Box2) {
         if (!Box2->HasComponent<Transform>())
+            return false;
+        
+        if(!Box2->HasComponent<BoxCollision2D>())
             return false;
 
         if (Box1 == Box2)

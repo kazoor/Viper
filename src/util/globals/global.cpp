@@ -10,6 +10,8 @@ namespace Viper::Globals {
         float LightDensity = 1.0f;
         double DeltaTime = 0.0;
         int SelectedObject = -1;
+        bool HasMainCamera = false;
+        bool isPlaying = false;
     };
 
     // == // == // == // == // == // == //
