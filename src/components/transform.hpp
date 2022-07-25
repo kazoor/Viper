@@ -17,7 +17,7 @@ namespace Viper::Components {
 
         void OnAwake() override;
         
-        void OnUpdate() override;
+        void OnUpdate(double deltatime) override;
 
         void OnEditor() override;
     };

@@ -51,5 +51,7 @@ namespace Viper::Globals {
         extern float LightDensity;
         extern double DeltaTime;
         extern int SelectedObject;
+        extern bool HasMainCamera;
+        extern bool isPlaying;
     };
 };

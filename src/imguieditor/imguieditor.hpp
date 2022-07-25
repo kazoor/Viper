@@ -107,6 +107,14 @@ namespace Viper {
                 ImGui::DragFloat("Radians", &Globals::Editor::Radians, 1.0f, -180.0f, 180.0f);
                 ImGui::DragFloat("Light Density", &Globals::Editor::LightDensity, 0.1f, -10.0f, 10.0f);
 
+                if( !Globals::Editor::isPlaying && ImGui::Button("Play")) {
+                    Globals::Editor::isPlaying = true;
+                } else if(Globals::Editor::isPlaying && ImGui::Button("Editor")) {
+                    Globals::Editor::isPlaying = false;
+                };
+
+                ImGui::Image(reinterpret_cast< ImTextureID >( Globals::GlobalsContext::Renderer2D->GetTestTextureID()), ImVec2(100,100));
+
                 ImGui::Separator();
                 static char buff[80];
                 ImGui::SetNextItemWidth(100.0f);
@@ -119,22 +127,34 @@ namespace Viper {
                         auto go = std::make_unique<Viper::Components::GameObject>(buff);
                         [&](Components::GameObject* c) {
                             c->AddComponent< Viper::Components::Transform >( 
-                                glm::vec3( 0.0f, 0.0f, 0.0f ), // position
+                                glm::vec3( 10.0f, 10.0f, 0.0f ), // position
                                 glm::vec3( 1.0f, 1.0f, 0.0f ), // scale
                                 glm::vec3( 0.0f, 0.0f, 0.0f ) // rotation
                                 );
-
-                            c->AddComponent< Viper::Components::SpriteRenderer >( 
-                                c, // parent
-                                glm::vec4(1.0f, 0.8f, 0.3f, 1.0f) // color
-                            );
-
+                            c->AddComponent< Viper::Components::SpriteRenderer >( c, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f ) );
+                            c->AddComponent< Viper::Components::BoxCollision2D >( c );
                         }(go.get());
 
                         Globals::GlobalsContext::Gom->OnAdd( std::move( go ) );
                         buff[0] = '\0';
                         Globals::Editor::SelectedObject++;
                     };
+                };
+                if( ImGui::Button("Add PlayerController")) {
+                    auto go = std::make_unique<Viper::Components::GameObject>("PlayerController");
+                    [&](Components::GameObject* c) {
+                        c->AddComponent< Viper::Components::Transform >( 
+                            glm::vec3( 0.0f, 0.0f, 0.0f ), // position
+                            glm::vec3( 1.0f, 1.0f, 2.0f ), // scale
+                            glm::vec3( 0.0f, 0.0f, 0.0f ) // rotation
+                            );
+
+                        c->AddComponent< Viper::Components::SpriteRenderer >(c);
+                        c->AddComponent< Viper::Components::Camera >(c);
+                        c->AddComponent< Viper::Components::BoxCollision2D >(c);
+                    }(go.get());
+
+                    Globals::GlobalsContext::Gom->OnAdd( std::move( go ) );
                 };
 
                 ImGui::Separator();
@@ -160,8 +180,8 @@ namespace Viper {
                 };
 
                 ImGui::Text("GameObjects: %i", Globals::GlobalsContext::Gom->GameObjectSize());
-                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1.0f / Globals::Editor::DeltaTime,
-                            1000.0f * Globals::Editor::DeltaTime);
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f * Globals::Editor::DeltaTime,
+                           1.0f / Globals::Editor::DeltaTime );
                 ImGui::End();
             };
 
@@ -181,29 +201,12 @@ namespace Viper {
                     auto &go = Globals::GlobalsContext::Gom->m_GameObjects.at(Globals::Editor::SelectedObject);
 
                     go->OnEditor();
+                    
+                    MakeComponent< Components::Transform >( go, "Transform" );
+                    MakeComponent< Components::SpriteRenderer >( go, "SpriteRenderer", go.get());
+                    MakeComponent< Components::BoxCollision2D >( go, "BoxCollision2D", go.get());
+                    MakeComponent< Components::Camera >( go, "Camera", go.get());
 
-                    if (go->HasComponent<Components::Transform>()) {
-                        ImGui::Separator();
-                        if (ImGui::Button("Remove Transform"))
-                            go->RemoveComponent<Components::Transform>();
-                    }
-
-                    if (go->HasComponent<Components::Transform>()) {
-                    }
-
-                    if (go->HasComponent<Components::SpriteRenderer>()) {
-                        ImGui::Separator();
-                        if( ImGui::Button( "Remove SpriteRenderer" ) )
-                            go->RemoveComponent< Components::SpriteRenderer >( );
-                        ImGui::Separator();
-                    }
-
-                    if (!go->HasComponent<Components::BoxCollision2D>() && ImGui::Button("Add BoxCollision2D")) {
-                        auto &go = Globals::GlobalsContext::Gom->m_GameObjects.at(Globals::Editor::SelectedObject);
-                        go->AddComponent<Components::BoxCollision2D>(go.get());
-                    } else if (go->HasComponent<Components::BoxCollision2D>() && ImGui::Button("Remove BoxCollision2D")) {
-                        go->RemoveComponent<Components::BoxCollision2D>();
-                    }
                     ImGui::Separator();
                 }
                 ImGui::End();
@@ -225,6 +228,19 @@ namespace Viper {
             ImGui_ImplGlfw_Shutdown();
             ImGui::DestroyContext();
         }
+
+    protected:
+
+     template< typename T = Components::Component, typename... TArgs >
+     void MakeComponent(std::unique_ptr< Components::GameObject >& obj, const std::string& s, TArgs&&... args ) {
+        bool hasComponent = obj->HasComponent< T >( );
+
+         if(!hasComponent && ImGui::Button( std::string("Add ").append(s).c_str())) {
+             obj->AddComponent<T>(std::forward< TArgs >(args)...);
+         } else if(hasComponent && ImGui::Button(std::string("Remove ").append(s).c_str())) {
+             obj->RemoveComponent< T >( );
+         }
+     };
 
     private:
         Viper::Graphics::Window *WindowContext;

@@ -6,6 +6,9 @@ namespace Viper::Renderer {
     public:
         OrthoGraphicCamera();
         OrthoGraphicCamera(float left, float right, float bottom, float top, float z_near = -1.0f, float z_far = 1.0f );
+
+        void SetProjection(float left, float right, float bottom, float top, float z_near = -1.0f, float z_far = 1.0f );
+        void SetPosition( const glm::vec3& position );
         glm::mat4 GetViewProjectionMatrix() const;
         glm::mat4 GetViewMatrix() const;
         glm::mat4 GetProjectionMatrix() const;

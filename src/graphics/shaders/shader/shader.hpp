@@ -3,6 +3,7 @@
 #include <string>
 #include <glfw/glfw3.h>
 #include <glm/mat4x4.hpp>
+#include "../../../util/ref/reference.hpp"
 
 namespace Viper::Graphics
 {
@@ -39,6 +40,8 @@ namespace Viper::Graphics
         void SetVector4(const std::string &Name, const glm::vec4 &Value) const;
 
         inline unsigned int ID() const { return ProgramID; }
+
+        static Ref< Shader > Create( const std::string &VertexPath, const std::string &FragmentPath );
     private:
         unsigned int ProgramID;
         static void CheckCompileErrors(unsigned int Shader, const std::string& Type);

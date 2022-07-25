@@ -3,7 +3,9 @@
 #include <glm/vec2.hpp>
 #include "camera/orthographic_camera.hpp"
 #include <string>
+
 namespace Viper::Renderer {
+    
     class Renderer2D {
     public:
         Renderer2D();
@@ -14,6 +16,8 @@ namespace Viper::Renderer {
         void DrawQuadRotated( const glm::vec2& pos, float radians, RendererAPI::Color color );
         void DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color );
 
+        void DrawTexture( const glm::vec2& pos, uint32_t textureid );
+
         void Begin( const OrthoGraphicCamera& camera );
         void Flush();
         void End();
@@ -23,6 +27,8 @@ namespace Viper::Renderer {
 
         uint32_t GetFramebufferID() { return m_Fbo; };
         uint32_t GetTexturebufferID() { return m_Tcb; };
+
+        uint32_t GetTestTextureID() { return m_TestTexture; };
 
         void ResizeFBO( int Width, int Height );
 
@@ -41,6 +47,7 @@ namespace Viper::Renderer {
         uint32_t m_Ibo;
         uint32_t m_Fbo; // Viewport impl snart.
         uint32_t m_Tcb;
+        uint32_t m_TestTexture;
         OrthoGraphicCamera m_Camera;
     };
 
