@@ -56,6 +56,12 @@ namespace Viper {
             style.GrabRounding = 2.0f;
 
             WindowPaddingReserved = style.WindowPadding;
+
+            Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleSuccess );
+            Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleError );
+            Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleWarning );
+            Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleInfo );
+            Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleNone );
         }
 
         ~ImGuiEditor() {
@@ -108,14 +114,20 @@ namespace Viper {
 
                         [&](Components::GameObject* c ) {
 
-                            c->AddComponent< Viper::Components::Transform >( glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3( 1.0f, 1.0f, 0.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) );
-                            c->AddComponent< Viper::Components::SpriteRenderer >( c, glm::vec4(1.0f, 0.8f, 0.3f, 1.0f));
+                            c->AddComponent< Viper::Components::Transform >( 
+                                glm::vec3( 0.0f, 0.0f, 0.0f ), // position
+                                glm::vec3( 1.0f, 1.0f, 0.0f ), // scale
+                                glm::vec3( 0.0f, 0.0f, 0.0f ) // rotation
+                                );
+
+                            c->AddComponent< Viper::Components::SpriteRenderer >( 
+                                c, // parent
+                                glm::vec4(1.0f, 0.8f, 0.3f, 1.0f) // color
+                            );
 
                         }(go.get());
 
                         Globals::GlobalsContext::Gom->OnAdd( std::move( go ) );
-
-                        Globals::ConsoleContext::AddLog( "GameObject", "A new gameobject has been added." );
                         buff[0] = '\0';
                         Globals::Editor::SelectedObject++;
                     };
@@ -146,8 +158,10 @@ namespace Viper {
             };
 
             if(ImGui::Begin("Debug Console")) {
+                Globals::ConsoleContext::ResizeLogs( 10U );                    
                 for( auto info : Globals::ConsoleContext::GetLogs( ) ) {
-                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), info.StringType.c_str( ) );
+                    auto color = Globals::ConsoleContext::GetConsoleColor( info.Flag );
+                    ImGui::TextColored(ImVec4(color[0], color[1], color[2], 1.0f), info.StringType.c_str( ) );
                     ImGui::Text(info.ConsoleMessage.c_str( ) );
                     ImGui::Separator();
                 }
@@ -170,7 +184,6 @@ namespace Viper {
                         ImGui::Separator();
                         if( ImGui::Button( "Remove SpriteRenderer" ) )
                             go->RemoveComponent< Components::SpriteRenderer >( );
-                       
                     }
                 }
              
