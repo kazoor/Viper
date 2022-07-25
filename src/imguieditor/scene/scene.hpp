@@ -33,9 +33,7 @@ namespace Viper::Scene {
 
             Globals::GlobalsContext::Gom->OnUpdate();
 
-            auto Ratio = GetCurrentWindowSize( );
-
-            AspectRatio = ( float )Ratio.first / ( float )Ratio.second;
+            AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
             
             Globals::GlobalsContext::Renderer2D->BindFramebuffer();
             
@@ -44,12 +42,9 @@ namespace Viper::Scene {
             Globals::GlobalsContext::Renderer2D->Begin(Renderer::OrthoGraphicCamera(-AspectRatio * zoom, AspectRatio * zoom, 
                 zoom, -zoom, 1.0f, -1.0f));
 
-            Globals::GlobalsContext::Renderer2D->PushVec2("u_LightPos", glm::vec2(1.0f,1.0f));
-            Globals::GlobalsContext::Renderer2D->PushFloat("u_LightDensity", Globals::Editor::LightDensity);
-
-            for( int y = -50; y < 30; y++ )
-                for( int x = -50; x < 30; x++ )
-                    Globals::GlobalsContext::Renderer2D->DrawQuad(glm::vec2(x, y), RendererAPI::Color::White());
+            for( int y = -20; y < 20; y++ )
+                for( int x = -20; x < 20; x++ )
+                    Globals::GlobalsContext::Renderer2D->DrawQuad(glm::vec2(x, y), ( x + y ) % 2 ? RendererAPI::Color(0.6f, 0.6f, 0.6f) : RendererAPI::Color(0.7f, 0.7f, 0.7f));
 
             static float posx = 0.0f;
             static float posy = 0.0f;
@@ -72,12 +67,6 @@ namespace Viper::Scene {
             Globals::GlobalsContext::Renderer2D->Flush();
             Globals::GlobalsContext::Renderer2D->End();
             Globals::GlobalsContext::Renderer2D->UnbindFramebuffer();
-        }
-
-        std::pair< float, float > GetCurrentWindowSize() const {
-            int m_TempWidth, m_TempHeight;
-            glfwGetWindowSize(WindowContext->Ctx(), &m_TempWidth, &m_TempHeight);
-            return std::make_pair( static_cast< float >( m_TempWidth ), static_cast< float >( m_TempHeight ) );
         }
 
         void OnEvent(Viper::Events::Event *Event) override {

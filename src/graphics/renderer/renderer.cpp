@@ -81,7 +81,7 @@ namespace Viper::Renderer {
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Tcb, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        s_Renderer.m_QuadShader = new Graphics::Shader("resources/test.vert", "resources/test.frag");
+        s_Renderer.m_QuadShader = new Graphics::Shader("resources/quad.vert", "resources/quad.frag");
 
         s_Renderer.m_QuadTransform[0] = glm::vec4( -0.5f, -0.5f, 0.0f, 1.0f );
 	    s_Renderer.m_QuadTransform[1] = glm::vec4(  0.5f, -0.5f, 0.0f, 1.0f );

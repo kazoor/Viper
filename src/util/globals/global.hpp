@@ -16,14 +16,29 @@ namespace Viper::Globals {
         static Events::EventBus* EventHandler;
     };
 
+    enum ConsoleFlag : int {
+        ConsoleNone,
+        ConsoleInfo,
+        ConsoleWarning,
+        ConsoleError,
+        ConsoleSuccess
+    };
+
     struct Console_t {
         std::string StringType;
         std::string ConsoleMessage;
+        ConsoleFlag Flag;
     };
 
     class ConsoleContext {
     public:
         static void AddLog( const std::string& title, const std::string& log );
+        static void AddLog( const std::string& title, const std::string& log, ConsoleFlag flag );
+
+        // Experimental.
+        static void ResizeLogs( const std::size_t maxlogs );
+        static float* GetConsoleColor(ConsoleFlag flag);
+
         static std::vector< Console_t > GetLogs();
     private:
         static std::vector< Console_t > m_errors;
