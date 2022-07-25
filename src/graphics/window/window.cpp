@@ -18,6 +18,8 @@
 #include "../../layers/layer/layer.hpp"
 #include "../../layers/layerstack/layerstack.hpp"
 #include "../../util/globals/global.hpp"
+#include "../../inputlayer/keyboardinputlayer.hpp"
+#include "../../inputlayer/mouseinputlayer.hpp"
 
 namespace Viper::Graphics {
 
@@ -58,6 +60,8 @@ namespace Viper::Graphics {
 
         PushLayer(new Viper::ImGuiEditor(this));
         PushLayer(new Viper::Scene::Scene(this));
+        PushLayer(new Viper::Input::KeyboardInputLayer());
+        PushLayer(new Viper::Input::MouseInputLayer());
 
         static double previous_delta = glfwGetTime();
         while (!glfwWindowShouldClose(Context)) {

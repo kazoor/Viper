@@ -65,9 +65,9 @@ namespace Viper::Components {
             return component_found;
         };
 
-        void OnUpdate() {
+        void OnUpdate(double deltatime) {
             for( auto& c : m_Components )
-                c->OnUpdate();
+                c->OnUpdate(deltatime);
         };
 
         void OnAwake() {
@@ -79,7 +79,7 @@ namespace Viper::Components {
             for( auto& c : m_Components )
                 c->OnEditor();
         };
-    private:
+
         std::vector< std::unique_ptr< Component > > m_Components;
     };
 };

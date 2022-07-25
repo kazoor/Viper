@@ -2455,6 +2455,9 @@ GLAPI PFNGLTEXSUBIMAGE2DPROC glad_glTexSubImage2D;
 typedef void (APIENTRYP PFNGLBINDTEXTUREPROC)(GLenum target, GLuint texture);
 GLAPI PFNGLBINDTEXTUREPROC glad_glBindTexture;
 #define glBindTexture glad_glBindTexture
+typedef void (APIENTRYP PFNGLBINDTEXTUREUNITPROC)(GLuint unit, GLuint texture);
+GLAPI PFNGLBINDTEXTUREUNITPROC glad_glBindTextureUnit;
+#define glBindTextureUnit glad_glBindTextureUnit
 typedef void (APIENTRYP PFNGLDELETETEXTURESPROC)(GLsizei n, const GLuint *textures);
 GLAPI PFNGLDELETETEXTURESPROC glad_glDeleteTextures;
 #define glDeleteTextures glad_glDeleteTextures

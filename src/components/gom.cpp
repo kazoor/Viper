@@ -1,9 +1,9 @@
 #include "gom.hpp"
 
 namespace Viper::Components {
-    void GameObjectManager::OnUpdate() {
+    void GameObjectManager::OnUpdate(double deltatime) {
         for( auto& go : m_GameObjects )
-            go->OnUpdate();
+            go->OnUpdate(deltatime);
     };
 
     void GameObjectManager::OnAwake() {

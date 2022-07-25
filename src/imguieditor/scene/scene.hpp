@@ -16,6 +16,7 @@ namespace Viper::Scene {
            //gom->OnAdd(std::move( new_gob ));
            //gom->OnAwake();
 
+            m_Camera = new Renderer::OrthoGraphicCamera(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
            AspectRatio = 0.0f;
         };
 
@@ -24,32 +25,22 @@ namespace Viper::Scene {
         };
 
         void Destroy() {
-            
+            delete m_Camera;
         };
 
         void OnUpdate() override {
             Viper::Graphics::WindowParams_t &WindowData = *(Viper::Graphics::WindowParams_t *) glfwGetWindowUserPointer(
                     WindowContext->Ctx());
 
-            Globals::GlobalsContext::Gom->OnUpdate();
-
-            auto Ratio = GetCurrentWindowSize( );
-
-            AspectRatio = ( float )Ratio.first / ( float )Ratio.second;
+            AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
             
             Globals::GlobalsContext::Renderer2D->BindFramebuffer();
             
-            static float zoom = 0.0f;
-            zoom = Lerp( zoom, Globals::Editor::ZoomLevel, GetDeltaTime() * 4.0f );
-            Globals::GlobalsContext::Renderer2D->Begin(Renderer::OrthoGraphicCamera(-AspectRatio * zoom, AspectRatio * zoom, 
-                zoom, -zoom, 1.0f, -1.0f));
+            Globals::GlobalsContext::Renderer2D->Begin(*m_Camera);
 
-            Globals::GlobalsContext::Renderer2D->PushVec2("u_LightPos", glm::vec2(1.0f,1.0f));
-            Globals::GlobalsContext::Renderer2D->PushFloat("u_LightDensity", Globals::Editor::LightDensity);
-
-            for( int y = -50; y < 30; y++ )
-                for( int x = -50; x < 30; x++ )
-                    Globals::GlobalsContext::Renderer2D->DrawQuad(glm::vec2(x, y), RendererAPI::Color::White());
+            for( int y = -20; y < 20; y++ )
+                for( int x = -20; x < 20; x++ )
+                    Globals::GlobalsContext::Renderer2D->DrawQuad(glm::vec2(x, y), ( x + y ) % 2 ? RendererAPI::Color(0.6f, 0.6f, 0.6f) : RendererAPI::Color(0.7f, 0.7f, 0.7f));
 
             static float posx = 0.0f;
             static float posy = 0.0f;
@@ -61,22 +52,24 @@ namespace Viper::Scene {
             
             Globals::GlobalsContext::Renderer2D->DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
+            if(!Globals::Editor::isPlaying )
+                m_Camera->SetProjection(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
+            
             for(auto& go : Globals::GlobalsContext::Gom->m_GameObjects ) {
-                if( go->HasComponent< Components::Transform >( ) ) {
-                    auto& tr = go->GetComponent< Components::Transform >( );
-                    Globals::GlobalsContext::Renderer2D->DrawQuadRotated(glm::vec2(tr.position.x, tr.position.y), glm::vec2(tr.scale.x, tr.scale.y), tr.rotation.z, RendererAPI::Color::Red());
+                go->OnUpdate(GetDeltaTime());
+                
+                if( go->HasComponent< Components::Camera >( ) ) {
+                    auto& cam = go->GetComponent< Components::Transform >( );
+                    if( Globals::Editor::isPlaying ) {
+                        m_Camera->SetProjection(-AspectRatio * cam.scale.z, AspectRatio * cam.scale.z, cam.scale.z, -cam.scale.z, 1.0f, -1.0f);
+                        m_Camera->SetPosition(cam.position);
+                    }
                 };
             };
 
             Globals::GlobalsContext::Renderer2D->Flush();
             Globals::GlobalsContext::Renderer2D->End();
             Globals::GlobalsContext::Renderer2D->UnbindFramebuffer();
-        }
-
-        std::pair< float, float > GetCurrentWindowSize() const {
-            int m_TempWidth, m_TempHeight;
-            glfwGetWindowSize(WindowContext->Ctx(), &m_TempWidth, &m_TempHeight);
-            return std::make_pair( static_cast< float >( m_TempWidth ), static_cast< float >( m_TempHeight ) );
         }
 
         void OnEvent(Viper::Events::Event *Event) override {
@@ -92,6 +85,8 @@ namespace Viper::Scene {
         };
     private:
         Graphics::Window* WindowContext;
+        bool hasCameraTarget;
+        Renderer::OrthoGraphicCamera* m_Camera;
     private:
         float AspectRatio;
     };
