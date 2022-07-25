@@ -67,7 +67,7 @@ namespace Viper::Components {
 
     void Transform::OnAwake() { };
         
-    void Transform::OnUpdate() { };
+    void Transform::OnUpdate(double deltatime) { };
 
     void Transform::OnEditor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;

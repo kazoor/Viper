@@ -25,7 +25,7 @@ namespace Viper::Components {
     void SpriteRenderer::OnAwake() {
     };
 
-    void SpriteRenderer::OnUpdate() {
+    void SpriteRenderer::OnUpdate(double deltatime) {
         tr = object->GetComponent< Transform >( );
         Globals::GlobalsContext::Renderer2D->DrawQuadRotated(
         glm::vec2(tr.position.x, tr.position.y),

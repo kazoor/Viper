@@ -7,6 +7,7 @@ namespace Viper::RendererAPI {
     struct Vertex_t {
         glm::vec3 position;
         Color color;
-        glm::vec2 TexCoords;
+        glm::vec2 texcoords;
+        float texindex;
     };
 };
