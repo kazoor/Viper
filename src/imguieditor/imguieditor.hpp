@@ -117,7 +117,7 @@ namespace Viper {
                 if (ImGui::Button("Add GameObject")) {
                     if (strlen(buff) > 1) {
                         auto go = std::make_unique<Viper::Components::GameObject>(buff);
-
+                        [&](Components::GameObject* c) {
                             c->AddComponent< Viper::Components::Transform >( 
                                 glm::vec3( 0.0f, 0.0f, 0.0f ), // position
                                 glm::vec3( 1.0f, 1.0f, 0.0f ), // scale
@@ -195,8 +195,6 @@ namespace Viper {
                         ImGui::Separator();
                         if( ImGui::Button( "Remove SpriteRenderer" ) )
                             go->RemoveComponent< Components::SpriteRenderer >( );
-                        if (ImGui::Button("Remove SpriteRenderer"))
-                            go->RemoveComponent<Components::SpriteRenderer>();
                         ImGui::Separator();
                     }
 
