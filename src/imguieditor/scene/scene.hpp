@@ -49,7 +49,7 @@ namespace Viper::Scene {
             Renderer::Renderer2D::DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
             if(!Globals::Editor::isPlaying )
-                m_Camera->SetProjection(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
+                m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
 
             for(auto& go : Globals::GlobalsContext::Gom->m_GameObjects ) {
                 go->OnUpdate(GetDeltaTime());
