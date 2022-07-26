@@ -219,7 +219,8 @@ namespace Viper {
         }
 
         void OnEvent(Viper::Events::Event *Event) override {
-            Globals::GlobalsContext::EventHandler->Commit(new OnLayerUpdateEvent());
+            MAKE_REF(OnLayerUpdateEvent, ());
+            Globals::GlobalsContext::EventHandler->Commit(g_OnLayerUpdateEvent.get());
         }
 
         void Destroy() {
