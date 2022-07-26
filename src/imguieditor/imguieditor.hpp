@@ -11,6 +11,7 @@
 #include "../components/boxcollision2d.hpp"
 #include "../util/input/input.hpp"
 #include "../util/input/keycodes.hpp"
+#include "../components/input.hpp"
 
 namespace Viper {
     struct OnLayerUpdateEvent : public Viper::Events::Event {
@@ -204,6 +205,7 @@ namespace Viper {
                     MakeComponent< Components::SpriteRenderer >( go, "SpriteRenderer", go.get());
                     MakeComponent< Components::BoxCollision2D >( go, "BoxCollision2D", go.get());
                     MakeComponent< Components::Camera >( go, "Camera", go.get());
+                    MakeComponent< Components::Input >( go, "Input") ;
 
                     ImGui::Separator();
                 }
