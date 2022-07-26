@@ -8,8 +8,8 @@ namespace Viper::Renderer {
     
     class Renderer2D {
     public:
-        Renderer2D();
-        ~Renderer2D();
+        static void Instantiate();
+        static void Destroy();
 
         static void DrawQuad( const glm::mat4& transform, RendererAPI::Color color );
         static void DrawQuad( const glm::vec2& pos, RendererAPI::Color color );
@@ -18,17 +18,14 @@ namespace Viper::Renderer {
         static void DrawQuadRotated( const glm::vec2& pos, float radians, RendererAPI::Color color );
         static void DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color );
 
-        void Begin( const OrthoGraphicCamera& camera );
-        void Flush();
-        void End();
+        static void Begin( const OrthoGraphicCamera& camera );
+        static void Flush();
+        static void End();
 
-        void BindFramebuffer();
-        void UnbindFramebuffer();
+        static void BindFramebuffer();
+        static void UnbindFramebuffer();
 
-        void ResizeFBO( int Width, int Height );
-
-        void PushVec2( const std::string& s, const glm::vec2& v );
-        void PushFloat( const std::string& s, float v );
+        static void ResizeFBO( int Width, int Height );
 
         static uint32_t GetTexture();
 
@@ -37,9 +34,7 @@ namespace Viper::Renderer {
         uint32_t GetIndexCount();
         uint32_t GetQuadCount();
 
-        OrthoGraphicCamera GetCamera() const;
     private:
-        uint32_t m_TestTexture;
         OrthoGraphicCamera m_Camera;
     };
 
@@ -50,5 +45,6 @@ namespace Viper::Renderer {
         static void UnbindFramebuffer( );
         static void ResizeTexture( uint32_t TextureID, int Width, int Height );
         static void Clear();
+        static void SetClearColor(float color[3]);
     };
 };

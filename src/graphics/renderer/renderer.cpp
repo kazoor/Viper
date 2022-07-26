@@ -36,12 +36,12 @@ struct RendererData {
     Viper::Ref<Viper::Renderer::IndexBuffer> IndexBuffer;
     Viper::Ref<Viper::Renderer::VertexBuffer> VertexBuffer;
     Viper::Ref<Viper::Renderer::FrameBuffer> FrameBuffer;
+    Viper::Ref<Viper::Renderer::OrthoGraphicCamera> OrthoGraphicGamera;
 };
 
 RendererData s_Renderer;
 namespace Viper::Renderer {
-    Renderer2D::Renderer2D()
-    {
+    void Renderer2D::Instantiate() {
         s_Renderer.m_VertexBuffer = new Viper::RendererAPI::Vertex_t[ max_quad_count ];
         
         s_Renderer.VertexArray = VertexArray::Create();
@@ -69,13 +69,12 @@ namespace Viper::Renderer {
         s_Renderer.m_TextureTransform[1] = glm::vec2(1.0f, 0.0f);
         s_Renderer.m_TextureTransform[2] = glm::vec2(1.0f, 1.0f);
         s_Renderer.m_TextureTransform[3] = glm::vec2(0.0f, 1.0f);
-    }
+    };
 
-    Renderer2D::~Renderer2D()
-    {
+    void Renderer2D::Destroy() {
         delete[] s_Renderer.m_VertexBuffer;
-    }
-
+    };
+    
     void Renderer2D::Flush()
     {
         GLsizeiptr size_ptr = reinterpret_cast< uint8_t* >( s_Renderer.m_VertexBufferPtr ) - reinterpret_cast< uint8_t* >( s_Renderer.m_VertexBuffer );
@@ -85,7 +84,7 @@ namespace Viper::Renderer {
 
     void Renderer2D::ResizeFBO( int Width, int Height ) {
         RenderCommand::ResizeTexture( s_Renderer.FrameBuffer->GetTex(), Width, Height );
-    }
+    };
 
 
     void Renderer2D::DrawQuad( const glm::mat4& transform, RendererAPI::Color color ) {
@@ -132,11 +131,9 @@ namespace Viper::Renderer {
     void Renderer2D::Begin( const OrthoGraphicCamera& camera ) {
         auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         s_Renderer.m_VertexBufferPtr = s_Renderer.m_VertexBuffer;
-
-        m_Camera = camera;
        
         s_Renderer.m_QuadShader->Use();
-        s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", m_Camera.GetViewProjectionMatrix());
+        s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
         s_Renderer.m_QuadShader->SetUniformMat4("u_Transform", m_Transform);
     };
 
@@ -160,18 +157,6 @@ namespace Viper::Renderer {
 
     void Renderer2D::UnbindFramebuffer() {
         RenderCommand::UnbindFramebuffer();
-    };
-
-    OrthoGraphicCamera Renderer2D::GetCamera() const {
-        return m_Camera;
-    }
-
-    void Renderer2D::PushVec2( const std::string& s, const glm::vec2& v ) {
-        s_Renderer.m_QuadShader->SetVector2(s, v);
-    };
-
-    void Renderer2D::PushFloat( const std::string& s, float v ) {
-        s_Renderer.m_QuadShader->SetFloat(s, v);
     };
 
     uint32_t Renderer2D::GetVertexCount() { return s_Renderer.m_VertexCount; }
@@ -201,5 +186,9 @@ namespace Viper::Renderer {
 
     void RenderCommand::Clear() {
         glClear(GL_COLOR_BUFFER_BIT);
+    };
+
+    void RenderCommand::SetClearColor(float color[3]) {
+        glClearColor(color[0], color[1], color[2], color[3]);
     };
 };

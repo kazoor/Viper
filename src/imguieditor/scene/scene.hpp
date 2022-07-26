@@ -11,6 +11,7 @@ namespace Viper::Scene {
     public:
         Scene(Viper::Graphics::Window* Window) : Layer("Scene"), WindowContext(Window) {
             m_Camera = new Renderer::OrthoGraphicCamera(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
+            Renderer::Renderer2D::Instantiate();
             AspectRatio = 0.0f;
         };
 
@@ -20,6 +21,7 @@ namespace Viper::Scene {
 
         void Destroy() {
             delete m_Camera;
+            Renderer::Renderer2D::Destroy();
         };
 
         void OnUpdate() override {
@@ -28,13 +30,13 @@ namespace Viper::Scene {
 
             AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
 
-            Globals::GlobalsContext::Renderer2D->BindFramebuffer();
+            Renderer::Renderer2D::BindFramebuffer();
 
-            Globals::GlobalsContext::Renderer2D->Begin(*m_Camera);
+            Renderer::Renderer2D::Begin(*m_Camera);
 
             for( int y = -20; y < 20; y++ )
                 for( int x = -20; x < 20; x++ )
-                    Globals::GlobalsContext::Renderer2D->DrawQuad(glm::vec2(x, y), ( x + y ) % 2 ? RendererAPI::Color(0.6f, 0.6f, 0.6f) : RendererAPI::Color(0.7f, 0.7f, 0.7f));
+                    Renderer::Renderer2D::DrawQuad(glm::vec2(x, y), ( x + y ) % 2 ? RendererAPI::Color(0.6f, 0.6f, 0.6f) : RendererAPI::Color(0.7f, 0.7f, 0.7f));
 
             static float posx = 0.0f;
             static float posy = 0.0f;
@@ -44,7 +46,7 @@ namespace Viper::Scene {
             posy = Lerp(posy, Globals::Editor::Position[1], GetDeltaTime() * 3.0f );
             rad = Lerp(rad, Globals::Editor::Radians, GetDeltaTime() * 3.0f );
 
-            Globals::GlobalsContext::Renderer2D->DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
+            Renderer::Renderer2D::DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
             if(!Globals::Editor::isPlaying )
                 m_Camera->SetProjection(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
@@ -61,9 +63,9 @@ namespace Viper::Scene {
                 };
             };
 
-            Globals::GlobalsContext::Renderer2D->Flush();
-            Globals::GlobalsContext::Renderer2D->End();
-            Globals::GlobalsContext::Renderer2D->UnbindFramebuffer();
+            Renderer::Renderer2D::Flush();
+            Renderer::Renderer2D::End();
+            Renderer::Renderer2D::UnbindFramebuffer();
         }
 
         void OnEvent(Viper::Events::Event *Event) override {
