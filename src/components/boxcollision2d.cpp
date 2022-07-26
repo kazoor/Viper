@@ -1,5 +1,6 @@
 #include <ImGui/imgui.h>
 #include <spdlog/spdlog.h>
+#include "../util/ref/reference.hpp"
 #include "boxcollision2d.hpp"
 #include "../util/globals/global.hpp"
 
@@ -25,7 +26,8 @@ namespace Viper::Components {
         for (auto &Objects: Globals::GlobalsContext::Gom->m_GameObjects) {
             if (IsColliding(Objects.get())) {
                 Globals::ConsoleContext::AddLog("BoxCollision2D", "Collision Detected!");
-                Globals::GlobalsContext::EventHandler->Commit( new BoxCollision2DEvent(Box1, Objects.get()));//CreateRef< BoxCollision2DEvent >(Box1, Objects.get()));
+                MAKE_REF(BoxCollision2DEvent, (Box1, Objects.get()));
+                Globals::GlobalsContext::EventHandler->Commit( g_BoxCollision2DEvent.get() );//CreateRef< BoxCollision2DEvent >(Box1, Objects.get()));
             }
         }
     }

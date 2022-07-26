@@ -18,3 +18,5 @@ namespace Viper {
         return std::make_shared< T >( std::forward< TArgs >( args )... );
     };
 };
+
+#define MAKE_REF( x, y ) Viper::Scope< x > g_ ##x = Viper::CreateScope< x >y
