@@ -64,7 +64,7 @@ namespace Viper::Graphics {
             Renderer::Renderer2D::UnbindFramebuffer();
 
             for (auto Layer: *LayerStack) {
-                spdlog::info("Updating Layer {0}", Layer->GetLayerName());
+                //spdlog::info("Updating Layer {0}", Layer->GetLayerName());
                 Layer->OnUpdate();
             }
 

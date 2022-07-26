@@ -7,6 +7,7 @@
 #include "../layers/layer/layer.hpp"
 #include "../events/event/event.hpp"
 #include "../util/globals/global.hpp"
+#include "../util/ref/reference.hpp"
 
 namespace Viper::Input {
     struct KeyboardInputLayerEvent : public Viper::Events::Event {
@@ -33,7 +34,9 @@ namespace Viper::Input {
             for(int I = Key::SPACE; I != Key::MENU; ++I) { // First key in the keyboard enum is Space and the last one is Menu
                 Keyboard.insert({I, Input::IsKeyPressed(I)});
             }
-            Viper::Globals::GlobalsContext::EventHandler->Commit(new KeyboardInputLayerEvent(Keyboard));
+            MAKE_REF(KeyboardInputLayerEvent, (Keyboard));
+
+            Viper::Globals::GlobalsContext::EventHandler->Commit(g_KeyboardInputLayerEvent.get());
             Keyboard.clear(); // Reset the keyboard map when the event has been sent out.
         }
 

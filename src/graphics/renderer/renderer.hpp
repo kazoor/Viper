@@ -30,9 +30,9 @@ namespace Viper::Renderer {
         static uint32_t GetTexture();
 
         // Stats.
-        uint32_t GetVertexCount();
-        uint32_t GetIndexCount();
-        uint32_t GetQuadCount();
+        static uint32_t GetVertexCount();
+        static uint32_t GetIndexCount();
+        static uint32_t GetQuadCount();
 
     private:
         OrthoGraphicCamera m_Camera;

@@ -179,6 +179,8 @@ namespace Viper {
                 ImGui::Text("GameObjects: %i", Globals::GlobalsContext::Gom->GameObjectSize());
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f * Globals::Editor::DeltaTime,
                            1.0f / Globals::Editor::DeltaTime );
+                ImGui::Text("Quads Rendered: %i", Renderer::Renderer2D::GetQuadCount());
+                ImGui::Text("Indices used: %i", Renderer::Renderer2D::GetIndexCount());
                 ImGui::End();
             };
 
@@ -196,7 +198,6 @@ namespace Viper {
             if (ImGui::Begin("Inspector")) {
                 if (Globals::Editor::SelectedObject != -1) {
                     auto &go = Globals::GlobalsContext::Gom->m_GameObjects.at(Globals::Editor::SelectedObject);
-
                     go->OnEditor();
                     
                     MakeComponent< Components::Transform >( go, "Transform" );
@@ -218,7 +219,8 @@ namespace Viper {
         }
 
         void OnEvent(Viper::Events::Event *Event) override {
-            Globals::GlobalsContext::EventHandler->Commit(new OnLayerUpdateEvent());
+            MAKE_REF(OnLayerUpdateEvent, ());
+            Globals::GlobalsContext::EventHandler->Commit(g_OnLayerUpdateEvent.get());
         }
 
         void Destroy() {
