@@ -1,25 +1,13 @@
 // Copyright (c) 2022.
 
-#include <iostream>
 #include <string>
 #include <functional>
-#include <memory>
 #include <glad/glad.h>
-#include <glfw/glfw3.h>
 #include <spdlog/spdlog.h>
-#include <ImGui/imgui.h>
-#include <ImGui/imgui_impl_glfw.h>
-#include <ImGui/imgui_impl_opengl3.h>
 #include "window.hpp"
 #include "../../util/input/inputhandler/inputhandler.hpp"
 #include "../../imguieditor/imguieditor.hpp"
 #include "../../imguieditor/scene/scene.hpp"
-#include "../../util/input/mouse/mouseevents.hpp"
-#include "../../layers/layer/layer.hpp"
-#include "../../layers/layerstack/layerstack.hpp"
-#include "../../util/globals/global.hpp"
-#include "../../inputlayer/keyboardinputlayer.hpp"
-#include "../../inputlayer/mouseinputlayer.hpp"
 
 namespace Viper::Graphics {
 
@@ -80,11 +68,6 @@ namespace Viper::Graphics {
                 Layer->OnUpdate();
             }
 
-            auto scrolldelta = Input::Input::GetScrollInput();
-            auto mouse = Input::MouseEvents::GetMousePosition();
-
-            spdlog::info("MouseCallbackPos: {0}, {1}", mouse.first, mouse.second);
-
             Update();
         }
 
@@ -112,8 +95,8 @@ namespace Viper::Graphics {
         Globals::GlobalsContext::EventHandler->Subscribe(new Viper::Input::MouseEvents(),
                                          &Input::MouseEvents::OnMouseCursorPositionEvent);
 
-        for (auto It = LayerStack->end(); It != LayerStack->begin();) {
-            Globals::GlobalsContext::EventHandler->Subscribe((*--It), &Viper::Layers::Layer::OnEvent);
+        for (auto &It : *LayerStack) {
+            Globals::GlobalsContext::EventHandler->Subscribe(It, &Viper::Layers::Layer::OnEvent);
         }
     }
 

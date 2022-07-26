@@ -9,6 +9,8 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/shaders/shader/shader.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/layers/layerstack/layerstack.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/renderer.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/vertexbuffer.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/vertexarray.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/sprite2d.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/camera/orthographic_camera.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/component.cpp
@@ -18,6 +20,7 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/camera.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/gom.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/components/boxcollision2d.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/input.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/inputhandler/inputhandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
@@ -30,7 +33,7 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_impl_opengl3.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_widgets.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_tables.cpp
-            )
+        )
 
 # Set target folders
 message(STATUS "Setting up output directories.")

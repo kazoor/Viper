@@ -11,6 +11,7 @@
 #include "../components/boxcollision2d.hpp"
 #include "../util/input/input.hpp"
 #include "../util/input/keycodes.hpp"
+#include "../components/input.hpp"
 
 namespace Viper {
     struct OnLayerUpdateEvent : public Viper::Events::Event {
@@ -57,8 +58,6 @@ namespace Viper {
             ImGui_ImplOpenGL3_Init("#version 410");
 
             style.GrabRounding = 2.0f;
-
-            WindowPaddingReserved = style.WindowPadding;
 
             Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleSuccess );
             Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleError );
@@ -204,6 +203,7 @@ namespace Viper {
                     MakeComponent< Components::SpriteRenderer >( go, "SpriteRenderer", go.get());
                     MakeComponent< Components::BoxCollision2D >( go, "BoxCollision2D", go.get());
                     MakeComponent< Components::Camera >( go, "Camera", go.get());
+                    MakeComponent< Components::Input >( go, "Input") ;
 
                     ImGui::Separator();
                 }
@@ -242,6 +242,5 @@ namespace Viper {
 
     private:
         Viper::Graphics::Window *WindowContext;
-        ImVec2 WindowPaddingReserved;
     };
 }
