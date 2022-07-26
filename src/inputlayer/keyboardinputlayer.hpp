@@ -6,9 +6,11 @@
 #include "../util/input/keycodes.hpp"
 #include "../layers/layer/layer.hpp"
 #include "../events/event/event.hpp"
+#include "../util/globals/global.hpp"
 
 namespace Viper::Input {
     struct KeyboardInputLayerEvent : public Viper::Events::Event {
+        KeyboardInputLayerEvent() {}
         KeyboardInputLayerEvent(std::unordered_map<int, bool> Keyboard) : Keyboard(std::move(Keyboard)) {}
 
         // The event sends out an unordered_map of the keyboard each update, int = key, bool = state
@@ -28,14 +30,14 @@ namespace Viper::Input {
         }
 
         void OnUpdate() override {
-            for(int I = Key::SPACE; I != Key::MENU; ++I) {
+            for(int I = Key::SPACE; I != Key::MENU; ++I) { // First key in the keyboard enum is Space and the last one is Menu
                 Keyboard.insert({I, Input::IsKeyPressed(I)});
             }
+            Viper::Globals::GlobalsContext::EventHandler->Commit(new KeyboardInputLayerEvent(Keyboard));
+            Keyboard.clear(); // Reset the keyboard map when the event has been sent out.
         }
 
         void OnEvent(Viper::Events::Event *Event) override {
-            Globals::GlobalsContext::EventHandler->Commit(new KeyboardInputLayerEvent(Keyboard));
-            Keyboard.clear(); // Reset the keyboard map when the event has been sent out.
         }
 
     private:
