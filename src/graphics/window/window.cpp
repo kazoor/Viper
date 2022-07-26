@@ -59,9 +59,9 @@ namespace Viper::Graphics {
             Globals::Editor::DeltaTime = current_delta - previous_delta;
             previous_delta = current_delta;
 
-            Globals::GlobalsContext::Renderer2D->BindFramebuffer();
+            Renderer::Renderer2D::BindFramebuffer();
             glClear(GL_COLOR_BUFFER_BIT);
-            Globals::GlobalsContext::Renderer2D->UnbindFramebuffer();
+            Renderer::Renderer2D::UnbindFramebuffer();
 
             for (auto Layer: *LayerStack) {
                 spdlog::info("Updating Layer {0}", Layer->GetLayerName());
@@ -157,14 +157,14 @@ namespace Viper::Graphics {
         glViewport(0, 0, E->Width, E->Height);
         WindowParams.Width = E->Width;
         WindowParams.Height = E->Height;
-        Globals::GlobalsContext::Renderer2D->ResizeFBO(E->Width, E->Height);
+        Renderer::Renderer2D::ResizeFBO(E->Width, E->Height);
     }
 
     void Window::OnWindowResizeEvent(WindowResizeEvent *E) {
         spdlog::info("WindowResize Event triggered! New size is {0}x{1}", E->Width, E->Height);
         WindowParams.Width = E->Width;
         WindowParams.Height = E->Height;
-        Globals::GlobalsContext::Renderer2D->ResizeFBO(E->Width, E->Height);
+        Renderer::Renderer2D::ResizeFBO(E->Width, E->Height);
     }
 
     void Window::OnWindowPositionEvent(WindowPositionEvent *E) {
