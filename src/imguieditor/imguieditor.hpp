@@ -114,8 +114,6 @@ namespace Viper {
                     Globals::Editor::isPlaying = false;
                 };
 
-                ImGui::Image(reinterpret_cast< ImTextureID >( Globals::GlobalsContext::Renderer2D->GetTestTextureID()), ImVec2(100,100));
-
                 ImGui::Separator();
                 static char buff[80];
                 ImGui::SetNextItemWidth(100.0f);
