@@ -28,8 +28,6 @@ namespace Viper::Renderer {
         uint32_t GetFramebufferID() { return m_Fbo; };
         uint32_t GetTexturebufferID() { return m_Tcb; };
 
-        uint32_t GetTestTextureID() { return m_TestTexture; };
-
         void ResizeFBO( int Width, int Height );
 
         void PushVec2( const std::string& s, const glm::vec2& v );
