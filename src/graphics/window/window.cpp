@@ -1,25 +1,13 @@
 // Copyright (c) 2022.
 
-#include <iostream>
 #include <string>
 #include <functional>
-#include <memory>
 #include <glad/glad.h>
-#include <glfw/glfw3.h>
 #include <spdlog/spdlog.h>
-#include <ImGui/imgui.h>
-#include <ImGui/imgui_impl_glfw.h>
-#include <ImGui/imgui_impl_opengl3.h>
 #include "window.hpp"
 #include "../../util/input/inputhandler/inputhandler.hpp"
 #include "../../imguieditor/imguieditor.hpp"
 #include "../../imguieditor/scene/scene.hpp"
-#include "../../util/input/mouse/mouseevents.hpp"
-#include "../../layers/layer/layer.hpp"
-#include "../../layers/layerstack/layerstack.hpp"
-#include "../../util/globals/global.hpp"
-#include "../../inputlayer/keyboardinputlayer.hpp"
-#include "../../inputlayer/mouseinputlayer.hpp"
 
 namespace Viper::Graphics {
 

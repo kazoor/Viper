@@ -10,14 +10,8 @@ namespace Viper::Scene {
     class Scene : public Viper::Layers::Layer {
     public:
         Scene(Viper::Graphics::Window* Window) : Layer("Scene"), WindowContext(Window) {
-           //gom = new Components::GameObjectManager();
-           //auto new_gob = std::make_unique< Components::GameObject >( );
-           //         new_gob->AddComponent< Components::Game >( );
-           //gom->OnAdd(std::move( new_gob ));
-           //gom->OnAwake();
-
             m_Camera = new Renderer::OrthoGraphicCamera(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
-           AspectRatio = 0.0f;
+            AspectRatio = 0.0f;
         };
 
         ~Scene() {
@@ -33,9 +27,9 @@ namespace Viper::Scene {
                     WindowContext->Ctx());
 
             AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
-            
+
             Globals::GlobalsContext::Renderer2D->BindFramebuffer();
-            
+
             Globals::GlobalsContext::Renderer2D->Begin(*m_Camera);
 
             for( int y = -20; y < 20; y++ )
@@ -49,15 +43,15 @@ namespace Viper::Scene {
             posx = Lerp(posx, Globals::Editor::Position[0], GetDeltaTime() * 3.0f );
             posy = Lerp(posy, Globals::Editor::Position[1], GetDeltaTime() * 3.0f );
             rad = Lerp(rad, Globals::Editor::Radians, GetDeltaTime() * 3.0f );
-            
+
             Globals::GlobalsContext::Renderer2D->DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
             if(!Globals::Editor::isPlaying )
                 m_Camera->SetProjection(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
-            
+
             for(auto& go : Globals::GlobalsContext::Gom->m_GameObjects ) {
                 go->OnUpdate(GetDeltaTime());
-                
+
                 if( go->HasComponent< Components::Camera >( ) ) {
                     auto& cam = go->GetComponent< Components::Transform >( );
                     if( Globals::Editor::isPlaying ) {
@@ -73,7 +67,6 @@ namespace Viper::Scene {
         }
 
         void OnEvent(Viper::Events::Event *Event) override {
-
         }
 
         double GetDeltaTime() const {
@@ -85,7 +78,6 @@ namespace Viper::Scene {
         };
     private:
         Graphics::Window* WindowContext;
-        bool hasCameraTarget;
         Renderer::OrthoGraphicCamera* m_Camera;
     private:
         float AspectRatio;

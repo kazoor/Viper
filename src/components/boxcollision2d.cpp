@@ -25,7 +25,7 @@ namespace Viper::Components {
         for (auto &Objects: Globals::GlobalsContext::Gom->m_GameObjects) {
             if (IsColliding(Objects.get())) {
                 Globals::ConsoleContext::AddLog("BoxCollision2D", "Collision Detected!");
-                Globals::GlobalsContext::EventHandler->Commit(new BoxCollision2DEvent(Box1, Objects.get()));
+                Globals::GlobalsContext::EventHandler->Commit( new BoxCollision2DEvent(Box1, Objects.get()));//CreateRef< BoxCollision2DEvent >(Box1, Objects.get()));
             }
         }
     }
