@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp> // ortho
 #include "../../src/graphics/shaders/shader/shader.hpp"
+#include "vertexbuffer.hpp"
+#include "vertexarray.hpp"
 
 constexpr uint32_t max_quad_count = 32000;
 constexpr uint32_t max_vertices_count = max_quad_count * 4;
@@ -26,6 +28,8 @@ struct RendererData {
 
     glm::vec4 m_QuadTransform[ 4 ];
     glm::vec2 m_TextureTransform[ 4 ];
+
+    Viper::Ref<Viper::Renderer::VertexArray> QuadVAO;
 };
 
 RendererData s_Renderer;
@@ -41,8 +45,10 @@ namespace Viper::Renderer {
 
         s_Renderer.m_VertexBuffer = new Viper::RendererAPI::Vertex_t[ max_quad_count ];
         
-        glGenVertexArrays(1, &m_Vao);
-        glBindVertexArray(m_Vao);
+        //glGenVertexArrays(1, &m_Vao);
+        //glBindVertexArray(m_Vao);
+        s_Renderer.QuadVAO = Viper::Renderer::VertexArray::Create();
+        s_Renderer.QuadVAO->Bind();
 
         glGenBuffers(1, &m_Vbo);
         glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
@@ -78,7 +84,7 @@ namespace Viper::Renderer {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_IndexArray), m_IndexArray, GL_STATIC_DRAW);
 
-        glBindVertexArray(0);
+        s_Renderer.QuadVAO->Unbind();
 
         glGenFramebuffers(1, &m_Fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, m_Fbo);
@@ -223,7 +229,7 @@ namespace Viper::Renderer {
     void Renderer2D::End() {
 
         glBindTexture(GL_TEXTURE_2D, m_Tcb);
-        RenderCommand::DrawIndexed(m_Vao, s_Renderer.m_IndexCount );
+        RenderCommand::DrawIndexed(s_Renderer.QuadVAO->Get(), s_Renderer.m_IndexCount );
 
         s_Renderer.m_IndexCount = 0;
         s_Renderer.m_QuadCount = 0;

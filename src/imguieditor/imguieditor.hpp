@@ -59,8 +59,6 @@ namespace Viper {
 
             style.GrabRounding = 2.0f;
 
-            WindowPaddingReserved = style.WindowPadding;
-
             Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleSuccess );
             Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleError );
             Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleWarning );
@@ -244,6 +242,5 @@ namespace Viper {
 
     private:
         Viper::Graphics::Window *WindowContext;
-        ImVec2 WindowPaddingReserved;
     };
 }
