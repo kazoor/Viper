@@ -27,7 +27,7 @@ namespace Viper::Components {
         void OnEditor() override;
 
         bool IsColliding(GameObject *Box2);
-        
+
     private:
         bool CheckCollision(Transform T1, Transform T2);
     private:

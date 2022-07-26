@@ -80,11 +80,6 @@ namespace Viper::Graphics {
                 Layer->OnUpdate();
             }
 
-            auto scrolldelta = Input::Input::GetScrollInput();
-            auto mouse = Input::MouseEvents::GetMousePosition();
-
-            spdlog::info("MouseCallbackPos: {0}, {1}", mouse.first, mouse.second);
-
             Update();
         }
 
@@ -112,8 +107,8 @@ namespace Viper::Graphics {
         Globals::GlobalsContext::EventHandler->Subscribe(new Viper::Input::MouseEvents(),
                                          &Input::MouseEvents::OnMouseCursorPositionEvent);
 
-        for (auto It = LayerStack->end(); It != LayerStack->begin();) {
-            Globals::GlobalsContext::EventHandler->Subscribe((*--It), &Viper::Layers::Layer::OnEvent);
+        for (auto &It : *LayerStack) {
+            Globals::GlobalsContext::EventHandler->Subscribe(It, &Viper::Layers::Layer::OnEvent);
         }
     }
 
