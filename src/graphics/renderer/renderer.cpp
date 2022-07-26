@@ -1,8 +1,6 @@
 #include "renderer.hpp"
 #include <array>
 #include <glm/mat4x4.hpp>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp> // ortho
 #include "../../src/graphics/shaders/shader/shader.hpp"
@@ -94,23 +92,6 @@ namespace Viper::Renderer {
         glBindTexture(GL_TEXTURE_2D, 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Tcb, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        glGenTextures(1, &m_TestTexture);
-        glBindTexture(GL_TEXTURE_2D, m_TestTexture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        int m_TexWidth, m_TexHeight, m_TexChannels;
-        unsigned char* m_TextureData = stbi_load("cherno.png", &m_TexWidth, &m_TexHeight, &m_TexChannels, 0);
-
-        if( m_TextureData ) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_TexWidth, m_TexHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, m_TextureData);
-            glGenerateMipmap(GL_TEXTURE_2D);
-        };
-
-        stbi_image_free(m_TextureData);
-        glBindTexture(GL_TEXTURE_2D, 0);
 
         s_Renderer.m_QuadShader = Graphics::Shader::Create("resources/flat.vert", "resources/flat.frag");
         s_Renderer.m_TextureShader = Graphics::Shader::Create("resources/quad.vert", "resources/quad.frag");
