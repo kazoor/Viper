@@ -14,7 +14,7 @@ namespace Viper::Renderer {
         glGenVertexArrays(1, &VAO);
     }
 
-    uint32_t VertexArray::Get() {
+    uint32_t VertexArray::Get() const {
         return VAO;
     }
 
@@ -24,5 +24,9 @@ namespace Viper::Renderer {
 
     void VertexArray::Bind() {
         glBindVertexArray(VAO);
+    }
+
+    VertexArray::~VertexArray() {
+        glDeleteVertexArrays(1, &VAO);
     }
 }

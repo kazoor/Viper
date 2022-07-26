@@ -5,15 +5,19 @@
 #ifndef VIPER_VERTEXBUFFER_HPP
 #define VIPER_VERTEXBUFFER_HPP
 #include <cstdint>
+#include <vector>
 #include "../../util/ref/reference.hpp"
 
 namespace Viper::Renderer {
     class VertexBuffer {
     public:
-        VertexBuffer();
-        static Ref< VertexBuffer > Create( uint32_t max_vert_cound );
+        VertexBuffer( uint32_t max_vert_count );
+        ~VertexBuffer();
+        static Ref< VertexBuffer > Create( uint32_t max_vert_count );
+        uint32_t Get() const;
+        void Bind();
+        void Unbind();
     private:
-        uint32_t VAO;
         uint32_t VBO;
     };
 };

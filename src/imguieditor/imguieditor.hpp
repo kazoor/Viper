@@ -7,11 +7,11 @@
 #include "../layers/layer/layer.hpp"
 #include "../events/event/event.hpp"
 #include "../graphics/window/window.hpp"
-#include "../util/globals/global.hpp"
 #include "../components/boxcollision2d.hpp"
+#include "../components/input.hpp"
+#include "../util/globals/global.hpp"
 #include "../util/input/input.hpp"
 #include "../util/input/keycodes.hpp"
-#include "../components/input.hpp"
 
 namespace Viper {
     struct OnLayerUpdateEvent : public Viper::Events::Event {
@@ -92,7 +92,7 @@ namespace Viper {
             if (ImGui::Begin("Scene")) {
                 ImVec2 SceneSize = ImGui::GetContentRegionAvail();
                 ImGui::Image(
-                        reinterpret_cast< ImTextureID * >( Globals::GlobalsContext::Renderer2D->GetTexturebufferID()),
+                        reinterpret_cast< ImTextureID * >( Renderer::Renderer2D::GetTexture()),
                         ImVec2(SceneSize.x, SceneSize.y));
                 if (ImGui::IsItemClicked())
                     Globals::Editor::SelectedObject = -1;
