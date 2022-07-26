@@ -9,7 +9,7 @@
 #include "../layers/layer/layer.hpp"
 #include "../events/event/event.hpp"
 #include "../util/input/mouse/mouseevents.hpp"
-#include "../util/globals/global.hpp"
+#include "../util/ref/reference.hpp"
 
 namespace Viper::Input {
     struct MouseInputLayerEvent : public Viper::Events::Event {
@@ -42,7 +42,8 @@ namespace Viper::Input {
             MousePos = Input::GetMousePosition();
             ScrollInput = Input::GetScrollInput();
 
-            Globals::GlobalsContext::EventHandler->Commit(new MouseInputLayerEvent(Mouse, MousePos, ScrollInput));
+            MAKE_REF(MouseInputLayerEvent, (Mouse, MousePos, ScrollInput));
+            Globals::GlobalsContext::EventHandler->Commit(g_MouseInputLayerEvent.get());
 
             // Reset all values after sending the event.
             Mouse.clear();
