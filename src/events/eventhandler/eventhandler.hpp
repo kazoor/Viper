@@ -25,7 +25,6 @@ namespace Viper::Events {
                     Handler->Exec(E);
                 }
             }
-
             delete E;
         }
 

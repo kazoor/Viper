@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include "transform.hpp"
 #include "component.hpp"
 
 namespace Viper::Components {
@@ -25,6 +26,10 @@ namespace Viper::Components {
                 };
             };
             return *std::unique_ptr< T >( nullptr );
+        };
+
+        Transform GetTransform() {
+            return GetComponent< Transform >( );
         };
 
         template< class T = Component >
