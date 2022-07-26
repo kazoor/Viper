@@ -9,7 +9,10 @@ namespace Viper::Renderer {
         static Ref< Sprite2D > Create( const std::string& sprite_path );
         static Ref< Sprite2D > Create( const std::string& sprite_path, int width, int height );
 
-        uint32_t GetSprite();
+        uint32_t GetSprite() const;
+
+        void Bind();
+        void Unbind();
     private:
         int Width;
         int Height;

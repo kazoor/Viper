@@ -7,13 +7,16 @@
 #include "../../util/ref/reference.hpp"
 
 namespace Viper::Renderer {
+
     class VertexArray {
     public:
         VertexArray();
+        ~VertexArray();
 
         static Ref< VertexArray > Create();
 
-        uint32_t Get();
+        uint32_t Get() const;
+
         void Bind();
         void Unbind();
     private:

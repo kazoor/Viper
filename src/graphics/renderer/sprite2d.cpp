@@ -24,7 +24,7 @@ namespace Viper::Renderer {
      };
     
     Sprite2D::~Sprite2D() {
-        glDeleteBuffers(1, &SpriteID);
+        glDeleteTextures(1, &SpriteID);
     };
 
     Ref< Sprite2D > Sprite2D::Create( const std::string& sprite_path ) {
@@ -35,7 +35,15 @@ namespace Viper::Renderer {
         return CreateRef< Sprite2D >( sprite_path, width, height );
     };
 
-    uint32_t Sprite2D::GetSprite() {
+    uint32_t Sprite2D::GetSprite() const {
         return SpriteID;
+    };
+
+    void Sprite2D::Bind() {
+        glBindTexture(GL_TEXTURE_2D, SpriteID);
+    };
+
+    void Sprite2D::Unbind() {
+        glBindTexture(GL_TEXTURE_2D, 0);
     };
 };
