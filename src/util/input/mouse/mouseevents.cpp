@@ -2,24 +2,17 @@
 #include <spdlog/spdlog.h>
 #include <utility>
 #include "mouseevents.hpp"
-#include "../../../graphics/window/window.hpp"
-#include "../../globals/global.hpp"
 
 double MousePosX, MousePosY;
 
 namespace Viper::Input {
+    // TODO: Fix events here
     MouseEvents::MouseEvents() {
         auto Ctx = glfwGetCurrentContext();
-
         glfwSetCursorPosCallback(Ctx, [](GLFWwindow *Window, double XPos, double YPos) {
-            
-            Globals::GlobalsContext::EventHandler->Commit(new MouseCursorPositionEvent(XPos, YPos));
+            MousePosX = XPos;
+            MousePosY = YPos;
         });
-    }
-
-    void MouseEvents::OnMouseCursorPositionEvent(MouseCursorPositionEvent *E) {
-        MousePosX = E->XPos;
-        MousePosY = E->YPos;
     }
 
     std::pair<double, double> MouseEvents::GetMousePosition() {

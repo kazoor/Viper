@@ -85,7 +85,7 @@ namespace Viper::Graphics {
 
     void Window::SetEventSubscriptions() {
         // WindowEvents subscriptions.
-        Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowFrameBufferSizeEvent);
+        /*Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowFrameBufferSizeEvent);
         Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowResizeEvent);
         Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowPositionEvent);
         Globals::GlobalsContext::EventHandler->Subscribe(this, &Window::OnWindowContentScaleEvent);
@@ -97,15 +97,18 @@ namespace Viper::Graphics {
 
         for (auto &It : *LayerStack) {
             Globals::GlobalsContext::EventHandler->Subscribe(It, &Viper::Layers::Layer::OnEvent);
-        }
+        }*/
     }
 
     void Window::UpdateWindowEvents() {
         glfwSetFramebufferSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
-            Globals::GlobalsContext::EventHandler->Commit(new WindowFrameBufferSizeEvent(Width, Height));
+            // Globals::GlobalsContext::EventHandler->Commit(new WindowFrameBufferSizeEvent(Width, Height));
+            WindowParams_t& Data = *(WindowParams_t*)glfwGetWindowUserPointer(Window);
+            WindowFrameBufferSizeEvent Event(Width, Height);
+            Data.EventCallback(Event);
         });
 
-        glfwSetWindowSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
+        /* glfwSetWindowSizeCallback(Context, [](GLFWwindow *Window, int Width, int Height) {
             Globals::GlobalsContext::EventHandler->Commit(new WindowResizeEvent(Width, Height));
         });
 
@@ -127,7 +130,7 @@ namespace Viper::Graphics {
 
         glfwSetWindowCloseCallback(Context, [](GLFWwindow *Window) {
             Globals::GlobalsContext::EventHandler->Commit(new WindowCloseEvent());
-        });
+        }); */
     }
 
     void Window::Update() const {
@@ -160,7 +163,7 @@ namespace Viper::Graphics {
         Renderer::Renderer2D::ResizeFBO(E->Width, E->Height);
     }
 
-    void Window::OnWindowResizeEvent(WindowResizeEvent *E) {
+    /* void Window::OnWindowResizeEvent(WindowResizeEvent *E) {
         spdlog::info("WindowResize Event triggered! New size is {0}x{1}", E->Width, E->Height);
         WindowParams.Width = E->Width;
         WindowParams.Height = E->Height;
@@ -185,5 +188,5 @@ namespace Viper::Graphics {
 
     void Window::OnWindowCloseEvent(WindowCloseEvent *E) {
         spdlog::info("WindowCloseEvent Event triggered!");
-    }
+    }*/
 }

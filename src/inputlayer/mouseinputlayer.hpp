@@ -7,12 +7,12 @@
 #include "../util/input/inputhandler/inputhandler.hpp"
 #include "../util/input/mousebuttoncodes.hpp"
 #include "../layers/layer/layer.hpp"
-#include "../events/event/event.hpp"
 #include "../util/input/mouse/mouseevents.hpp"
 #include "../util/ref/reference.hpp"
 
 namespace Viper::Input {
-    struct MouseInputLayerEvent : public Viper::Events::Event {
+    //TODO: Fix events here
+    /*struct MouseInputLayerEvent : public Viper::Events::Event {
         MouseInputLayerEvent() {}
         MouseInputLayerEvent(std::unordered_map<int, bool> Mouse, std::pair<double, double> MousePos, std::pair<double, double> ScrollInput) : Mouse(std::move(Mouse)), MousePos(std::move(MousePos)), ScrollInput(std::move(ScrollInput)) {}
 
@@ -20,7 +20,7 @@ namespace Viper::Input {
         std::unordered_map<int, bool> Mouse;
         std::pair<double, double> MousePos;
         std::pair<double, double> ScrollInput;
-    };
+    };*/
 
     class MouseInputLayer : public Viper::Layers::Layer {
     public:
@@ -42,8 +42,7 @@ namespace Viper::Input {
             MousePos = Input::GetMousePosition();
             ScrollInput = Input::GetScrollInput();
 
-            MAKE_REF(MouseInputLayerEvent, (Mouse, MousePos, ScrollInput));
-            Globals::GlobalsContext::EventHandler->Commit(g_MouseInputLayerEvent.get());
+            // Globals::GlobalsContext::EventHandler->Commit(g_MouseInputLayerEvent.get());
 
             // Reset all values after sending the event.
             Mouse.clear();
@@ -51,8 +50,8 @@ namespace Viper::Input {
             ScrollInput = {0, 0};
         }
 
-        void OnEvent(Viper::Events::Event *Event) override {
-        }
+        /*void OnEvent(Viper::Events::Event *Event) override {
+        }*/
 
     private:
         std::unordered_map<int, bool> Mouse;

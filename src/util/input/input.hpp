@@ -1,16 +1,14 @@
 #pragma once
 #include <utility>
-#include "../../events/event/event.hpp"
-#include "../../events/eventhandler/eventhandler.hpp"
 
 namespace Viper::Input {
 
-    struct ScrollEvent : public Viper::Events::Event {
+    /*struct ScrollEvent : public Viper::Events::Event {
         ScrollEvent(double X, double Y) : X(X), Y(Y) {}
 
         double X;
         double Y;
-    };
+    };*/
 
     class Input {
     public:

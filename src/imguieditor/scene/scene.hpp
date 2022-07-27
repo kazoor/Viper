@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../layers/layer/layer.hpp"
-#include "../../events/event/event.hpp"
 #include "../../graphics/window/window.hpp"
 #include "../../util/globals/global.hpp"
 #include "../../graphics/renderer/camera/orthographic_camera.hpp"
@@ -68,8 +67,8 @@ namespace Viper::Scene {
             Renderer::Renderer2D::UnbindFramebuffer();
         }
 
-        void OnEvent(Viper::Events::Event *Event) override {
-        }
+       /* void OnEvent(Viper::Events::Event *Event) override {
+        }*/
 
         double GetDeltaTime() const {
             return Globals::Editor::DeltaTime;

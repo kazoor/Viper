@@ -28,9 +28,10 @@ namespace Viper::Components {
         const std::pair<double, double> &GetScrollInput() const;
 
     private:
-        void OnKeyboardEventUpdate(Viper::Input::KeyboardInputLayerEvent *E);
+        // TODO: Fix events here
+       // void OnKeyboardEventUpdate(Viper::Input::KeyboardInputLayerEvent *E);
 
-        void OnMouseEventUpdate(Viper::Input::MouseInputLayerEvent *E);
+       // void OnMouseEventUpdate(Viper::Input::MouseInputLayerEvent *E);
     private:
         std::unordered_map<int, bool> Keys;
 

@@ -3,15 +3,15 @@
 #include "transform.hpp"
 #include "component.hpp"
 #include "gameobject.hpp"
-#include "../events/event/event.hpp"
 
 namespace Viper::Components {
-    struct BoxCollision2DEvent : Viper::Events::Event {
+    // TODO: Fix events here
+    /*struct BoxCollision2DEvent : Viper::Events::Event {
         BoxCollision2DEvent(GameObject* First, GameObject* Second) : First(First), Second(Second) {}
 
         GameObject* First;
         GameObject* Second;
-    };
+    };*/
 
     class BoxCollision2D : public Component {
     VIPER_CLASS_DECLARATION(BoxCollision2D)

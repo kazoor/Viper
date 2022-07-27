@@ -5,7 +5,6 @@
 #include <ImGui/imgui_impl_glfw.h>
 #include <ImGui/imgui_impl_opengl3.h>
 #include "../layers/layer/layer.hpp"
-#include "../events/event/event.hpp"
 #include "../graphics/window/window.hpp"
 #include "../components/boxcollision2d.hpp"
 #include "../components/input.hpp"
@@ -14,9 +13,10 @@
 #include "../util/input/keycodes.hpp"
 
 namespace Viper {
-    struct OnLayerUpdateEvent : public Viper::Events::Event {
+    // TODO: Fix events here
+    /*struct OnLayerUpdateEvent : public Viper::Events::Event {
         OnLayerUpdateEvent() {}
-    };
+    };*/
 
     class ImGuiEditor : public Layers::Layer {
     public:
@@ -218,10 +218,10 @@ namespace Viper {
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
 
-        void OnEvent(Viper::Events::Event *Event) override {
+        /*void OnEvent(Viper::Events::Event *Event) override {
             MAKE_REF(OnLayerUpdateEvent, ());
             Globals::GlobalsContext::EventHandler->Commit(g_OnLayerUpdateEvent.get());
-        }
+        }*/
 
         void Destroy() {
             ImGui_ImplOpenGL3_Shutdown();

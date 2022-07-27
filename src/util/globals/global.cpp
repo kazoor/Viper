@@ -17,16 +17,16 @@ namespace Viper::Globals {
     // == // == // == // == // == // == //
 
     VIPER_DECLARE_CONTEXT_NULL(Components::GameObjectManager*, Gom)
-    VIPER_DECLARE_CONTEXT_NULL(Events::EventBus*, EventHandler)
+    // VIPER_DECLARE_CONTEXT_NULL(Events::EventBus*, EventHandler)
 
     void GlobalsContext::CreateContext() {
         Gom = new Components::GameObjectManager();
-        EventHandler = new Events::EventBus();
+        // EventHandler = new Events::EventBus();
     };
 
     void GlobalsContext::DestroyContext() {
         delete Gom;
-        delete EventHandler;
+        // delete EventHandler;
     };
 
     // == // == // == // == // == // == //

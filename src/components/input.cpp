@@ -14,16 +14,17 @@ namespace Viper::Components {
 
     }
 
+    //TODO: Fix events here
     void Input::OnUpdate(double deltatime) {
-        Globals::GlobalsContext::EventHandler->Subscribe(this, &Viper::Components::Input::OnKeyboardEventUpdate);
-        Globals::GlobalsContext::EventHandler->Subscribe(this, &Viper::Components::Input::OnMouseEventUpdate);
+        // Globals::GlobalsContext::EventHandler->Subscribe(this, &Viper::Components::Input::OnKeyboardEventUpdate);
+        // Globals::GlobalsContext::EventHandler->Subscribe(this, &Viper::Components::Input::OnMouseEventUpdate);
     }
 
     void Input::OnEditor() {
 
     }
 
-    void Input::OnKeyboardEventUpdate(Viper::Input::KeyboardInputLayerEvent *E) {
+  /*  void Input::OnKeyboardEventUpdate(Viper::Input::KeyboardInputLayerEvent *E) {
         Keys = E->Keyboard;
     }
 
@@ -31,7 +32,7 @@ namespace Viper::Components {
         MouseButtons = E->Mouse;
         MousePos = E->MousePos;
         ScrollInput = E->ScrollInput;
-    }
+    }*/
 
     const std::unordered_map<int, bool> &Input::GetKeys() const {
         return Keys;

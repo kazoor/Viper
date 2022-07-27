@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
-#include "../../events/event/event.hpp"
-#include "../../events/eventhandler/eventhandler.hpp"
 
 namespace Viper::Layers {
+
+    // TODO: Fix events here.
     class Layer {
     public:
         Layer(const std::string &LayerName = "NewLayer") : LayerName(LayerName) {}
@@ -12,7 +12,7 @@ namespace Viper::Layers {
         virtual void OnAttach() {}
         virtual void OnDetach() {}
         virtual void OnUpdate() {}
-        virtual void OnEvent(Viper::Events::Event *Event) {}
+        // virtual void OnEvent(Viper::Events::Event *Event) {}
 
         inline const std::string &GetLayerName() const { return LayerName; }
     protected:
