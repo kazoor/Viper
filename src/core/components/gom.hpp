@@ -3,8 +3,8 @@
 #include <memory>
 #include "gameobject.hpp"
 #include "transform.hpp"
-#include "spriterenderer.hpp"
-#include "camera.hpp"
+//#include "spriterenderer.hpp"
+//#include "camera.hpp"
 #include "../util/ref/reference.hpp"
 
 namespace Viper::Components {
