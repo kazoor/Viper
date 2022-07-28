@@ -43,7 +43,7 @@ namespace Viper::Components {
         tr.position.y += direction_y * 1.0f * deltatime * 3.0f;
     };
 
-    void Camera::SetEditor() {
+    void Camera::Editor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
         if(ImGui::TreeNodeEx( " " ICON_FA_CUBE " Camera", t)) {
             ImGui::TreePop();
