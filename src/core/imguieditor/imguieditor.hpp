@@ -35,33 +35,42 @@ namespace Viper {
             ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
             io.Fonts->AddFontFromFileTTF( FONT_ICON_FILE_NAME_FAS, 12.0f, &icons_config, icons_ranges );
 
+            style.Colors[ImGuiCol_Text] = ImColor( 200, 200, 200, 255 );
             style.Colors[ImGuiCol_Button] = ImColor(35, 35, 35, 255);
             style.Colors[ImGuiCol_ButtonHovered] = ImColor(40, 40, 40, 255);
             style.Colors[ImGuiCol_ButtonActive] = ImColor(45, 45, 45, 255);
 
-            style.Colors[ImGuiCol_FrameBg] = ImColor(35, 35, 35, 255);
-            style.Colors[ImGuiCol_FrameBgHovered] = ImColor(40, 40, 40, 255);
-            style.Colors[ImGuiCol_FrameBgActive] = ImColor(45, 45, 45, 255);
+            style.Colors[ImGuiCol_FrameBg] = ImColor(14, 16, 39, 255);
+            style.Colors[ImGuiCol_FrameBgHovered] = ImColor(17, 19, 47, 255);
+            style.Colors[ImGuiCol_FrameBgActive] = ImColor(22, 25, 52, 255);
 
-            style.Colors[ImGuiCol_TitleBg] = ImColor(35, 35, 35, 255);
-            style.Colors[ImGuiCol_TitleBgActive] = ImColor(40, 40, 40, 255);
-            style.Colors[ImGuiCol_TitleBgCollapsed] = ImColor(45, 45, 45, 255);
+            style.Colors[ImGuiCol_Tab] = ImColor(17, 11, 44, 255);
+            style.Colors[ImGuiCol_TabHovered] = ImColor(22, 17, 68, 255);
+            style.Colors[ImGuiCol_TabActive] = ImColor(22, 17, 68, 255);
+            style.Colors[ImGuiCol_TabUnfocused] = ImColor(17, 11, 44, 255);
+            style.Colors[ImGuiCol_TabUnfocusedActive] = ImColor(41, 29, 93, 255);
 
-            style.Colors[ImGuiCol_Tab] = ImColor(35, 35, 35, 255);
-            style.Colors[ImGuiCol_TabHovered] = ImColor(40, 40, 40, 255);
-            style.Colors[ImGuiCol_TabActive] = ImColor(45, 45, 45, 255);
-            style.Colors[ImGuiCol_TabUnfocused] = ImColor(70, 70, 70, 255);
-            style.Colors[ImGuiCol_TabUnfocusedActive] = ImColor(80, 80, 80, 255);
-
-            style.Colors[ImGuiCol_Header] = ImColor(35, 35, 35, 255);
-            style.Colors[ImGuiCol_HeaderHovered] = ImColor(40, 40, 40, 255);
-            style.Colors[ImGuiCol_HeaderActive] = ImColor(45, 45, 45, 255);
+            style.Colors[ImGuiCol_Header] = ImColor(26, 16, 61, 255);
+            style.Colors[ImGuiCol_HeaderHovered] = ImColor(37, 28, 68, 255);
+            style.Colors[ImGuiCol_HeaderActive] = ImColor(36, 24, 83, 255);
 
             style.Colors[ImGuiCol_SliderGrab] = ImColor(50, 50, 50, 255);
             style.Colors[ImGuiCol_SliderGrabActive] = ImColor(50, 50, 50, 255);
 
+            style.Colors[ImGuiCol_WindowBg] = ImColor(3, 3, 13, 255 );
+            style.Colors[ImGuiCol_TitleBg] = ImColor(11, 9, 35, 255 );
+            style.Colors[ImGuiCol_TitleBgActive] = ImColor(21, 18, 55, 255 );
+            style.Colors[ImGuiCol_TitleBgCollapsed] = ImColor(21, 18, 55, 255 );
+
+            style.Colors[ ImGuiCol_Button ] = ImColor(35, 27, 75, 255 );
+            style.Colors[ ImGuiCol_ButtonHovered ] = ImColor(35, 27, 75, 255 );
+            style.Colors[ ImGuiCol_ButtonActive ] = ImColor(34, 24, 81, 255 );
+
+            style.Colors[ImGuiCol_SliderGrab] = ImColor( 50, 46, 117, 255 );
+            style.Colors[ImGuiCol_SliderGrabActive] = ImColor( 65, 61, 139, 255 );
+
             style.WindowBorderSize = 0;
-            style.FrameBorderSize = 1;
+            style.FrameBorderSize = 0;
             style.IndentSpacing = 0.0f;
             style.WindowTitleAlign = ImVec2( 0.5f, 0.5f );
             style.WindowPadding = ImVec2( 0, 8 );
