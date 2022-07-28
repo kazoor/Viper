@@ -1,9 +1,9 @@
 #include <iostream>
-#include "../src/graphics/window/window.hpp"
+#include "../src/core/graphics/window/application.hpp"//../src/graphics/window/application.hpp"
 
 int main()
 {
-    auto *window = new Viper::Graphics::Window(1280, 720, "Viper-Sandbox");
-
+    auto app = new Viper::Application( );
+    
     return 0;
 }
