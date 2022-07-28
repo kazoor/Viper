@@ -10,6 +10,7 @@ namespace Viper {
     };
 
     void Application::OnEvent(Events::Event& e) {
-        VIPER_LOG("EventCalled: {0}", e.GetName());
+        m_Window->OnEvent(e);
+        VIPER_LOG("call for event :: {0}", e.GetName());
      };
 };

@@ -71,6 +71,7 @@ namespace Viper::Components {
 
     void Transform::OnEditor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
+
         if(ImGui::TreeNodeEx("Transform", t)) {
             ImGuiTransform3F("Position", position);
             ImGuiTransform3F("Rotation", rotation);

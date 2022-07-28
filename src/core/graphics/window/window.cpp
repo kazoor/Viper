@@ -86,12 +86,29 @@ namespace Viper::Graphics {
     };
 
     void Window::OnEvent(Events::Event& event) {
+        // Kommer att säga detta en gång, och en gång bara.
+        // Vi dispatchar dem ENBART för att logga.
+        // Dem blir redan calla'de av EventCallback.
+        {
+            Events::EventDispatcher dispatcher(event);
+
+            dispatcher.Dispatch< WindowFrameBufferSizeEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowFrameBufferSizeEvent ) );
+            dispatcher.Dispatch< WindowResizeEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowResizeEvent ) );
+            dispatcher.Dispatch< WindowPositionEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowPositionEvent ) );
+            dispatcher.Dispatch< WindowContentScaleEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowContentScaleEvent ) );
+            dispatcher.Dispatch< WindowMaximizationEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowMaximizationEvent ) );
+            dispatcher.Dispatch< WindowFocusEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowFocusEvent ) );
+            dispatcher.Dispatch< WindowCloseEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowCloseEvent ) );
+            dispatcher.Dispatch< MouseCursorPositionEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowMouseCursorPositionEvent ) );
+        }
+
+
         for (auto &It : *LayerStack) {
             if(event.handled)
                 break;
             
             It->OnEvent(event);
-        }
+        };
     };
 
     void Window::SetCallback( const fn_EventCallback& callback ) {
@@ -215,4 +232,9 @@ namespace Viper::Graphics {
         spdlog::info("WindowCloseEvent Event triggered!");
         return true;
     }
+
+    bool Window::OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent& E) {
+        VIPER_LOG( "MouseCursorPositionEvent Event triggered! {0}, {1}", E.x, E.y);
+        return true;
+    };
 }

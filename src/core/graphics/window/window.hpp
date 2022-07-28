@@ -61,6 +61,13 @@ namespace Viper::Graphics {
         VIPER_MAKE_EVENT(WindowClose, WindowCloseEvent);
     };
 
+    class MouseCursorPositionEvent : public Events::Event {
+    public:
+        VIPER_MAKE_EVENT(MouseCursorPosition, MouseCursorPositionEvent);
+        MouseCursorPositionEvent( double xpos, double ypos ) : x( xpos ), y( ypos ) { };
+        double x, y;
+    };
+
     class Window {
     public:
         struct WindowParams_t {
@@ -126,6 +133,7 @@ namespace Viper::Graphics {
         // Sends an event when window is closing.
         bool OnWindowCloseEvent(WindowCloseEvent& E);
 
+        bool OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent& E);
         
     private:
 

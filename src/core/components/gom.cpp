@@ -11,7 +11,7 @@ namespace Viper::Components {
             go->OnAwake();
     };
 
-    void GameObjectManager::OnAdd( std::unique_ptr< GameObject > gameObject ) {
-        m_GameObjects.push_back( std::move( gameObject ) );
+    void GameObjectManager::OnAdd( Ref< GameObject > gameObject ) {
+        m_GameObjects.push_back( gameObject );
     };
 };
