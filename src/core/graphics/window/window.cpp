@@ -100,6 +100,7 @@ namespace Viper::Graphics {
             dispatcher.Dispatch< WindowFocusEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowFocusEvent ) );
             dispatcher.Dispatch< WindowCloseEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowCloseEvent ) );
             dispatcher.Dispatch< MouseCursorPositionEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowMouseCursorPositionEvent ) );
+            dispatcher.Dispatch< MouseScrollEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowMouseScrollEvent ) );
         }
 
 
@@ -165,6 +166,12 @@ namespace Viper::Graphics {
         glfwSetCursorPosCallback(Context, [](GLFWwindow* Window, double xpos, double ypos ) {
             VIPER_GET(Window);
             MouseCursorPositionEvent event((double)xpos, (double)ypos);
+            data.EventCallback(event);
+        });
+
+        glfwSetScrollCallback( Context, [](GLFWwindow* Window, double xpos, double ypos) {
+            VIPER_GET(Window);
+            MouseScrollEvent event(xpos, ypos);
             data.EventCallback(event);
         });
     }
@@ -235,6 +242,13 @@ namespace Viper::Graphics {
 
     bool Window::OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent& E) {
         VIPER_LOG( "MouseCursorPositionEvent Event triggered! {0}, {1}", E.x, E.y);
+        return true;
+    };
+
+    bool Window::OnWindowMouseScrollEvent(MouseScrollEvent& E) {
+        VIPER_LOG("MouseScrollEvent Event triggered! {0}, {1}", E.x, E.y);
+        if( !Globals::Editor::isPlaying )
+            Globals::Editor::ZoomLevel -= static_cast< float >( E.y );
         return true;
     };
 }
