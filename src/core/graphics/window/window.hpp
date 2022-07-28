@@ -75,6 +75,15 @@ namespace Viper::Graphics {
         double x, y;
     };
 
+    class KeyboardKeyEvent : public Events::Event {
+    public:
+        VIPER_MAKE_EVENT(KeyboardInputLayer, KeyboardKeyEvent);
+        KeyboardKeyEvent(int akey, int ascancode, int aaction, int amods)
+            : key( akey ), scancode( ascancode ), action(aaction), mods(amods) { };
+
+        int key, scancode, action, mods;
+    };
+
     class Window {
     public:
         struct WindowParams_t {
@@ -144,6 +153,8 @@ namespace Viper::Graphics {
         bool OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent& E);
 
         bool OnWindowMouseScrollEvent(MouseScrollEvent& E);
+
+        bool OnWindowKeyEvent(KeyboardKeyEvent& E);
         
     private:
 

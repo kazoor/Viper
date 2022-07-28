@@ -9,6 +9,7 @@
 #include "../../imguieditor/imguieditor.hpp"
 #include "../../imguieditor/scene/scene.hpp"
 #include "../../util/input/mouse/mouseevents.hpp"
+#include "../../inputlayer/keyboardinputlayer.hpp"
 
 namespace Viper::Graphics {
     #define VIPER_GET(wnd) WindowParams_t& data = *(WindowParams_t*)glfwGetWindowUserPointer(wnd)
@@ -55,8 +56,8 @@ namespace Viper::Graphics {
 
         PushLayer(new ImGuiEditor(this));
         PushLayer(new Scene::Scene(this));
-        //PushLayer(new Viper::Input::KeyboardInputLayer());
-        //PushLayer(new Viper::Input::MouseInputLayer());
+        //PushLayer(new Input::KeyboardInputLayer());
+        //PushLayer(new Input::MouseInputLayer());
 
         static double previous_delta = glfwGetTime();
         while (!glfwWindowShouldClose(Context)) {
@@ -102,8 +103,9 @@ namespace Viper::Graphics {
             
             dispatcher.Dispatch< MouseCursorPositionEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowMouseCursorPositionEvent ) );
             dispatcher.Dispatch< MouseScrollEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowMouseScrollEvent ) );
-        }
 
+            dispatcher.Dispatch< KeyboardKeyEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowKeyEvent ) );
+        }
 
         for (auto &It : *LayerStack) {
             if(event.handled)
@@ -175,6 +177,14 @@ namespace Viper::Graphics {
             MouseScrollEvent event(xpos, ypos);
             data.EventCallback(event);
         });
+
+        glfwSetKeyCallback( Context, [ ](GLFWwindow* Window, int key, int scancode, int action, int mods ) {
+            VIPER_GET(Window);
+            KeyboardKeyEvent event(key, scancode, action, mods);
+            data.EventCallback(event);
+        });
+
+        //bool OnWindowKeyEvent(KeyboardKeyEvent& E);
     }
 
     void Window::Update() const {
@@ -250,6 +260,11 @@ namespace Viper::Graphics {
         VIPER_LOG("MouseScrollEvent Event triggered! {0}, {1}", E.x, E.y);
         if( !Globals::Editor::isPlaying )
             Globals::Editor::ZoomLevel -= static_cast< float >( E.y );
+        return true;
+    };
+
+    bool Window::OnWindowKeyEvent(KeyboardKeyEvent& E) {
+        VIPER_LOG("KeyPressed: {0} :: state = {1}", E.key, E.action);
         return true;
     };
 }
