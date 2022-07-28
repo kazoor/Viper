@@ -7,6 +7,7 @@
 #include "shader.hpp"
 #include "../../../util/filehandler/filehandler.hpp"
 #include "../../../util/globals/global.hpp"
+#include "../../../viper/base.hpp"
 
 namespace Viper::Graphics {
 
@@ -129,7 +130,7 @@ namespace Viper::Graphics {
             if (!success) {
                 glGetShaderInfoLog(Shader, 1024, NULL, InfoLog);
                 spdlog::error("ERROR::SHADER_COMPILATION_ERROR of type: {0} \n :: {1}", Type, InfoLog);
-                Globals::ConsoleContext::AddLog( "ERROR::SHADER_COMPILATION_ERROR!", InfoLog );
+                Globals::ConsoleContext::AddLog( "ERROR::SHADER_COMPILATION_ERROR!", VIPER_FORMAT_STRING( "Type :: %s, Info :: %s", Type.c_str( ), InfoLog ), Globals::ConsoleFlag::ConsoleWarning );
             }
         } else {
             glGetProgramiv(Shader, GL_LINK_STATUS, &success);
@@ -137,7 +138,7 @@ namespace Viper::Graphics {
                 glGetProgramInfoLog(Shader, 1024, NULL, InfoLog);
                 //spdlog::error("ERROR::PROGRAM_LINKING_ERROR of type: ", Type, "\n", InfoLog);
                 spdlog::error("ERROR::PROGRAM_LINKING_ERROR of type: {0} \n :: {1}", Type, InfoLog);
-                Globals::ConsoleContext::AddLog( "ERROR::PROGRAM_LINKING_ERROR!", InfoLog );
+                Globals::ConsoleContext::AddLog( "ERROR::PROGRAM_LINKING_ERROR!", VIPER_FORMAT_STRING( "Type :: %s, Info :: %s", Type.c_str( ), InfoLog ), Globals::ConsoleFlag::ConsoleWarning  );
             }
         }
     }

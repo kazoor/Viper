@@ -54,16 +54,15 @@ namespace Viper {
             style.Colors[ImGuiCol_SliderGrab] = ImColor(50, 50, 50, 255);
             style.Colors[ImGuiCol_SliderGrabActive] = ImColor(50, 50, 50, 255);
 
+            style.WindowBorderSize = 0;
+            style.FrameBorderSize = 1;
+            style.IndentSpacing = 0.0f;
+            style.WindowTitleAlign = ImVec2( 0.5f, 0.5f );
+
             ImGui_ImplGlfw_InitForOpenGL(WindowContext->Ctx(), true);
             ImGui_ImplOpenGL3_Init("#version 410");
 
             style.GrabRounding = 2.0f;
-
-            Globals::ConsoleContext::AddLog( "Test", VIPER_FORMAT_STRING("hello %i", 10), Globals::ConsoleSuccess );
-            Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleError );
-            Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleWarning );
-            Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleInfo );
-            Globals::ConsoleContext::AddLog( "Test", "Test message.", Globals::ConsoleNone );
         }
 
         ~ImGuiEditor() {
@@ -121,7 +120,8 @@ namespace Viper {
 
                 if (ImGui::Button("Add GameObject")) {
                     if (strlen(buff) > 1) {
-                        auto go = std::make_unique<Viper::Components::GameObject>(buff);
+                        //auto go = std::make_unique<Viper::Components::GameObject>(buff);
+                        auto go = Components::GameObject::Create(buff);
                         [&](Components::GameObject* c) {
                             c->AddComponent< Viper::Components::Transform >( 
                                 glm::vec3( 10.0f, 10.0f, 0.0f ), // position
@@ -132,13 +132,15 @@ namespace Viper {
                             c->AddComponent< Viper::Components::BoxCollision2D >( c );
                         }(go.get());
 
-                        Globals::GlobalsContext::Gom->OnAdd( std::move( go ) );
+                        Globals::GlobalsContext::Gom->OnAdd( go );
                         buff[0] = '\0';
                         Globals::Editor::SelectedObject++;
                     };
                 };
                 if( ImGui::Button("Add PlayerController")) {
-                    auto go = std::make_unique<Viper::Components::GameObject>("PlayerController");
+                    //auto go = std::make_unique<Viper::Components::GameObject>("PlayerController");
+
+                    auto go = Components::GameObject::Create("PlayerController");
                     [&](Components::GameObject* c) {
                         c->AddComponent< Viper::Components::Transform >( 
                             glm::vec3( 0.0f, 0.0f, 0.0f ), // position
@@ -151,7 +153,7 @@ namespace Viper {
                         c->AddComponent< Viper::Components::BoxCollision2D >(c);
                     }(go.get());
 
-                    Globals::GlobalsContext::Gom->OnAdd( std::move( go ) );
+                    Globals::GlobalsContext::Gom->OnAdd( go );
                 };
 
                 ImGui::Separator();
@@ -197,7 +199,7 @@ namespace Viper {
 
             if (ImGui::Begin("Inspector")) {
                 if (Globals::Editor::SelectedObject != -1) {
-                    auto &go = Globals::GlobalsContext::Gom->m_GameObjects.at(Globals::Editor::SelectedObject);
+                    auto go = Globals::GlobalsContext::Gom->m_GameObjects.at(Globals::Editor::SelectedObject);
                     go->OnEditor();
                     
                     MakeComponent< Components::Transform >( go, "Transform" );
@@ -219,6 +221,7 @@ namespace Viper {
         }
 
         bool OnLayerUpdateEvent(LayerUpdateEvent& e) {
+            VIPER_LOG("Call from :: ImGuiLayer :: {0}", e.GetName());
             return true;
         };
 
@@ -234,15 +237,14 @@ namespace Viper {
         }
 
     protected:
-
      template< typename T = Components::Component, typename... TArgs >
-     void MakeComponent(std::unique_ptr< Components::GameObject >& obj, const std::string& s, TArgs&&... args ) {
-        bool hasComponent = obj->HasComponent< T >( );
+     void MakeComponent(Ref< Components::GameObject >& ref, const std::string& s, TArgs&&... args ) {
+        bool hasComponent = ref->HasComponent< T >( );
 
          if(!hasComponent && ImGui::Button( std::string("Add ").append(s).c_str())) {
-             obj->AddComponent<T>(std::forward< TArgs >(args)...);
+             ref->AddComponent<T>(std::forward< TArgs >(args)...);
          } else if(hasComponent && ImGui::Button(std::string("Remove ").append(s).c_str())) {
-             obj->RemoveComponent< T >( );
+             ref->RemoveComponent< T >( );
          }
      };
 

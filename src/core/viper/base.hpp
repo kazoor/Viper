@@ -6,6 +6,8 @@
 
 #define VIPER_LOG(fmt, ...) spdlog::info(fmt, __VA_ARGS__)
 
+#define VIPER_ERR(fmt) spdlog::error(fmt)
+
 template<typename ... Args>
 std::string VIPER_FORMAT_STRING( const std::string& format, Args ... args ) {
     const auto string_size = std::snprintf(nullptr, 0, format.c_str(), std::forward< Args >( args )... ) + 1;
@@ -13,7 +15,7 @@ std::string VIPER_FORMAT_STRING( const std::string& format, Args ... args ) {
     std::unique_ptr< char[] > buffer( new char[ string_size ] );
 
     std::snprintf(buffer.get(), string_size, format.c_str(), std::forward< Args >( args )... );
-
+    
     return std::string( buffer.get(), buffer.get() + string_size - 1 );
 };
 

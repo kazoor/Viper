@@ -68,7 +68,8 @@ namespace Viper::Scene {
         }
 
         void OnEvent(Events::Event& event) override {
-        }
+            
+        };
 
         double GetDeltaTime() const {
             return Globals::Editor::DeltaTime;

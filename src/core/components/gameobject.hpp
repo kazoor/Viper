@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "transform.hpp"
 #include "component.hpp"
+#include "../util/ref/reference.hpp"
 
 namespace Viper::Components {
     class GameObject {
@@ -17,6 +18,8 @@ namespace Viper::Components {
         void AddComponent( TArgs&&... args ) {
             m_Components.push_back( std::make_unique< T >( std::forward< TArgs >( args )... ) );
         };
+
+        static Ref< GameObject > Create( const std::string& tagname );
 
         template< class T = Component >
         T& GetComponent( ) {
