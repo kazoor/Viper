@@ -62,12 +62,16 @@ namespace Viper {
             style.Colors[ImGuiCol_TitleBgActive] = ImColor(21, 18, 55, 255 );
             style.Colors[ImGuiCol_TitleBgCollapsed] = ImColor(21, 18, 55, 255 );
 
-            style.Colors[ ImGuiCol_Button ] = ImColor(35, 27, 75, 255 );
-            style.Colors[ ImGuiCol_ButtonHovered ] = ImColor(35, 27, 75, 255 );
-            style.Colors[ ImGuiCol_ButtonActive ] = ImColor(34, 24, 81, 255 );
+            style.Colors[ImGuiCol_Button] = ImColor(35, 27, 75, 255 );
+            style.Colors[ImGuiCol_ButtonHovered] = ImColor(35, 27, 75, 255 );
+            style.Colors[ImGuiCol_ButtonActive] = ImColor(34, 24, 81, 255 );
 
             style.Colors[ImGuiCol_SliderGrab] = ImColor( 50, 46, 117, 255 );
             style.Colors[ImGuiCol_SliderGrabActive] = ImColor( 65, 61, 139, 255 );
+
+            style.Colors[ImGuiCol_ScrollbarGrab] = ImColor( 50, 46, 117, 255 );
+            style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImColor( 65, 61, 139, 255 );
+            style.Colors[ImGuiCol_ScrollbarGrabActive] = ImColor( 65, 61, 139, 255 );
 
             style.WindowBorderSize = 0;
             style.FrameBorderSize = 0;
@@ -75,6 +79,8 @@ namespace Viper {
             style.WindowTitleAlign = ImVec2( 0.5f, 0.5f );
             style.WindowPadding = ImVec2( 0, 8 );
             style.IndentSpacing = 10.0f;
+            style.ScrollbarRounding = 2.0f;
+            style.ScrollbarSize = 10.0f;
 
             ImGui_ImplGlfw_InitForOpenGL(WindowContext->Ctx(), true);
             ImGui_ImplOpenGL3_Init("#version 410");
@@ -152,6 +158,7 @@ namespace Viper {
                         }(go.get());
 
                         Globals::GlobalsContext::Gom->OnAdd( go );
+                        Globals::ConsoleContext::AddLog( VIPER_ICON_INFO " GameObject Spawn.", VIPER_FORMAT_STRING("GameObject: %s has been spawned!", buff), Globals::ConsoleInfo);
                         buff[0] = '\0';
                         Globals::Editor::SelectedObject++;
                     };
@@ -174,6 +181,7 @@ namespace Viper {
                     }(go.get());
 
                     Globals::GlobalsContext::Gom->OnAdd( go );
+                    Globals::ConsoleContext::AddLog( VIPER_ICON_INFO " GameObject Spawn.", VIPER_FORMAT_STRING("GameObject: PlayerController has been spawned!", buff), Globals::ConsoleInfo);
                 };
 
                 ImGui::Separator();
@@ -208,7 +216,7 @@ namespace Viper {
             };
             ImGui::PopStyleVar();
 
-
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
             if(ImGui::Begin("Debug Console")) {
                 Globals::ConsoleContext::ResizeLogs( 10U );                    
                 for( auto info : Globals::ConsoleContext::GetLogs( ) ) {
@@ -219,6 +227,7 @@ namespace Viper {
                 }
                 ImGui::End();
             };
+            ImGui::PopStyleVar();
 
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
             if (ImGui::Begin("Inspector")) {
@@ -238,7 +247,7 @@ namespace Viper {
             };
             ImGui::PopStyleVar();
 
-            ImGui::ShowDemoWindow();
+            //ImGui::ShowDemoWindow();
 
             ImGui::EndFrame();
             ImGui::Render();
