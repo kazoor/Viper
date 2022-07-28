@@ -5,29 +5,31 @@ set(CMAKE_CXX_STANDARD 20)
 project(Viper)
 
 add_library(Viper
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/window/window.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/shaders/shader/shader.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/layers/layerstack/layerstack.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/renderer.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/vertexbuffer.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/indexbuffer.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/framebuffer.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/vertexarray.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/sprite2d.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/renderer/camera/orthographic_camera.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/component.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/transform.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/spriterenderer.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/gameobject.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/camera.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/gom.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/boxcollision2d.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/components/input.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/inputhandler/inputhandler.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/util/filehandler/filehandler.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/util/input/mouse/mouseevents.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/util/globals/global.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/window/application.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/window/window.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/shaders/shader/shader.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/vertexbuffer.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/indexbuffer.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/framebuffer.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/vertexarray.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/sprite2d.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/component.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/transform.cpp
+            
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gameobject.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/camera.cpp
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gom.cpp
+
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/inputhandler/inputhandler.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/mouse/mouseevents.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/globals/global.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_demo.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_draw.cpp
@@ -102,8 +104,8 @@ target_link_libraries(Sandbox PUBLIC glm)
 target_link_libraries(Sandbox PUBLIC spdlog)
 
 # Copy shaders to bin
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/resources/
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/
         DESTINATION ${CMAKE_BINARY_DIR}/bin/resources/)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/resources/imgui.ini
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/imgui.ini
     DESTINATION ${CMAKE_BINARY_DIR}/bin/)
