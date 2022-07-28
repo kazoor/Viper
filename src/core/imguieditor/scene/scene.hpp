@@ -14,6 +14,8 @@ namespace Viper::Scene {
             m_Camera = new Renderer::OrthoGraphicCamera(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
             Renderer::Renderer2D::Instantiate();
             AspectRatio = 0.0f;
+
+            Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Success!", "Window has been loaded!", Globals::ConsoleSuccess );
         };
 
         ~Scene() {

@@ -14,6 +14,11 @@
 
 #define VIPER_TITLE "Viper " VIPER_VERSION "-" VIPER_ENV
 
+#define VIPER_ICON_ERR "\xef\x81\x97" //0xEF 0x81 0x97
+#define VIPER_ICON_WARN "\xee\x90\x97"
+#define VIPER_ICON_INFO "\xef\x81\x9a"
+#define VIPER_ICON_SUCC "\xef\x81\x98"
+
 template<typename ... Args>
 std::string VIPER_FORMAT_STRING( const std::string& format, Args ... args ) {
     const auto string_size = std::snprintf(nullptr, 0, format.c_str(), std::forward< Args >( args )... ) + 1;
