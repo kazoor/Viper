@@ -68,6 +68,13 @@ namespace Viper::Graphics {
         double x, y;
     };
 
+    class MouseScrollEvent : public Events::Event {
+    public:
+        VIPER_MAKE_EVENT(MouseScroll, MouseScrollEvent);
+        MouseScrollEvent( double xpos, double ypos ) : x( xpos ), y( ypos ) { };
+        double x, y;
+    };
+
     class Window {
     public:
         struct WindowParams_t {
@@ -133,7 +140,10 @@ namespace Viper::Graphics {
         // Sends an event when window is closing.
         bool OnWindowCloseEvent(WindowCloseEvent& E);
 
+        // Sends an event everytime the mouse position has CHANGED.
         bool OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent& E);
+
+        bool OnWindowMouseScrollEvent(MouseScrollEvent& E);
         
     private:
 
