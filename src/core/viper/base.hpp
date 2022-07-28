@@ -8,6 +8,12 @@
 
 #define VIPER_ERR(fmt) spdlog::error(fmt)
 
+#define VIPER_ENV "dev"
+
+#define VIPER_VERSION "0.0.1"
+
+#define VIPER_TITLE "Viper " VIPER_VERSION "-" VIPER_ENV
+
 template<typename ... Args>
 std::string VIPER_FORMAT_STRING( const std::string& format, Args ... args ) {
     const auto string_size = std::snprintf(nullptr, 0, format.c_str(), std::forward< Args >( args )... ) + 1;

@@ -4,6 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "../util/globals/global.hpp"
 #include "../util/input/input.hpp"
+#include "../imguieditor/fontawesome5.hpp"
 
 namespace Viper::Components {
     VIPER_CLASS_DEFINE(Component, Camera)
@@ -45,7 +46,7 @@ namespace Viper::Components {
 
     void Camera::OnEditor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        if(ImGui::TreeNodeEx("Camera", t)) {
+        if(ImGui::TreeNodeEx( " " ICON_FA_CUBE " Camera", t)) {
             ImGui::TreePop();
         };
     };

@@ -3,6 +3,7 @@
 #include "../../layers/layer/layer.hpp"
 #include "../../events/event/event.hpp"
 #include "../../graphics/window/window.hpp"
+#include "../../graphics/renderer/sprite2d.hpp"
 #include "../../util/globals/global.hpp"
 #include "../../graphics/renderer/camera/orthographic_camera.hpp"
 
@@ -81,6 +82,7 @@ namespace Viper::Scene {
     private:
         Graphics::Window* WindowContext;
         Renderer::OrthoGraphicCamera* m_Camera;
+        
     private:
         float AspectRatio;
     };

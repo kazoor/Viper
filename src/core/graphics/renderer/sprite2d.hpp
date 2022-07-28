@@ -4,6 +4,7 @@
 namespace Viper::Renderer {
     class Sprite2D {
     public:
+        Sprite2D();
         Sprite2D( const std::string& str, int width, int height );
         ~Sprite2D();
         static Ref< Sprite2D > Create( const std::string& sprite_path );
