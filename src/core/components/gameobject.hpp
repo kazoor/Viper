@@ -3,91 +3,143 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <cstring>
 #include "transform.hpp"
 #include "component.hpp"
 #include "../util/ref/reference.hpp"
+#include "../imguieditor/fontawesome5.hpp"
+#include <ImGui/imgui.h>
+#include "../viper/base.hpp"
 
 namespace Viper::Components {
     class GameObject {
     public:
         GameObject();
         GameObject( const std::string& tagname );
-        std::string tag;
 
-        template< class T = Component, typename... TArgs >
-        void AddComponent( TArgs&&... args ) {
-            m_Components.push_back( std::make_unique< T >( std::forward< TArgs >( args )... ) );
+        ~GameObject();
+
+        template< class T, typename... TArgs >
+        void AddComponent(TArgs&&... args) {
+            auto idx = std::find_if(components.begin(), components.end(), [ a = T::GetType() ]( auto& c ) { return c->IsComponentValid( a ) && a != ComponentType::Scripting;});
+            bool found_in_table = ( idx != components.end());
+
+            if( found_in_table ) // component already exist.
+            {
+                printf("error, this component does already exist.\n");
+                return;
+            } else {
+                components.push_back( std::make_unique< T >( std::forward< TArgs >( args )... ) );
+                printf("component has been added.\n");
+            };
         };
 
-        static Ref< GameObject > Create( const std::string& tagname );
+        template< typename T >
+        void RemoveComponent() {
+            if(components.empty())
+                return;
 
-        template< class T = Component >
-        T& GetComponent( ) {
-            for( auto&& component : m_Components ) {
-                if( component->IsComponentType( T::Type ) ) {
-                    return *static_cast< T* >( component.get( ) );
+            auto idx = std::find_if(components.begin(), components.end(), [ a = T::GetType() ]( auto& c ) { return c->IsComponentValid(a);});
+            bool found_in_table = ( idx != components.end());
+
+            if( found_in_table ) {
+                components.erase( idx );
+                printf("found component, deleted.\n");
+            } else {
+                printf("error, can't find component. fallback.\n");
+                return;
+            };
+        };
+
+        void RemoveComponent( const char* name ) {
+            if(components.empty())
+                return;
+
+            auto idx = std::find_if(components.begin(), components.end(), [ a = name ]( auto& c ) { return strstr(c->GetName(), a);});
+            bool found_in_table = ( idx != components.end());
+
+            if( found_in_table ) {
+                components.erase( idx );
+                printf("found component, deleted. :: %s\n", name);
+            } else {
+                printf("error, can't find component. :: %s\n", name);
+                return;
+            };
+        };
+
+        template< class T >
+        bool HasComponent( ) {
+            auto idx = std::find_if(components.begin(), components.end(), [ a = T::GetType() ]( auto& c ) { return c->IsComponentValid(a);});
+            bool found_in_table = ( idx != components.end());
+            if( found_in_table ) {
+                printf("found component. has_component.\n");
+                return true;
+            } else {
+                printf("error, can't find component. has_component. \n");
+                return false;
+            };
+        };
+
+        bool HasComponent( const char* name ) {
+            auto idx = std::find_if(components.begin(), components.end(), [ a = name ]( auto& c ) { return strstr(c->GetName(), a);});
+            bool found_in_table = ( idx != components.end());
+            if( found_in_table ) {
+                printf("found component. has_component. :: %s\n", name);
+                return true;
+            } else {
+                printf("error, can't find component. has_component. :: %s\n", name);
+                return false;
+            };
+        };
+
+        template< class T >
+        T& GetComponent() {
+            for( auto&& c : components ) {
+                if( c->IsComponentValid( T::GetType( ) ) ) {
+                    return *static_cast< T* >( c.get( ) );
                 };
             };
             return *std::unique_ptr< T >( nullptr );
         };
 
-        Transform GetTransform() {
-            return GetComponent< Transform >( );
+        const char* GetComponentNameByIndex( uint32_t index ) {
+            if( components.empty() )
+                return nullptr;
+
+            return components.at( index )->GetName( );
         };
 
-        template< class T = Component >
-        bool RemoveComponent() {
-            if( m_Components.empty() )
-                return false;
-
-            auto index = std::find_if( 
-                m_Components.begin(),
-                m_Components.end(), 
-                [ classType = T::Type ]( auto& c) {
-                    return c->IsComponentType( classType );
-                });
-
-            bool ret = ( index != m_Components.end() );
-
-            if( ret )
-                m_Components.erase( index );
-            
-            return ret;
+        size_t GetComponents() const {
+            return components.size();
         };
 
-        template< class T = Component >
-        bool HasComponent() {
-            if( m_Components.empty() )
-                return false;
-
-            auto index = std::find_if(
-                m_Components.begin(),
-                m_Components.end(),
-                [ classType = T::Type ]( auto& c ) {
-                    return c->IsComponentType( classType );
-                });
-
-
-            bool component_found = ( index != m_Components.end() );
-
-            return component_found;
+        void OnUpdate( float deltaticks ) {
+            for(auto& c : components )
+                c->Update( deltaticks );
         };
 
-        void OnUpdate(double deltatime) {
-            for( auto& c : m_Components )
-                c->OnUpdate(deltatime);
+        void OnAwake( ) {
+            for(auto& c : components )
+                c->Awake( );
         };
 
-        void OnAwake() {
-            for( auto& c : m_Components )
-                c->OnAwake();
+        void OnEditor( ) {
+            for(auto& c : components ) {
+                c->SetEditor( );
+
+                if( c->GetComponentType() == ComponentType::Transform )
+                    continue;
+                    
+                if( ImGui::Button( VIPER_FORMAT_STRING( ICON_FA_TRASH_ALT " Remove %s", c->GetName() ).c_str( ) ) )
+                    RemoveComponent( c->GetName());
+            }
         };
 
-        void OnEditor() {
-            for( auto& c : m_Components )
-                c->OnEditor();
-        };
+        static Ref< GameObject > Create();
+        static Ref< GameObject > Create(const std::string& tagname);
 
-        std::vector< std::unique_ptr< Component > > m_Components;
+        std::string tag;
+    private:
+        std::vector< Ref< Component > > components;
     };
 };

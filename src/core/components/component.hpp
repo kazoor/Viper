@@ -1,33 +1,51 @@
 #pragma once
 #include <cstddef>
-#include <functional>
-#define VIPER_COMPONENT_DEF( x ) #x
-
-#define VIPER_CLASS_DECLARATION( classname ) \
-public: \
-    bool IsComponentType( const std::size_t classType ) const; \
-    static const std::size_t Type; \
-
-
-#define VIPER_CLASS_DEFINE( ParentClass, ChildClass ) \
-const std::size_t ChildClass::Type = std::hash< std::string >( )( VIPER_COMPONENT_DEF( ChildClass ) ); \
-bool ChildClass::IsComponentType( const std::size_t classType ) const {  \
-    if( classType == Type ) \
-        return true; \
-    return ParentClass::IsComponentType( classType ); \
-}; \
 
 namespace Viper::Components {
+    enum class ComponentType : int {
+        None = 0,
+        Transform = 1,
+        Camera = 2,
+        NativeScripting = 3,
+        Scripting = 4,
+
+        BoxCollider2D = 100,
+        Rigidbody2D = 101,
+        SpriteRenderer2D = 102,
+
+        TestComp
+    };
+
+    #define VIPER_COMPONENT_DECLARE( ComponentDef ) ~ComponentDef() { printf("deconstructed " #ComponentDef "\n"); }; \
+        static ComponentType GetType() { return ComponentType::ComponentDef; }; \
+        virtual const char* GetName() const override { return #ComponentDef; }; \
+        virtual ComponentType GetComponentType() const override { return GetType(); }
+
+    #define VIPER_COMPONENT_CLASS_TEMPLATE( ComponentDef ) class ComponentDef : public Component { \
+        public: \
+        VIPER_COMPONENT_DECLARE( ComponentDef ); \
+        \
+        ComponentDef( ) { }; \
+        \
+    }; \
+
+    #define VIPER_COMPONENT_CLASS_PARENTAL_TEMPLATE( ComponentDef1, ParentDef ) class ComponentDef1 : public ParentDef { \
+        public: \
+        VIPER_COMPONENT_DECLARE( ComponentDef1 ); \
+        \
+        ComponentDef1( ) { }; \
+        \
+    }; \
+
     class Component {
     public:
-        virtual void OnAwake() = 0;
-        virtual void OnUpdate(double deltatime) = 0;
-        virtual void OnEditor() = 0;
-
-        virtual bool IsComponentType( const std::size_t compType ) const {
-            return compType == Type;
-        };
+        virtual ~Component() = default;
+        virtual const char* GetName() const = 0;
+        virtual ComponentType GetComponentType() const = 0;
+        virtual bool IsComponentValid( ComponentType type ) const { return ( GetComponentType() == type ); };
+        virtual void SetEditor() {};
         
-        static const std::size_t Type;
+        virtual void Update(float deltaticks) {};
+        virtual void Awake() {};
     };
 };

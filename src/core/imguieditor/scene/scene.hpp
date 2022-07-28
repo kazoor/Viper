@@ -54,15 +54,15 @@ namespace Viper::Scene {
                 m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
 
             for(auto& go : Globals::GlobalsContext::Gom->m_GameObjects ) {
-                go->OnUpdate(GetDeltaTime());
+                //go->OnUpdate(GetDeltaTime());
 
-                if( go->HasComponent< Components::Camera >( ) ) {
-                    auto& cam = go->GetComponent< Components::Transform >( );
-                    if( Globals::Editor::isPlaying ) {
-                        m_Camera->SetProjection(-AspectRatio * cam.scale.z, AspectRatio * cam.scale.z, cam.scale.z, -cam.scale.z, 1.0f, -1.0f);
-                        m_Camera->SetPosition(cam.position);
-                    }
-                };
+                //if( go->HasComponent< Components::Camera >( ) ) {
+                //    auto& cam = go->GetComponent< Components::Transform >( );
+                //    if( Globals::Editor::isPlaying ) {
+                //        m_Camera->SetProjection(-AspectRatio * cam.scale.z, AspectRatio * cam.scale.z, cam.scale.z, -cam.scale.z, 1.0f, -1.0f);
+                //        m_Camera->SetPosition(cam.position);
+                //    }
+                //};
             };
 
             Renderer::Renderer2D::Flush();

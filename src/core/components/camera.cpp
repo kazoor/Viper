@@ -5,10 +5,9 @@
 #include "../util/globals/global.hpp"
 #include "../util/input/input.hpp"
 #include "../imguieditor/fontawesome5.hpp"
+#include "camera.hpp"
 
 namespace Viper::Components {
-    VIPER_CLASS_DEFINE(Component, Camera)
-
     Camera::Camera() {
         object = nullptr;
     };
@@ -17,14 +16,14 @@ namespace Viper::Components {
         object = parent;
     };
 
-    void Camera::OnAwake() {
+    void Camera::Awake() {
     };
 
     float Lerp( float a, float b, float t ) {
         return a + ( b - a ) * t;
     };
 
-    void Camera::OnUpdate(double deltatime) {
+    void Camera::Update(double deltatime) {
         auto& tr = object->GetComponent< Transform >( );
         float direction_x = 0.0f;
         float direction_y = 0.0f;
@@ -44,7 +43,7 @@ namespace Viper::Components {
         tr.position.y += direction_y * 1.0f * deltatime * 3.0f;
     };
 
-    void Camera::OnEditor() {
+    void Camera::SetEditor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
         if(ImGui::TreeNodeEx( " " ICON_FA_CUBE " Camera", t)) {
             ImGui::TreePop();
