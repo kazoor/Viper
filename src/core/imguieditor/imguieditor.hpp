@@ -8,6 +8,8 @@
 #include "../events/event/event.hpp"
 #include "../graphics/window/window.hpp"
 #include "../components/camera.hpp"
+#include "../components/spriterenderer.hpp"
+#include "../components/scripting.hpp"
 //#include "../components/boxcollision2d.hpp"
 #include "../util/globals/global.hpp"
 #include "../util/input/input.hpp"
@@ -132,7 +134,6 @@ namespace Viper {
             ImGui::DestroyContext();
         }
     private:
-
         void ImGui_OnInspector()
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
@@ -140,13 +141,7 @@ namespace Viper {
                 if (Globals::Editor::SelectedObject != -1) {
                     auto go = Globals::GlobalsContext::Gom->m_GameObjects.at(Globals::Editor::SelectedObject);
                     go->OnEditor();
-                    
-                    //MakeComponent< Components::Transform >( go, "Transform" );
-                    //MakeComponent< Components::SpriteRenderer >( go, "SpriteRenderer", go.get());
-                    //MakeComponent< Components::BoxCollision2D >( go, "BoxCollision2D", go.get());
-                    //MakeComponent< Components::Camera >( go, "Camera", go.get());
-                    //MakeComponent< Components::Input >( go, "Input") ;
-
+                    go->OnDeletion();
                     ImGui::Separator();
                 }
                 ImGui::End();
@@ -223,9 +218,11 @@ namespace Viper {
                     //auto go = std::make_unique<Viper::Components::GameObject>("PlayerController");
 
                     auto go = Components::GameObject::Create("PlayerController");
-                    [&](Components::GameObject* c) {
-                        c->AddComponent< Components::Camera >(c);
-                    }(go.get());
+                    [&](Ref< Components::GameObject >& c) {
+                        c->AddComponent< Components::Camera >(c.get());
+                        c->AddComponent< Components::SpriteRenderer >(c.get());
+                        c->AddComponent< Components::TestScript >( c.get() );
+                    }(go);
 
                     Globals::GlobalsContext::Gom->OnAdd( go );
                     Globals::ConsoleContext::AddLog( VIPER_ICON_INFO " GameObject Spawn.", VIPER_FORMAT_STRING("GameObject: PlayerController has been spawned!", buff), Globals::ConsoleInfo);

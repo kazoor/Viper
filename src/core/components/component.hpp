@@ -8,10 +8,10 @@ namespace Viper::Components {
         Camera = 2,
         NativeScripting = 3,
         Scripting = 4,
+        SpriteRenderer = 5,
 
         BoxCollider2D = 100,
         Rigidbody2D = 101,
-        SpriteRenderer2D = 102,
 
         TestComp
     };
@@ -43,9 +43,9 @@ namespace Viper::Components {
         virtual const char* GetName() const = 0;
         virtual ComponentType GetComponentType() const = 0;
         virtual bool IsComponentValid( ComponentType type ) const { return ( GetComponentType() == type ); };
-        virtual void SetEditor() {};
         
-        virtual void Update(float deltaticks) {};
         virtual void Awake() {};
+        virtual void Update( double deltaticks) {};
+        virtual void Editor() {};
     };
 };

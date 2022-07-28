@@ -1,12 +1,11 @@
 #include <ImGui/imgui.h>
-#include <memory>
 #include <vector>
 #include <glm/gtc/type_ptr.hpp>
 #include "../util/globals/global.hpp"
 #include "../imguieditor/fontawesome5.hpp"
-namespace Viper::Components {
-    VIPER_CLASS_DEFINE(Component, SpriteRenderer)
+#include "spriterenderer.hpp"
 
+namespace Viper::Components {
     SpriteRenderer::SpriteRenderer() {
         object = nullptr;
         color = glm::vec4(1.0f,1.0f,1.0f,1.0f);
@@ -22,10 +21,10 @@ namespace Viper::Components {
         color = col;
     };
 
-    void SpriteRenderer::OnAwake() {
+    void SpriteRenderer::Awake() {
     };
 
-    void SpriteRenderer::OnUpdate(double deltatime) {
+    void SpriteRenderer::Update(double deltatime) {
         tr = object->GetComponent< Transform >( );
         Renderer::Renderer2D::DrawQuadRotated(
         glm::vec2(tr.position.x, tr.position.y),
@@ -34,7 +33,7 @@ namespace Viper::Components {
         RendererAPI::Color(color.x, color.y, color.z, color.w));
     };
 
-    void SpriteRenderer::OnEditor() {
+    void SpriteRenderer::Editor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
         if(ImGui::TreeNodeEx(" " ICON_FA_PAINT_BRUSH " SpriteRenderer", t)) {
             ImGui::ColorEdit4("Sprite Color", glm::value_ptr(color));

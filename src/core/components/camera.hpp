@@ -16,7 +16,7 @@ namespace Viper::Components {
         
         void Update(double deltatime);
 
-        void SetEditor();
+        void Editor();
     private:
         GameObject* object;
     };
