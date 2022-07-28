@@ -1,22 +1,22 @@
 #pragma once
 #include <glm/vec3.hpp>
 #include "component.hpp"
-#include "transform.hpp"
 #include "gameobject.hpp"
 
 namespace Viper::Components {
     class Camera : public Component {
-        VIPER_CLASS_DECLARATION( Camera )
     public:
+        VIPER_COMPONENT_DECLARE( Camera );
+
         Camera();
 
         Camera(GameObject* parent);
 
-        void OnAwake() override;
+        void Awake();
         
-        void OnUpdate(double deltatime) override;
+        void Update(double deltatime);
 
-        void OnEditor() override;
+        void SetEditor();
     private:
         GameObject* object;
     };

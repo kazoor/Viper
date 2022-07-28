@@ -99,6 +99,7 @@ namespace Viper::Graphics {
             dispatcher.Dispatch< WindowMaximizationEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowMaximizationEvent ) );
             dispatcher.Dispatch< WindowFocusEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowFocusEvent ) );
             dispatcher.Dispatch< WindowCloseEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowCloseEvent ) );
+            
             dispatcher.Dispatch< MouseCursorPositionEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowMouseCursorPositionEvent ) );
             dispatcher.Dispatch< MouseScrollEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowMouseScrollEvent ) );
         }

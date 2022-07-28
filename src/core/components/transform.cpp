@@ -40,8 +40,6 @@ static void ImGuiTransform3F(const std::string& string, glm::vec3& values, float
 };
 
 namespace Viper::Components {
-    VIPER_CLASS_DEFINE(Component, Transform)
-    
     Transform::Transform() {
         position = glm::vec3(0.0f);
         scale = glm::vec3(0.0f);
@@ -66,11 +64,7 @@ namespace Viper::Components {
         rotation = rot;
     };
 
-    void Transform::OnAwake() { };
-        
-    void Transform::OnUpdate(double deltatime) { };
-
-    void Transform::OnEditor() {
+    void Transform::SetEditor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
 
         if(ImGui::TreeNodeEx( " " ICON_FA_CUBES " Transform", t)) {
