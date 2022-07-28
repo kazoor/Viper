@@ -1,6 +1,7 @@
 #include <string>
 #include "transform.hpp"
 #include <ImGui/imgui.h>
+#include "../imguieditor/fontawesome5.hpp"
 
 static void ImGuiTransform3F(const std::string& string, glm::vec3& values, float reset_value = 0.0f) {
     ImGui::Columns(2, std::string("##").append(string).c_str( ), false);
@@ -72,7 +73,7 @@ namespace Viper::Components {
     void Transform::OnEditor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
 
-        if(ImGui::TreeNodeEx("Transform", t)) {
+        if(ImGui::TreeNodeEx( " " ICON_FA_CUBES " Transform", t)) {
             ImGuiTransform3F("Position", position);
             ImGuiTransform3F("Rotation", rotation);
             ImGuiTransform3F("Scale", scale, 1.0f);

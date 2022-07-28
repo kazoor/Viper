@@ -48,13 +48,13 @@ namespace Viper::Graphics {
             spdlog::error("Failed to initialize GLAD");
         }
 
-        LayerStack = new Viper::Layers::LayerStack();
+        LayerStack = new Layers::LayerStack();
         Globals::GlobalsContext::CreateContext();
 
         UpdateWindowEvents();
 
-        PushLayer(new Viper::ImGuiEditor(this));
-        PushLayer(new Viper::Scene::Scene(this));
+        PushLayer(new ImGuiEditor(this));
+        PushLayer(new Scene::Scene(this));
         //PushLayer(new Viper::Input::KeyboardInputLayer());
         //PushLayer(new Viper::Input::MouseInputLayer());
 

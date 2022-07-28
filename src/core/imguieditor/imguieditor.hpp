@@ -11,6 +11,7 @@
 #include "../util/globals/global.hpp"
 #include "../util/input/input.hpp"
 #include "../util/input/keycodes.hpp"
+#include "fontawesome5.hpp"
 #include "../viper/base.hpp"
 
 namespace Viper {
@@ -27,7 +28,12 @@ namespace Viper {
             ImGui::StyleColorsDark();
 
             io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-            io.FontDefault = io.Fonts->AddFontFromFileTTF("resources/assets/fonts/JetBrainsMonoNL-Bold.ttf", 14.0f);
+            io.Fonts->AddFontFromFileTTF("resources/assets/fonts/JetBrainsMonoNL-Bold.ttf", 14.0f);
+            //io.Fonts->AddFontDefault();
+
+            static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+            ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
+            io.Fonts->AddFontFromFileTTF( FONT_ICON_FILE_NAME_FAS, 12.0f, &icons_config, icons_ranges );
 
             style.Colors[ImGuiCol_Button] = ImColor(35, 35, 35, 255);
             style.Colors[ImGuiCol_ButtonHovered] = ImColor(40, 40, 40, 255);
@@ -58,9 +64,13 @@ namespace Viper {
             style.FrameBorderSize = 1;
             style.IndentSpacing = 0.0f;
             style.WindowTitleAlign = ImVec2( 0.5f, 0.5f );
+            style.WindowPadding = ImVec2( 0, 8 );
+            style.IndentSpacing = 10.0f;
 
             ImGui_ImplGlfw_InitForOpenGL(WindowContext->Ctx(), true);
             ImGui_ImplOpenGL3_Init("#version 410");
+
+            
 
             style.GrabRounding = 2.0f;
         }
@@ -77,7 +87,8 @@ namespace Viper {
             ImGui_ImplOpenGL3_NewFrame();
             ImGui::NewFrame();
 
-            if (ImGui::Begin("Viewport", NULL,
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+            if (ImGui::Begin(VIPER_TITLE, NULL,
                              ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove)) {
                 ImGui::SetWindowPos(ImVec2(0.0f, 0.0f));
                 ImGui::SetWindowSize(
@@ -86,6 +97,7 @@ namespace Viper {
                 ImGui::DockSpace(m_dock_space, ImVec2(0, 0));
                 ImGui::End();
             }
+            ImGui::PopStyleVar();
 
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
             if (ImGui::Begin("Scene")) {
@@ -99,17 +111,14 @@ namespace Viper {
             };
             ImGui::PopStyleVar();
 
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
             if (ImGui::Begin("Hierarchy")) {
+                ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f ), "=======This section will be deleted soon.=====");
                 ImGui::DragFloat("Zoom Level", &Globals::Editor::ZoomLevel, 1.0f, -200.0f, 200.0f);
                 ImGui::DragFloat2("Position", Globals::Editor::Position, 1.0f, -100.0f, 100.0f);
                 ImGui::DragFloat("Radians", &Globals::Editor::Radians, 1.0f, -180.0f, 180.0f);
                 ImGui::DragFloat("Light Density", &Globals::Editor::LightDensity, 0.1f, -10.0f, 10.0f);
-
-                if( !Globals::Editor::isPlaying && ImGui::Button("Play")) {
-                    Globals::Editor::isPlaying = true;
-                } else if(Globals::Editor::isPlaying && ImGui::Button("Editor")) {
-                    Globals::Editor::isPlaying = false;
-                };
+                ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f ), "==============================================");
 
                 ImGui::Separator();
                 static char buff[80];
@@ -118,7 +127,8 @@ namespace Viper {
                 ImGui::PopItemWidth();
                 ImGui::SameLine();
 
-                if (ImGui::Button("Add GameObject")) {
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+                if (ImGui::Button(ICON_FA_PLUS " Add GameObject")) {
                     if (strlen(buff) > 1) {
                         //auto go = std::make_unique<Viper::Components::GameObject>(buff);
                         auto go = Components::GameObject::Create(buff);
@@ -137,7 +147,8 @@ namespace Viper {
                         Globals::Editor::SelectedObject++;
                     };
                 };
-                if( ImGui::Button("Add PlayerController")) {
+                ImGui::PopStyleColor();
+                if( ImGui::Button(ICON_FA_PLUS " Add PlayerController")) {
                     //auto go = std::make_unique<Viper::Components::GameObject>("PlayerController");
 
                     auto go = Components::GameObject::Create("PlayerController");
@@ -183,8 +194,11 @@ namespace Viper {
                            1.0f / Globals::Editor::DeltaTime );
                 ImGui::Text("Quads Rendered: %i", Renderer::Renderer2D::GetQuadCount());
                 ImGui::Text("Indices used: %i", Renderer::Renderer2D::GetIndexCount());
+
                 ImGui::End();
             };
+            ImGui::PopStyleVar();
+
 
             if(ImGui::Begin("Debug Console")) {
                 Globals::ConsoleContext::ResizeLogs( 10U );                    
@@ -197,6 +211,7 @@ namespace Viper {
                 ImGui::End();
             };
 
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
             if (ImGui::Begin("Inspector")) {
                 if (Globals::Editor::SelectedObject != -1) {
                     auto go = Globals::GlobalsContext::Gom->m_GameObjects.at(Globals::Editor::SelectedObject);
@@ -212,6 +227,7 @@ namespace Viper {
                 }
                 ImGui::End();
             };
+            ImGui::PopStyleVar();
 
             ImGui::ShowDemoWindow();
 
@@ -235,20 +251,37 @@ namespace Viper {
             ImGui_ImplGlfw_Shutdown();
             ImGui::DestroyContext();
         }
+    private:
+
+        void ImGui_OnInspector()
+        {
+
+        };
+
+        void ImGui_OnHierarchy()
+        {
+
+        };
+
+        void ImGui_OnViewport()
+        {
+
+        };
 
     protected:
      template< typename T = Components::Component, typename... TArgs >
      void MakeComponent(Ref< Components::GameObject >& ref, const std::string& s, TArgs&&... args ) {
         bool hasComponent = ref->HasComponent< T >( );
 
-         if(!hasComponent && ImGui::Button( std::string("Add ").append(s).c_str())) {
+         if(!hasComponent && ImGui::Button( std::string( ICON_FA_PLUS " Add ").append(s).c_str())) {
              ref->AddComponent<T>(std::forward< TArgs >(args)...);
-         } else if(hasComponent && ImGui::Button(std::string("Remove ").append(s).c_str())) {
+         } else if(hasComponent && ImGui::Button(std::string( ICON_FA_TRASH_ALT " Remove ").append(s).c_str())) {
              ref->RemoveComponent< T >( );
          }
      };
 
     private:
         Viper::Graphics::Window *WindowContext;
+        
     };
 }

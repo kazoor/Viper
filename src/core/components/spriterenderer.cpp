@@ -3,7 +3,7 @@
 #include <vector>
 #include <glm/gtc/type_ptr.hpp>
 #include "../util/globals/global.hpp"
-
+#include "../imguieditor/fontawesome5.hpp"
 namespace Viper::Components {
     VIPER_CLASS_DEFINE(Component, SpriteRenderer)
 
@@ -36,7 +36,7 @@ namespace Viper::Components {
 
     void SpriteRenderer::OnEditor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        if(ImGui::TreeNodeEx("SpriteRenderer", t)) {
+        if(ImGui::TreeNodeEx(" " ICON_FA_PAINT_BRUSH " SpriteRenderer", t)) {
             ImGui::ColorEdit4("Sprite Color", glm::value_ptr(color));
             ImGui::TreePop();
         };

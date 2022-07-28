@@ -4,6 +4,9 @@
 #include "sprite2d.hpp"
 
 namespace Viper::Renderer {
+    Sprite2D::Sprite2D() {
+        
+    };
     Sprite2D::Sprite2D( const std::string& path, int width, int height ) : Path(path), Width( width ), Height( height ) {
         glGenTextures(1, &SpriteID);
         glBindTexture(GL_TEXTURE_2D, SpriteID);
