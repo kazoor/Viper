@@ -24,14 +24,8 @@ namespace Viper::Components {
             auto idx = std::find_if(components.begin(), components.end(), [ a = T::GetType() ]( auto& c ) { return c->IsComponentValid( a ) && a != ComponentType::Scripting;});
             bool found_in_table = ( idx != components.end());
 
-            if( found_in_table ) // component already exist.
-            {
-                printf("error, this component does already exist.\n");
-                return;
-            } else {
+            if( !found_in_table ) // component already exist.
                 components.push_back( std::make_unique< T >( std::forward< TArgs >( args )... ) );
-                printf("component has been added.\n");
-            };
         };
 
         template< typename T >
@@ -42,13 +36,8 @@ namespace Viper::Components {
             auto idx = std::find_if(components.begin(), components.end(), [ a = T::GetType() ]( auto& c ) { return c->IsComponentValid(a);});
             bool found_in_table = ( idx != components.end());
 
-            if( found_in_table ) {
+            if( found_in_table )
                 components.erase( idx );
-                printf("found component, deleted.\n");
-            } else {
-                printf("error, can't find component. fallback.\n");
-                return;
-            };
         };
 
         void RemoveComponent( const char* name ) {
@@ -58,13 +47,8 @@ namespace Viper::Components {
             auto idx = std::find_if(components.begin(), components.end(), [ a = name ]( auto& c ) { return strstr(c->GetName(), a);});
             bool found_in_table = ( idx != components.end());
 
-            if( found_in_table ) {
+            if( found_in_table )
                 components.erase( idx );
-                printf("found component, deleted. :: %s\n", name);
-            } else {
-                printf("error, can't find component. :: %s\n", name);
-                return;
-            };
         };
 
         template< class T >
@@ -83,13 +67,7 @@ namespace Viper::Components {
         bool HasComponent( const char* name ) {
             auto idx = std::find_if(components.begin(), components.end(), [ a = name ]( auto& c ) { return strstr(c->GetName(), a);});
             bool found_in_table = ( idx != components.end());
-            if( found_in_table ) {
-                printf("found component. has_component. :: %s\n", name);
-                return true;
-            } else {
-                printf("error, can't find component. has_component. :: %s\n", name);
-                return false;
-            };
+            return found_in_table;
         };
 
         template< class T >
@@ -113,7 +91,7 @@ namespace Viper::Components {
             return components.size();
         };
 
-        void OnUpdate( float deltaticks ) {
+        void OnUpdate( double deltaticks ) {
             for(auto& c : components )
                 c->Update( deltaticks );
         };
@@ -124,15 +102,19 @@ namespace Viper::Components {
         };
 
         void OnEditor( ) {
-            for(auto& c : components ) {
-                c->SetEditor( );
+            for( auto&& c : components ) {
+                c->Editor( );
+            };
+        };
 
-                if( c->GetComponentType() == ComponentType::Transform )
+        void OnDeletion() {
+            for( auto&& c = components.rbegin(); c != components.rend(); c++ ) {
+                if( c->get()->GetComponentType() == ComponentType::Transform )
                     continue;
                     
-                if( ImGui::Button( VIPER_FORMAT_STRING( ICON_FA_TRASH_ALT " Remove %s", c->GetName() ).c_str( ) ) )
-                    RemoveComponent( c->GetName());
-            }
+                if( ImGui::Button( VIPER_FORMAT_STRING( ICON_FA_TRASH_ALT " Remove %s", c->get()->GetName() ).c_str( ) ) )
+                    RemoveComponent( c->get()->GetName());
+            };
         };
 
         static Ref< GameObject > Create();
@@ -140,6 +122,6 @@ namespace Viper::Components {
 
         std::string tag;
     private:
-        std::vector< Ref< Component > > components;
+        std::vector< Scope< Component > > components;
     };
 };

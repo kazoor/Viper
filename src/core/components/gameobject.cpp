@@ -19,14 +19,12 @@ namespace Viper::Components {
     };
 
     GameObject::~GameObject() {
-        for( auto&& c : components ) // automatically deconstruct all the sub-components.
-        {
-            if(c->GetComponentType() == ComponentType::Transform)
+        for(auto&& c = components.rbegin(); c != components.rend(); c++ ) {
+            if( c->get()->GetComponentType() == ComponentType::Transform )
                 continue;
 
-            RemoveComponent(c->GetName());
+            RemoveComponent(c->get()->GetName());
         };
-            //RemoveComponent(c->GetName()); // this is great for debugging, but it should be handled by the user, and not the class.
     };
 
     Ref< GameObject > GameObject::Create( ) {

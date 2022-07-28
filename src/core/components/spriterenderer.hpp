@@ -1,28 +1,31 @@
-#include "transform.hpp"
+#pragma once
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include "component.hpp"
 #include "gameobject.hpp"
-#include <glm/vec4.hpp>
-#include <memory>
+
 
 namespace Viper::Components {
     class SpriteRenderer : public Component {
-        VIPER_CLASS_DECLARATION( SpriteRenderer )
     public:
+        VIPER_COMPONENT_DECLARE( SpriteRenderer );
+
         SpriteRenderer();
         
         SpriteRenderer(GameObject* obj);
 
         SpriteRenderer(GameObject* obj, glm::vec4 col );
 
-        void OnAwake() override;
+        void Awake();
         
-        void OnUpdate(double deltatime) override;
+        void Update(double deltatime);
 
-        void OnEditor() override;
+        void Editor();
 
         glm::vec4 color;
     private:
-        Transform tr;
         GameObject* object;
+    protected:
+        Transform tr;
     };
 }
