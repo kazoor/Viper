@@ -279,6 +279,5 @@ namespace Viper {
 
     private:
         Viper::Graphics::Window *WindowContext;
-        
     };
 }
