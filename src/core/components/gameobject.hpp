@@ -56,13 +56,7 @@ namespace Viper::Components {
         bool HasComponent( ) {
             auto idx = std::find_if(components.begin(), components.end(), [ a = T::GetType() ]( auto& c ) { return c->IsComponentValid(a);});
             bool found_in_table = ( idx != components.end());
-            if( found_in_table ) {
-                printf("found component. has_component.\n");
-                return true;
-            } else {
-                printf("error, can't find component. has_component. \n");
-                return false;
-            };
+            return found_in_table;
         };
 
         bool HasComponent( const char* name ) {
