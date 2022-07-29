@@ -12,8 +12,8 @@ namespace Viper::Events {
         
         LayerUpdate,
 
-        MouseCursorPosition, MouseDown, MouseUp, MouseInputLayer, MouseScroll,
-        KeyboardKeyDown, KeyboardKeyUp, KeyboardInputLayer,
+        MouseCursorPosition, MouseScroll, MouseButtonPressed, MouseButtonReleased,
+        KeyboardKeyPressed, KeyboardKeyReleased,
         WindowTest
     };
 
