@@ -50,11 +50,23 @@ namespace Viper::Scene {
 
             Renderer::Renderer2D::DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
+            for(auto& go : *Globals::GlobalsContext::Gom ) {
+                go->OnUpdate(GetDeltaTime());
+                
+                if( go->HasComponent< Components::Camera >( ) && Globals::Editor::isPlaying ) {
+                    if(!go->GetComponent< Components::Camera >( ).enabled)
+                        continue;
+
+                    auto camera_position = go->GetComponent< Components::Transform >( ).position;
+                    auto camera_scale = go->GetComponent< Components::Transform >( ).scale;
+
+                    m_Camera->SetProjection(-AspectRatio * camera_scale.z, AspectRatio * camera_scale.z, camera_scale.z, -camera_scale.z, 1.0f, -1.0f);
+                    m_Camera->SetPosition( glm::vec3( camera_position.x, camera_position.y, 0.0f ) );
+                };
+            };
+
             if(!Globals::Editor::isPlaying )
                 m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
-
-            for(auto& go : *Globals::GlobalsContext::Gom )
-                go->OnUpdate(GetDeltaTime());
 
             Renderer::Renderer2D::Flush();
             Renderer::Renderer2D::End();

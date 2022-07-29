@@ -114,9 +114,12 @@ namespace Viper {
 
             ImGUi_OnPlaymode();
 
+            ImGui::ShowDemoWindow();
+            
             ImGui::EndFrame();
 
             ImGui::Render();
+
             
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
@@ -147,6 +150,25 @@ namespace Viper {
                     auto go = Globals::GlobalsContext::Gom->get(Globals::Editor::SelectedObject);
                     go->OnEditor();
                     go->OnDeletion();
+
+                    //if(ImGui::Button( ICON_FA_PLUS " Add Component" ) && ImGui::IsMouseClicked(1) )
+                    //{
+                    //    bool is_widgets_open = ImGui::BeginPopup("##combo_widgets" );
+                    //    if( is_widgets_open )
+                    //        ImGui::Text("hello");
+                    //    ImGui::EndPopup();
+                    //};
+
+                    ImGui::Button( ICON_FA_PLUS " Add Component" );
+                    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+                    if (ImGui::BeginPopupContextItem())
+                    {
+                        ImGui_CreateComponent< Components::Camera >( "Camera", go );
+                        ImGui_CreateComponent< Components::SpriteRenderer >( "Sprite Renderer", go );
+                        ImGui_CreateComponent< Components::TestScript >( "Test Script", go );
+                        ImGui::EndPopup();
+                    }
+                    ImGui::PopStyleVar();
                     ImGui::Separator();
                 }
                 ImGui::End();
@@ -161,8 +183,10 @@ namespace Viper {
                 ImGui::Image(
                         reinterpret_cast< ImTextureID * >( Renderer::Renderer2D::GetTexture()),
                         ImVec2(SceneSize.x, SceneSize.y));
+
                 if (ImGui::IsItemClicked())
                     Globals::Editor::SelectedObject = -1;
+
                 ImGui::End();
             };
             ImGui::PopStyleVar();
@@ -203,14 +227,10 @@ namespace Viper {
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
                 if (ImGui::Button(ICON_FA_PLUS " Add GameObject")) {
                     if (strlen(buff) > 1) {
-                        //auto go = std::make_unique<Viper::Components::GameObject>(buff);
                         auto go = Components::GameObject::Create(buff);
-                        [&](Components::GameObject* c) {
-                            
-                            //c->AddComponent< Viper::Components::SpriteRenderer >( c, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f ) );
-                            //c->AddComponent< Viper::Components::BoxCollision2D >( c );
-                        }(go.get());
-
+                        [&](Ref< Components::GameObject >&) {
+                        }(go);
+                        
                         Globals::GlobalsContext::Gom->OnAdd( go );
                         Globals::ConsoleContext::AddLog( VIPER_ICON_INFO " GameObject Spawn.", VIPER_FORMAT_STRING("GameObject: %s has been spawned!", buff), Globals::ConsoleInfo);
                         buff[0] = '\0';
@@ -229,6 +249,7 @@ namespace Viper {
 
                     Globals::GlobalsContext::Gom->OnAdd( go );
                     Globals::ConsoleContext::AddLog( VIPER_ICON_INFO " GameObject Spawn.", VIPER_FORMAT_STRING("GameObject: PlayerController has been spawned!", buff), Globals::ConsoleInfo);
+                    Globals::Editor::SelectedObject++;
                 };
 
                 ImGui::Separator();
@@ -277,13 +298,32 @@ namespace Viper {
         };
 
         void ImGUi_OnPlaymode() {
+            ImGuiWindowFlags playmode = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
             if(ImGui::Begin("##PlayMode", NULL)) {
                 float size = ImGui::GetWindowHeight( ) - 4.0f;
                 ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - ( size * 0.5f ));
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0,0,0,0));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0,0,0,0));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0,0,0,0));
                 if( ImGui::Button( !( Globals::Editor::isPlaying ) ? ICON_FA_PLAY : ICON_FA_SQUARE ) )
                     Globals::Editor::isPlaying = !Globals::Editor::isPlaying;
+
+                ImGui::PopStyleColor(0);
+                ImGui::PopStyleColor(1);
+                ImGui::PopStyleColor(2);
+
                 ImGui::End();
             };
+        };
+
+        template< typename T >
+        void ImGui_CreateComponent( const char* button_name, Ref< Components::GameObject >& object ) {
+            if(!object->HasComponent< T >( ) ) {
+                if( ImGui::Button( button_name ) ) {
+                    object->AddComponent< T >( object.get() );
+                    ImGui::CloseCurrentPopup();
+                };
+            }
         };
 
     private:

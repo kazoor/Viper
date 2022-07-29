@@ -1,4 +1,5 @@
 #include "scripting.hpp"
+#include "camera.hpp"
 #include "../viper/base.hpp"
 
 namespace Viper::Components {
@@ -42,6 +43,20 @@ namespace Viper::Components {
         return parent->GetComponent< T >( );
     };
 
+    template< typename T, typename... TArgs >
+    void Scripting::AddComponent(TArgs&&... args) {
+        parent->AddComponent< T >( std::forward< TArgs >( args )... );
+    };
+
+    template< typename T >
+    bool Scripting::HasComponent() const {
+        return parent->HasComponent< T >( );
+    };
+
+    template< typename T >
+    void Scripting::RemoveComponent() {
+        parent->RemoveComponent< T >( );
+    };
 
     TestScript::TestScript() {
         parent = nullptr;
@@ -55,5 +70,13 @@ namespace Viper::Components {
 
     void TestScript::OnGui() {
         ImGui::Text("hello kajzan");
+
+        if( !HasComponent< Camera >( ) ) {
+            if( ImGui::Button( "Add Camera!" ) )
+                AddComponent< Camera >( parent );
+        } else {
+            if( ImGui::Button( "Remove Camera!" ) )
+                RemoveComponent< Camera >( );
+        };        
     };
 };
