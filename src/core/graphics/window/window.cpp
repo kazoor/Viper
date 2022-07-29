@@ -9,10 +9,10 @@
 #include "../../imguieditor/imguieditor.hpp"
 #include "../../imguieditor/scene/scene.hpp"
 #include "../../util/input/mouse/mouseevents.hpp"
-#include "../../inputlayer/keyboardinputlayer.hpp"
 
 namespace Viper::Graphics {
-    #define VIPER_GET(wnd) WindowParams_t& data = *(WindowParams_t*)glfwGetWindowUserPointer(wnd)
+#define VIPER_GET(wnd) WindowParams_t& data = *(WindowParams_t*)glfwGetWindowUserPointer(wnd)
+
     Window::Window(int Width, int Height, const std::string &WindowName) {
         glfwInit();
 
@@ -22,7 +22,7 @@ namespace Viper::Graphics {
                 WindowName,
                 nullptr,
                 nullptr,
-                nullptr };
+                nullptr};
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -86,7 +86,7 @@ namespace Viper::Graphics {
         glfwTerminate();
     };
 
-    void Window::OnEvent(Events::Event& event) {
+    void Window::OnEvent(Events::Event &event) {
         // Kommer att säga detta en gång, och en gång bara.
         // Vi dispatchar dem ENBART för att logga.
         // Dem blir redan calla'de av EventCallback.
@@ -96,6 +96,18 @@ namespace Viper::Graphics {
             dispatcher.Dispatch< WindowFrameBufferSizeEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowFrameBufferSizeEvent ) );
             dispatcher.Dispatch< WindowResizeEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowResizeEvent ) );
             dispatcher.Dispatch< WindowCloseEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowCloseEvent ) );
+            
+            dispatcher.Dispatch<MouseCursorPositionEvent>(
+                    VIPER_GET_EVENT_FUNC(Window::OnWindowMouseCursorPositionEvent));
+            dispatcher.Dispatch<MouseScrollEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowMouseScrollEvent));
+
+            dispatcher.Dispatch<KeyboardKeyPressedEvent>(VIPER_GET_EVENT_FUNC(Window::OnKeyboardKeyPressedEvent));
+
+            dispatcher.Dispatch<KeyboardKeyReleasedEvent>(VIPER_GET_EVENT_FUNC(Window::OnKeyboardKeyReleasedEvent));
+
+            dispatcher.Dispatch<MouseButtonPressedEvent>(VIPER_GET_EVENT_FUNC(Window::OnMouseButtonPressedEvent));
+
+            dispatcher.Dispatch<MouseButtonReleasedEvent>(VIPER_GET_EVENT_FUNC(Window::OnMouseButtonReleasedEvent));
         }
 
         for( auto it = LayerStack->rbegin(); it != LayerStack->rend(); it++ ) {
@@ -106,7 +118,7 @@ namespace Viper::Graphics {
         };
     };
 
-    void Window::SetCallback( const fn_EventCallback& callback ) {
+    void Window::SetCallback(const fn_EventCallback &callback) {
         WindowParams.EventCallback = callback;
     };
 
@@ -128,7 +140,7 @@ namespace Viper::Graphics {
         });
 
         glfwSetWindowPosCallback(Context, [](GLFWwindow *Window, int X, int Y) {
-            WindowParams_t& param = *(WindowParams_t*)glfwGetWindowUserPointer(Window);
+            WindowParams_t &param = *(WindowParams_t *) glfwGetWindowUserPointer(Window);
             WindowPositionEvent event(X, Y);
             param.EventCallback(event);
         });
@@ -157,25 +169,57 @@ namespace Viper::Graphics {
             data.EventCallback(event);
         });
 
-        glfwSetCursorPosCallback(Context, [](GLFWwindow* Window, double xpos, double ypos ) {
+        glfwSetCursorPosCallback(Context, [](GLFWwindow *Window, double xpos, double ypos) {
             VIPER_GET(Window);
-            MouseCursorPositionEvent event((double)xpos, (double)ypos);
+            MouseCursorPositionEvent event((double) xpos, (double) ypos);
             data.EventCallback(event);
         });
 
-        glfwSetScrollCallback( Context, [](GLFWwindow* Window, double xpos, double ypos) {
+        glfwSetScrollCallback(Context, [](GLFWwindow *Window, double xpos, double ypos) {
             VIPER_GET(Window);
             Events::MouseScrollEvent event(xpos, ypos);
             data.EventCallback(event);
         });
 
-        glfwSetKeyCallback( Context, [ ](GLFWwindow* Window, int key, int scancode, int action, int mods ) {
+        glfwSetKeyCallback(Context, [](GLFWwindow *Window, int Key, int ScanCode, int Action, int Mods) {
             VIPER_GET(Window);
-            KeyboardKeyEvent event(key, scancode, action, mods);
-            data.EventCallback(event);
+
+            switch (Action) {
+                case GLFW_PRESS: {
+                    KeyboardKeyPressedEvent Event(Key, false);
+                    data.EventCallback(Event);
+                    break;
+                }
+                case GLFW_REPEAT: {
+                    KeyboardKeyPressedEvent Event(Key, true);
+                    data.EventCallback(Event);
+                    break;
+                }
+                case GLFW_RELEASE: {
+                    KeyboardKeyReleasedEvent Event(Key);
+                    data.EventCallback(Event);
+                    break;
+                }
+            }
         });
 
-        //bool OnWindowKeyEvent(KeyboardKeyEvent& E);
+        glfwSetMouseButtonCallback(Context, [](GLFWwindow *Window, int Button, int Action, int mods) {
+            VIPER_GET(Window);
+            switch (Action) {
+                case GLFW_PRESS: {
+                    MouseButtonPressedEvent Event(Button);
+                    data.EventCallback(Event);
+                    break;
+                }
+                case GLFW_RELEASE: {
+                    MouseButtonReleasedEvent Event(Button);
+                    data.EventCallback(Event);
+                    break;
+                }
+            }
+        });
+
+        //bool OnWindowKeyEvent(KeyboardKeyPressedEvent& E);
     }
 
     void Window::Update() const {
@@ -200,7 +244,7 @@ namespace Viper::Graphics {
         return glfwCreateWindow(Params.Width, Params.Height, Params.Title.c_str(), Params.Monitor, Params.Share);
     }
 
-    bool Window::OnWindowFrameBufferSizeEvent(WindowFrameBufferSizeEvent& E) {
+    bool Window::OnWindowFrameBufferSizeEvent(WindowFrameBufferSizeEvent &E) {
         spdlog::info("WindowFrameBufferSize Event triggered! Updated viewport to: {0}x{1}", E.Width, E.Height);
         glViewport(0, 0, E.Width, E.Height);
         WindowParams.Width = E.Width;
@@ -209,7 +253,7 @@ namespace Viper::Graphics {
         return true;
     }
 
-    bool Window::OnWindowResizeEvent(WindowResizeEvent& E) {
+    bool Window::OnWindowResizeEvent(WindowResizeEvent &E) {
         spdlog::info("WindowResize Event triggered! New size is {0}x{1}", E.Width, E.Height);
         WindowParams.Width = E.Width;
         WindowParams.Height = E.Height;
@@ -217,38 +261,60 @@ namespace Viper::Graphics {
         return true;
     }
 
-    bool Window::OnWindowPositionEvent(WindowPositionEvent& E) {
+    bool Window::OnWindowPositionEvent(WindowPositionEvent &E) {
         spdlog::info("WindowPosition Event triggered! New position is X: {0} : Y: {1}", E.X, E.Y);
         return true;
     }
 
-    bool Window::OnWindowContentScaleEvent(WindowContentScaleEvent& E) {
+    bool Window::OnWindowContentScaleEvent(WindowContentScaleEvent &E) {
         spdlog::info("WindowContentScale Event triggered! Scale (X:Y): {0}:{1}", E.XScale, E.YScale);
         return true;
     }
 
-    bool Window::OnWindowMaximizationEvent(WindowMaximizationEvent& E) {
+    bool Window::OnWindowMaximizationEvent(WindowMaximizationEvent &E) {
         spdlog::info("WindowMaximization Event triggered! Value: {0}", E.Maximized);
         return true;
     }
 
-    bool Window::OnWindowFocusEvent(WindowFocusEvent& E) {
+    bool Window::OnWindowFocusEvent(WindowFocusEvent &E) {
         spdlog::info("WindowFocus Event triggered! Focus: {0}", E.Focused);
         return true;
     }
 
-    bool Window::OnWindowCloseEvent(WindowCloseEvent& E) {
+    bool Window::OnWindowCloseEvent(WindowCloseEvent &E) {
         spdlog::info("WindowCloseEvent Event triggered!");
         return true;
     }
 
-    bool Window::OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent& E) {
-        VIPER_LOG( "MouseCursorPositionEvent Event triggered! {0}, {1}", E.x, E.y);
+    bool Window::OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent &E) {
+        VIPER_LOG("MouseCursorPositionEvent Event triggered! {0}, {1}", E.x, E.y);
+        return true;
+    };
+    
+    bool Window::OnWindowMouseScrollEvent(MouseScrollEvent &E) {
+        VIPER_LOG("MouseScrollEvent Event triggered! {0}, {1}", E.x, E.y);
+        if (!Globals::Editor::isPlaying)
+            Globals::Editor::ZoomLevel -= static_cast< float >( E.y );
         return true;
     };
 
-    bool Window::OnWindowKeyEvent(KeyboardKeyEvent& E) {
-        VIPER_LOG("KeyPressed: {0} :: state = {1}", E.key, E.action);
+    bool Window::OnKeyboardKeyPressedEvent(KeyboardKeyPressedEvent &E) {
+        VIPER_LOG("KeyboardKeyPressed: {0} | IsHeld = {1}", E.Key, E.IsHeld);
+        return true;
+    }
+
+    bool Window::OnKeyboardKeyReleasedEvent(KeyboardKeyReleasedEvent &E) {
+        VIPER_LOG("KeyboardKeyReleased: {0}", E.Key);
+        return true;
+    }
+
+    bool Window::OnMouseButtonPressedEvent(MouseButtonPressedEvent &E) {
+        VIPER_LOG("MouseButtonPressedEvent: {0}", E.Button);
+        return true;
+    }
+
+    bool Window::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent &E) {
+        VIPER_LOG("MouseButtonPressedEvent: {0}", E.Button);
         return true;
     };
 }

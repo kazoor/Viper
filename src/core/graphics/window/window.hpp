@@ -68,13 +68,44 @@ namespace Viper::Graphics {
         double x, y;
     };
 
-    class KeyboardKeyEvent : public Events::Event {
+    class MouseScrollEvent : public Events::Event {
     public:
-        VIPER_MAKE_EVENT(KeyboardInputLayer, KeyboardKeyEvent);
-        KeyboardKeyEvent(int akey, int ascancode, int aaction, int amods)
-            : key( akey ), scancode( ascancode ), action(aaction), mods(amods) { };
+        VIPER_MAKE_EVENT(MouseScroll, MouseScrollEvent);
+        MouseScrollEvent( double xpos, double ypos ) : x( xpos ), y( ypos ) { };
+        double x, y;
+    };
 
-        int key, scancode, action, mods;
+    class KeyboardKeyPressedEvent : public Events::Event {
+    public:
+        VIPER_MAKE_EVENT(KeyboardKeyPressed, KeyboardKeyPressedEvent);
+        KeyboardKeyPressedEvent(int Key, bool IsHeld) : Key(Key), IsHeld(IsHeld) {}
+
+        int Key;
+        bool IsHeld; // Key is held down.
+    };
+
+    class KeyboardKeyReleasedEvent : public Events::Event {
+    public:
+        VIPER_MAKE_EVENT(KeyboardKeyReleased, KeyboardKeyReleasedEvent);
+        KeyboardKeyReleasedEvent(int Key) : Key(Key) {}
+
+        int Key;
+    };
+
+    class MouseButtonPressedEvent : public Events::Event {
+    public:
+        VIPER_MAKE_EVENT(MouseButtonPressed, MouseButtonPressedEvent);
+        MouseButtonPressedEvent(int Button) : Button(Button) {}
+
+        int Button;
+    };
+
+    class MouseButtonReleasedEvent : public Events::Event {
+    public:
+        VIPER_MAKE_EVENT(MouseButtonReleased, MouseButtonReleasedEvent);
+        MouseButtonReleasedEvent(int Button) : Button(Button) {}
+
+        int Button;
     };
 
     class Window {
@@ -144,8 +175,16 @@ namespace Viper::Graphics {
         // Sends an event everytime the mouse position has CHANGED.
         bool OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent& E);
 
-        bool OnWindowKeyEvent(KeyboardKeyEvent& E);
-        
+        bool OnWindowMouseScrollEvent(MouseScrollEvent& E);
+
+        bool OnKeyboardKeyPressedEvent(KeyboardKeyPressedEvent& E);
+
+        bool OnKeyboardKeyReleasedEvent(KeyboardKeyReleasedEvent& E);
+
+        bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& E);
+
+        bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& E);
+
     private:
 
         GLFWwindow* Context;
