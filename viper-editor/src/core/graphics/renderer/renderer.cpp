@@ -99,9 +99,9 @@ namespace Viper::Renderer {
         s_Renderer.m_TextureShader->SetUniformMat4("u_ViewProjection", s_Renderer.m_ViewProjection);
         s_Renderer.m_TextureShader->SetUniformMat4("u_Transform", m_Transform);
 
-        s_Renderer.m_QuadShader->Use();
-        s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", s_Renderer.m_ViewProjection);
-        s_Renderer.m_QuadShader->SetUniformMat4("u_Transform", m_Transform);
+        //s_Renderer.m_QuadShader->Use();
+        //s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", s_Renderer.m_ViewProjection);
+        //s_Renderer.m_QuadShader->SetUniformMat4("u_Transform", m_Transform);
         s_Renderer.m_Checkerboard->Bind(0);
        
         RenderCommand::DrawIndexed(s_Renderer.VertexArray->Get(), s_Renderer.m_IndexCount );
