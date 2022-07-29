@@ -64,7 +64,7 @@ namespace Viper::Renderer {
 
         s_Renderer.m_QuadShader = Graphics::Shader::Create("resources/shaders/quad.vert", "resources/shaders/quad.frag");
         s_Renderer.m_TextureShader = Graphics::Shader::Create("resources/shaders/flat.vert", "resources/shaders/flat.frag");
-        s_Renderer.m_Checkerboard = Sprite2D::Create( "resources/assets/textures/checkerboard.png");
+        s_Renderer.m_Checkerboard = Sprite2D::Create( "resources/textures/checkerboard.png");
         s_Renderer.m_TextureShader->Use();
         s_Renderer.m_TextureShader->SetInt("u_Texture",0);
 
@@ -99,9 +99,9 @@ namespace Viper::Renderer {
         s_Renderer.m_TextureShader->SetUniformMat4("u_ViewProjection", s_Renderer.m_ViewProjection);
         s_Renderer.m_TextureShader->SetUniformMat4("u_Transform", m_Transform);
 
-        //s_Renderer.m_QuadShader->Use();
-        //s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", s_Renderer.m_ViewProjection);
-        //s_Renderer.m_QuadShader->SetUniformMat4("u_Transform", m_Transform);
+        s_Renderer.m_QuadShader->Use();
+        s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", s_Renderer.m_ViewProjection);
+        s_Renderer.m_QuadShader->SetUniformMat4("u_Transform", m_Transform);
         s_Renderer.m_Checkerboard->Bind(0);
        
         RenderCommand::DrawIndexed(s_Renderer.VertexArray->Get(), s_Renderer.m_IndexCount );
