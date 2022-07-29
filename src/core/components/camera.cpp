@@ -10,10 +10,12 @@
 namespace Viper::Components {
     Camera::Camera() {
         object = nullptr;
+        enabled = true;
     };
 
     Camera::Camera(GameObject* parent ) {
         object = parent;
+        enabled = true;
     };
 
     void Camera::Awake() {
@@ -25,6 +27,9 @@ namespace Viper::Components {
 
     void Camera::Update(double deltatime) {
         auto& tr = object->GetComponent< Transform >( );
+        if(!enabled)
+            return;
+            
         float direction_x = 0.0f;
         float direction_y = 0.0f;
         if( Input::Input::IsKeyPressed(68) )
@@ -45,7 +50,11 @@ namespace Viper::Components {
 
     void Camera::Editor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        if(ImGui::TreeNodeEx( " " ICON_FA_CUBE " Camera", t)) {
+        if(ImGui::TreeNodeEx( " " ICON_FA_CAMERA "  Camera", t)) {
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+            ImGui::Checkbox("Enabled##Camera", &enabled);
+            ImGui::PopStyleVar();
+
             ImGui::TreePop();
         };
     };

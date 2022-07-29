@@ -12,7 +12,6 @@ namespace Viper::Components {
         Scripting();
         Scripting(GameObject* object);
 
-
         void Update(double deltatime);
 
         void Awake();
@@ -25,6 +24,16 @@ namespace Viper::Components {
 
         template< typename T = Scripting >
         T& GetComponent();
+
+        template< typename T = Scripting, typename... TArgs >
+        void AddComponent(TArgs&&... args);
+
+        template< typename T = Scripting >
+        bool HasComponent() const;
+
+        template< typename T = Scripting >
+        void RemoveComponent();
+        
     protected:
         void ScriptDescriptor( const std::string& scriptname ) { script_name = scriptname; };
 
@@ -38,7 +47,5 @@ namespace Viper::Components {
         TestScript(GameObject* object);
 
         void OnGui();
-    private:
-        float m_myValue;
     };
 };

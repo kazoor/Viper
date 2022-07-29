@@ -93,14 +93,10 @@ namespace Viper::Graphics {
         {
             Events::EventDispatcher dispatcher(event);
 
-            dispatcher.Dispatch<WindowFrameBufferSizeEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowFrameBufferSizeEvent));
-            dispatcher.Dispatch<WindowResizeEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowResizeEvent));
-            dispatcher.Dispatch<WindowPositionEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowPositionEvent));
-            dispatcher.Dispatch<WindowContentScaleEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowContentScaleEvent));
-            dispatcher.Dispatch<WindowMaximizationEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowMaximizationEvent));
-            dispatcher.Dispatch<WindowFocusEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowFocusEvent));
-            dispatcher.Dispatch<WindowCloseEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowCloseEvent));
-
+            dispatcher.Dispatch< WindowFrameBufferSizeEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowFrameBufferSizeEvent ) );
+            dispatcher.Dispatch< WindowResizeEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowResizeEvent ) );
+            dispatcher.Dispatch< WindowCloseEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowCloseEvent ) );
+            
             dispatcher.Dispatch<MouseCursorPositionEvent>(
                     VIPER_GET_EVENT_FUNC(Window::OnWindowMouseCursorPositionEvent));
             dispatcher.Dispatch<MouseScrollEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowMouseScrollEvent));
@@ -114,11 +110,11 @@ namespace Viper::Graphics {
             dispatcher.Dispatch<MouseButtonReleasedEvent>(VIPER_GET_EVENT_FUNC(Window::OnMouseButtonReleasedEvent));
         }
 
-        for (auto &It: *LayerStack) {
-            if (event.handled)
+        for( auto it = LayerStack->rbegin(); it != LayerStack->rend(); it++ ) {
+            if(event.handled)
                 break;
 
-            It->OnEvent(event);
+            ( *it )->OnEvent( event );
         };
     };
 
@@ -181,7 +177,7 @@ namespace Viper::Graphics {
 
         glfwSetScrollCallback(Context, [](GLFWwindow *Window, double xpos, double ypos) {
             VIPER_GET(Window);
-            MouseScrollEvent event(xpos, ypos);
+            Events::MouseScrollEvent event(xpos, ypos);
             data.EventCallback(event);
         });
 
@@ -294,7 +290,7 @@ namespace Viper::Graphics {
         VIPER_LOG("MouseCursorPositionEvent Event triggered! {0}, {1}", E.x, E.y);
         return true;
     };
-
+    
     bool Window::OnWindowMouseScrollEvent(MouseScrollEvent &E) {
         VIPER_LOG("MouseScrollEvent Event triggered! {0}, {1}", E.x, E.y);
         if (!Globals::Editor::isPlaying)

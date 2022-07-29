@@ -24,7 +24,9 @@ struct RendererData {
 
     uint32_t m_IndexCount = 0;
     uint32_t m_QuadCount = 0;
-    uint32_t m_VertexCount = 0;
+
+    uint32_t m_PrevIndexCount = 0;
+    uint32_t m_PrevQuadCount = 0;
 
     int m_FboWidth = 1280;
     int m_FboHeight = 720;
@@ -80,12 +82,14 @@ namespace Viper::Renderer {
         GLsizeiptr size_ptr = reinterpret_cast< uint8_t* >( s_Renderer.m_VertexBufferPtr ) - reinterpret_cast< uint8_t* >( s_Renderer.m_VertexBuffer );
         glBindBuffer(GL_ARRAY_BUFFER, s_Renderer.VertexBuffer->Get());
         glBufferSubData(GL_ARRAY_BUFFER, 0, size_ptr, s_Renderer.m_VertexBuffer );
+
+        s_Renderer.m_PrevIndexCount = s_Renderer.m_IndexCount;
+        s_Renderer.m_PrevQuadCount = s_Renderer.m_QuadCount;
     }
 
     void Renderer2D::ResizeFBO( int Width, int Height ) {
         RenderCommand::ResizeTexture( s_Renderer.FrameBuffer->GetTex(), Width, Height );
     };
-
 
     void Renderer2D::DrawQuad( const glm::mat4& transform, RendererAPI::Color color ) {
         for( int i = 0; i < 4; i++ ) {
@@ -148,7 +152,6 @@ namespace Viper::Renderer {
 
         s_Renderer.m_IndexCount = 0;
         s_Renderer.m_QuadCount = 0;
-        s_Renderer.m_VertexCount = 0;
     };
 
     void Renderer2D::BindFramebuffer() {
@@ -159,9 +162,8 @@ namespace Viper::Renderer {
         RenderCommand::UnbindFramebuffer();
     };
 
-    uint32_t Renderer2D::GetVertexCount() { return s_Renderer.m_VertexCount; }
-    uint32_t Renderer2D::GetIndexCount() { return s_Renderer.m_IndexCount; }
-    uint32_t Renderer2D::GetQuadCount() { return s_Renderer.m_QuadCount; }
+    uint32_t Renderer2D::GetIndexCount() { return s_Renderer.m_PrevIndexCount; }
+    uint32_t Renderer2D::GetQuadCount() { return s_Renderer.m_PrevQuadCount; }
 
     // == // == // == // == // == //
 

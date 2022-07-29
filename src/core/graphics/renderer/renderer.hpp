@@ -30,7 +30,6 @@ namespace Viper::Renderer {
         static uint32_t GetTexture();
 
         // Stats.
-        static uint32_t GetVertexCount();
         static uint32_t GetIndexCount();
         static uint32_t GetQuadCount();
 

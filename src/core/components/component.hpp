@@ -44,8 +44,17 @@ namespace Viper::Components {
         virtual ComponentType GetComponentType() const = 0;
         virtual bool IsComponentValid( ComponentType type ) const { return ( GetComponentType() == type ); };
         
+        // Making these functions non-pure as it's not necessary to define them all in a component.
+        
+        // Awake: Will only init once when loaded.
         virtual void Awake() {};
+
+        // Update: Everything related to runtime will be put inside of this function.
         virtual void Update( double deltaticks) {};
+
+        // Editor: The core UI elements of a component.
         virtual void Editor() {};
+
+        bool enabled;
     };
 };

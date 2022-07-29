@@ -1,4 +1,5 @@
 #include "scripting.hpp"
+#include "camera.hpp"
 #include "../viper/base.hpp"
 
 namespace Viper::Components {
@@ -20,7 +21,7 @@ namespace Viper::Components {
 
     bool Scripting::Begin() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        auto frame = ImGui::TreeNodeEx( VIPER_FORMAT_STRING( " " ICON_FA_CUBES " Script :: %s", script_name.c_str( ) ).c_str( ) , t);
+        auto frame = ImGui::TreeNodeEx( VIPER_FORMAT_STRING( " " ICON_FA_CODE "  Script :: %s", script_name.c_str( ) ).c_str( ) , t);
         return frame;
     };
 
@@ -42,6 +43,20 @@ namespace Viper::Components {
         return parent->GetComponent< T >( );
     };
 
+    template< typename T, typename... TArgs >
+    void Scripting::AddComponent(TArgs&&... args) {
+        parent->AddComponent< T >( std::forward< TArgs >( args )... );
+    };
+
+    template< typename T >
+    bool Scripting::HasComponent() const {
+        return parent->HasComponent< T >( );
+    };
+
+    template< typename T >
+    void Scripting::RemoveComponent() {
+        parent->RemoveComponent< T >( );
+    };
 
     TestScript::TestScript() {
         parent = nullptr;
@@ -55,6 +70,13 @@ namespace Viper::Components {
 
     void TestScript::OnGui() {
         ImGui::Text("hello kajzan");
-        ImGui::SliderFloat("dsajhd", &m_myValue, 0.0f, 100.0f);
+
+        if( !HasComponent< Camera >( ) ) {
+            if( ImGui::Button( "Add Camera!" ) )
+                AddComponent< Camera >( parent );
+        } else {
+            if( ImGui::Button( "Remove Camera!" ) )
+                RemoveComponent< Camera >( );
+        };        
     };
 };

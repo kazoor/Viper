@@ -11,7 +11,7 @@ namespace Viper::Layers {
         virtual void OnAttach() {}
         virtual void OnDetach() {}
         virtual void OnUpdate() {}
-        virtual void OnEvent(Events::Event& event) {}
+        virtual void OnEvent(Events::Event& event) = 0;
 
         inline const std::string &GetLayerName() const { return LayerName; }
     protected:

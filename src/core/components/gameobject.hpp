@@ -9,6 +9,7 @@
 #include "../util/ref/reference.hpp"
 #include "../imguieditor/fontawesome5.hpp"
 #include <ImGui/imgui.h>
+#include "../events/event/event.hpp"
 #include "../viper/base.hpp"
 
 namespace Viper::Components {
@@ -25,7 +26,7 @@ namespace Viper::Components {
             bool found_in_table = ( idx != components.end());
 
             if( !found_in_table ) // component already exist.
-                components.push_back( std::make_unique< T >( std::forward< TArgs >( args )... ) );
+                components.push_back( CreateScope< T >( std::forward< TArgs >( args )... ) );
         };
 
         template< typename T >
@@ -55,13 +56,7 @@ namespace Viper::Components {
         bool HasComponent( ) {
             auto idx = std::find_if(components.begin(), components.end(), [ a = T::GetType() ]( auto& c ) { return c->IsComponentValid(a);});
             bool found_in_table = ( idx != components.end());
-            if( found_in_table ) {
-                printf("found component. has_component.\n");
-                return true;
-            } else {
-                printf("error, can't find component. has_component. \n");
-                return false;
-            };
+            return found_in_table;
         };
 
         bool HasComponent( const char* name ) {
@@ -77,45 +72,20 @@ namespace Viper::Components {
                     return *static_cast< T* >( c.get( ) );
                 };
             };
-            return *std::unique_ptr< T >( nullptr );
+            return *Scope< T >( nullptr );
         };
 
-        const char* GetComponentNameByIndex( uint32_t index ) {
-            if( components.empty() )
-                return nullptr;
+        const char* GetComponentNameByIndex( uint32_t index );
 
-            return components.at( index )->GetName( );
-        };
+        size_t GetComponents( ) const;
 
-        size_t GetComponents() const {
-            return components.size();
-        };
+        void OnUpdate( double deltaticks );
 
-        void OnUpdate( double deltaticks ) {
-            for(auto& c : components )
-                c->Update( deltaticks );
-        };
+        void OnAwake( );
 
-        void OnAwake( ) {
-            for(auto& c : components )
-                c->Awake( );
-        };
+        void OnEditor( );
 
-        void OnEditor( ) {
-            for( auto&& c : components ) {
-                c->Editor( );
-            };
-        };
-
-        void OnDeletion() {
-            for( auto&& c = components.rbegin(); c != components.rend(); c++ ) {
-                if( c->get()->GetComponentType() == ComponentType::Transform )
-                    continue;
-                    
-                if( ImGui::Button( VIPER_FORMAT_STRING( ICON_FA_TRASH_ALT " Remove %s", c->get()->GetName() ).c_str( ) ) )
-                    RemoveComponent( c->get()->GetName());
-            };
-        };
+        void OnDeletion();
 
         static Ref< GameObject > Create();
         static Ref< GameObject > Create(const std::string& tagname);

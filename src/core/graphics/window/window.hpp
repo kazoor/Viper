@@ -127,7 +127,6 @@ namespace Viper::Graphics {
         ~Window();
 
         void Init();
-
         using fn_EventCallback = std::function< void(Events::Event&) >;
 
         void Initialize();
@@ -188,9 +187,9 @@ namespace Viper::Graphics {
 
     private:
 
-        GLFWwindow *Context;
+        GLFWwindow* Context;
 
-        Layers::LayerStack *LayerStack;
+        Layers::LayerStack* LayerStack;
 
         bool isClosed;
     };

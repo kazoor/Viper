@@ -48,4 +48,11 @@ namespace Viper::Events {
     private:
         Event& event;
     };
+
+    class MouseScrollEvent : public Events::Event {
+    public:
+        VIPER_MAKE_EVENT(MouseScroll, MouseScrollEvent);
+        MouseScrollEvent( double xpos, double ypos ) : x( xpos ), y( ypos ) { };
+        double x, y;
+    };
 };
