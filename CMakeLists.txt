@@ -20,7 +20,7 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/transform.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/spriterenderer.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/scripting.cpp
-            
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/rigidbody2d.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gameobject.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/camera.cpp
 
