@@ -1,21 +1,35 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
+
+// imgui:
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_glfw.h>
 #include <ImGui/imgui_impl_opengl3.h>
-#include "../layers/layer/layer.hpp"
-#include "../events/event/event.hpp"
-#include "../graphics/window/window.hpp"
-#include "../components/camera.hpp"
-#include "../components/spriterenderer.hpp"
-#include "../components/scripting.hpp"
-//#include "../components/boxcollision2d.hpp"
-#include "../util/globals/global.hpp"
-#include "../util/input/input.hpp"
-#include "../util/input/keycodes.hpp"
+
+// layer:
+#include <layers/layer/layer.hpp>
+
+// events:
+#include <events/event/event.hpp>
+
+// graphics:
+#include <graphics/window/window.hpp>
+
+#include <viper/base.hpp>
 #include "fontawesome5.hpp"
-#include "../viper/base.hpp"
+
+// util:
+#include <util/globals/global.hpp>
+#include <util/input/input.hpp>
+#include <util/input/keycodes.hpp>
+
+// components:
+#include <components/camera.hpp>
+#include <components/spriterenderer.hpp>
+#include <components/scripting.hpp>
+#include <components/rigidbody2d.hpp>
+//#include "../components/boxcollision2d.hpp"
 
 namespace Viper {
     
@@ -166,6 +180,7 @@ namespace Viper {
                         ImGui_CreateComponent< Components::Camera >( "Camera", go );
                         ImGui_CreateComponent< Components::SpriteRenderer >( "Sprite Renderer", go );
                         ImGui_CreateComponent< Components::TestScript >( "Test Script", go );
+                        ImGui_CreateComponent< Components::Rigidbody2D >( "Rigidbody2D", go );
                         ImGui::EndPopup();
                     }
                     ImGui::PopStyleVar();
@@ -245,6 +260,7 @@ namespace Viper {
                     [&](Ref< Components::GameObject >& c) {
                         c->AddComponent< Components::Camera >(c.get());
                         c->AddComponent< Components::SpriteRenderer >(c.get());
+                        c->AddComponent< Components::Rigidbody2D >(c.get());
                     }(go);
 
                     Globals::GlobalsContext::Gom->OnAdd( go );

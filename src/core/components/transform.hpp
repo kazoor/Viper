@@ -35,6 +35,10 @@ namespace Viper::Components {
         glm::vec3 scale;
         glm::vec3 rotation;
 
+        glm::vec3 up;
+        glm::vec3 right;
+        glm::vec3 forward;
+
         void Editor();
         //void Awake();
         //void Update(float deltaticks);

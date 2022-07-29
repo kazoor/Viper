@@ -20,13 +20,10 @@ add_library(Viper
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/transform.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/spriterenderer.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/scripting.cpp
-            
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/rigidbody2d.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gameobject.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/camera.cpp
-
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gom.cpp
-
-
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/inputhandler/inputhandler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
@@ -83,7 +80,8 @@ target_link_libraries(Viper PUBLIC json)
 
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/external")
+    "${CMAKE_CURRENT_SOURCE_DIR}/external"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core")
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
 

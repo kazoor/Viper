@@ -4,7 +4,7 @@
 
 #ifndef VIPER_VERTEXARRAY_HPP
 #define VIPER_VERTEXARRAY_HPP
-#include "../../util/ref/reference.hpp"
+#include <util/ref/reference.hpp>
 
 namespace Viper::Renderer {
 

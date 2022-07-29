@@ -6,7 +6,7 @@
 #define VIPER_VERTEXBUFFER_HPP
 #include <cstdint>
 #include <vector>
-#include "../../util/ref/reference.hpp"
+#include <util/ref/reference.hpp>
 
 namespace Viper::Renderer {
     class VertexBuffer {

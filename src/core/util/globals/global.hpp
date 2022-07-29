@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "../../graphics/renderer/renderer.hpp"
-#include "../../components/gom.hpp"
+#include <graphics/renderer/renderer.hpp>
+#include <components/gom.hpp>
 
 namespace Viper::Globals {
     class GlobalsContext {

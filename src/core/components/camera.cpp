@@ -6,6 +6,7 @@
 #include "../util/input/input.hpp"
 #include "../imguieditor/fontawesome5.hpp"
 #include "camera.hpp"
+#include "rigidbody2d.hpp"
 
 namespace Viper::Components {
     Camera::Camera() {

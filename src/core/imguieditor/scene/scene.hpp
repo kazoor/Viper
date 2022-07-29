@@ -1,11 +1,18 @@
 #pragma once
 
-#include "../../layers/layer/layer.hpp"
-#include "../../events/event/event.hpp"
-#include "../../graphics/window/window.hpp"
-#include "../../graphics/renderer/sprite2d.hpp"
-#include "../../util/globals/global.hpp"
-#include "../../graphics/renderer/camera/orthographic_camera.hpp"
+// layers:
+#include <layers/layer/layer.hpp>
+
+// events:
+#include <events/event/event.hpp>
+
+// graphics:
+#include <graphics/window/window.hpp>
+#include <graphics/renderer/sprite2d.hpp>
+#include <graphics/renderer/camera/orthographic_camera.hpp>
+
+// utils:
+#include <util/globals/global.hpp>
 
 namespace Viper::Scene {
     class Scene : public Layers::Layer {
