@@ -1,0 +1,15 @@
+[submodule "viper-editor/external/glm"]
+	path = viper-editor/external/glm
+	url = git@github.com:g-truc/glm.git
+[submodule "viper-editor/external/spdlog"]
+	path = viper-editor/external/spdlog
+	url = git@github.com:gabime/spdlog.git
+[submodule "viper-editor/external/glfw"]
+	path = viper-editor/external/glfw
+	url = git@github.com:glfw/glfw.git
+[submodule "viper-editor/external/stb"]
+	path = viper-editor/external/stb
+	url = git@github.com:nothings/stb.git
+[submodule "viper-editor/external/json"]
+	path = viper-editor/external/json
+	url = git@github.com:nlohmann/json.git
