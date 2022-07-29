@@ -5,7 +5,7 @@
 #ifndef VIPER_INDEXBUFFER_HPP
 #define VIPER_INDEXBUFFER_HPP
 #include <cstdint>
-#include "../../util/ref/reference.hpp"
+#include <util/ref/reference.hpp>
 
 namespace Viper::Renderer {
     class IndexBuffer {

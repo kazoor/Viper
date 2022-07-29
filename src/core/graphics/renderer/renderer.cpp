@@ -3,7 +3,7 @@
 #include <glm/mat4x4.hpp>
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp> // ortho
-#include "../../src/core/graphics/shaders/shader/shader.hpp"
+#include <graphics/shaders/shader/shader.hpp>
 
 #include "vertexarray.hpp"
 #include "vertexbuffer.hpp"

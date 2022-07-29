@@ -3,7 +3,7 @@
 #include <string>
 #include <glfw/glfw3.h>
 #include <glm/mat4x4.hpp>
-#include "../../../util/ref/reference.hpp"
+#include <util/ref/reference.hpp>
 
 namespace Viper::Graphics
 {

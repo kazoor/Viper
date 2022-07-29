@@ -80,7 +80,8 @@ target_link_libraries(Viper PUBLIC json)
 
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/external")
+    "${CMAKE_CURRENT_SOURCE_DIR}/external"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core")
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
 

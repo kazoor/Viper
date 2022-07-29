@@ -5,9 +5,9 @@
 #include <spdlog/spdlog.h>
 #include <glm/gtc/type_ptr.hpp>
 #include "shader.hpp"
-#include "../../../util/filehandler/filehandler.hpp"
-#include "../../../util/globals/global.hpp"
-#include "../../../viper/base.hpp"
+#include <util/filehandler/filehandler.hpp>
+#include <util/globals/global.hpp>
+#include <viper/base.hpp>
 
 namespace Viper::Graphics {
 
