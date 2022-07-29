@@ -18,8 +18,9 @@ namespace Viper::Renderer {
         int m_TexWidth, m_TexHeight, m_TexChannels;
         unsigned char* m_TextureData = stbi_load(path.c_str( ), &m_TexWidth, &m_TexHeight, NULL, 4);
         if( m_TextureData == nullptr )
-            Globals::ConsoleContext::AddLog( VIPER_ICON_ERR " Error loading texture!", VIPER_FORMAT_STRING("Missing texture.\nNo such file or dir: %s!",
-            path.c_str( ) ), Globals::ConsoleError );
+            printf("gl_BindFrameBufferTexture nullptr.\n");
+            //Globals::ConsoleContext::AddLog( VIPER_ICON_ERR " Error loading texture!", VIPER_FORMAT_STRING("Missing texture.\nNo such file or dir: %s!",
+            //path.c_str( ) ), Globals::ConsoleError );
 
         if( m_TextureData ) {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_TexWidth, m_TexHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_TextureData);
