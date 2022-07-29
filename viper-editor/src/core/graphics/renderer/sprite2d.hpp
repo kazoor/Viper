@@ -14,6 +14,7 @@ namespace Viper::Renderer {
 
         void Bind();
         void Unbind();
+        void Bind( uint32_t slot );
     private:
         int Width;
         int Height;

@@ -24,9 +24,9 @@ namespace Viper::Graphics {
                 nullptr,
                 nullptr};
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     }
 
     void Window::ProcessInput(GLFWwindow *Window) {
@@ -54,7 +54,7 @@ namespace Viper::Graphics {
 
         UpdateWindowEvents();
 
-        PushLayer(new ImGuiEditor(this));
+        //PushLayer(new ImGuiEditor(this));
         PushLayer(new Scene::Scene(this));
         //PushLayer(new Input::KeyboardInputLayer());
         //PushLayer(new Input::MouseInputLayer());
@@ -67,9 +67,7 @@ namespace Viper::Graphics {
             Globals::Editor::DeltaTime = current_delta - previous_delta;
             previous_delta = current_delta;
 
-            Renderer::Renderer2D::BindFramebuffer();
             glClear(GL_COLOR_BUFFER_BIT);
-            Renderer::Renderer2D::UnbindFramebuffer();
 
             for (auto Layer: *LayerStack) {
                 //spdlog::info("Updating Layer {0}", Layer->GetLayerName());

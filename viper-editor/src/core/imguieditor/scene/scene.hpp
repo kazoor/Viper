@@ -39,7 +39,6 @@ namespace Viper::Scene {
 
             AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
 
-            Renderer::Renderer2D::BindFramebuffer();
 
             Renderer::Renderer2D::Begin(*m_Camera);
 
@@ -56,6 +55,8 @@ namespace Viper::Scene {
             rad = Lerp(rad, Globals::Editor::Radians, GetDeltaTime() * 3.0f );
 
             Renderer::Renderer2D::DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
+
+            Renderer::Renderer2D::DrawTexture(glm::vec2(1.0f, 0.0f));
 
             for(auto& go : *Globals::GlobalsContext::Gom ) {
                 go->OnUpdate(GetDeltaTime());
@@ -75,9 +76,7 @@ namespace Viper::Scene {
             if(!Globals::Editor::isPlaying )
                 m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
 
-            Renderer::Renderer2D::Flush();
             Renderer::Renderer2D::End();
-            Renderer::Renderer2D::UnbindFramebuffer();
         }
 
         void OnEvent(Events::Event& event) override {
