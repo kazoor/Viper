@@ -35,7 +35,7 @@ namespace Viper::Components {
 
     void SpriteRenderer::Editor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        if(ImGui::TreeNodeEx(" " ICON_FA_PAINT_BRUSH " SpriteRenderer", t)) {
+        if(ImGui::TreeNodeEx(" " ICON_FA_PAINT_BRUSH "  SpriteRenderer", t)) {
             ImGui::ColorEdit4("Sprite Color", glm::value_ptr(color));
             ImGui::TreePop();
         };

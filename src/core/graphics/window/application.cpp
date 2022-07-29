@@ -11,6 +11,5 @@ namespace Viper {
 
     void Application::OnEvent(Events::Event& e) {
         m_Window->OnEvent(e);
-        VIPER_LOG("call for event :: {0}", e.GetName());
      };
 };

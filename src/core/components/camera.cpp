@@ -45,7 +45,7 @@ namespace Viper::Components {
 
     void Camera::Editor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        if(ImGui::TreeNodeEx( " " ICON_FA_CUBE " Camera", t)) {
+        if(ImGui::TreeNodeEx( " " ICON_FA_CAMERA "  Camera", t)) {
             ImGui::TreePop();
         };
     };

@@ -53,17 +53,8 @@ namespace Viper::Scene {
             if(!Globals::Editor::isPlaying )
                 m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
 
-            for(auto& go : Globals::GlobalsContext::Gom->m_GameObjects ) {
-                //go->OnUpdate(GetDeltaTime());
-
-                //if( go->HasComponent< Components::Camera >( ) ) {
-                //    auto& cam = go->GetComponent< Components::Transform >( );
-                //    if( Globals::Editor::isPlaying ) {
-                //        m_Camera->SetProjection(-AspectRatio * cam.scale.z, AspectRatio * cam.scale.z, cam.scale.z, -cam.scale.z, 1.0f, -1.0f);
-                //        m_Camera->SetPosition(cam.position);
-                //    }
-                //};
-            };
+            for(auto& go : *Globals::GlobalsContext::Gom )
+                go->OnUpdate(GetDeltaTime());
 
             Renderer::Renderer2D::Flush();
             Renderer::Renderer2D::End();
@@ -71,7 +62,7 @@ namespace Viper::Scene {
         }
 
         void OnEvent(Events::Event& event) override {
-            
+            printf("call event. [scene.hpp]\n");
         };
 
         double GetDeltaTime() const {

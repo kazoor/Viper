@@ -20,7 +20,7 @@ namespace Viper::Components {
 
     bool Scripting::Begin() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        auto frame = ImGui::TreeNodeEx( VIPER_FORMAT_STRING( " " ICON_FA_CUBES " Script :: %s", script_name.c_str( ) ).c_str( ) , t);
+        auto frame = ImGui::TreeNodeEx( VIPER_FORMAT_STRING( " " ICON_FA_CODE "  Script :: %s", script_name.c_str( ) ).c_str( ) , t);
         return frame;
     };
 
@@ -55,6 +55,5 @@ namespace Viper::Components {
 
     void TestScript::OnGui() {
         ImGui::Text("hello kajzan");
-        ImGui::SliderFloat("dsajhd", &m_myValue, 0.0f, 100.0f);
     };
 };

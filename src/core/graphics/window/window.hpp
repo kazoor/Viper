@@ -68,13 +68,6 @@ namespace Viper::Graphics {
         double x, y;
     };
 
-    class MouseScrollEvent : public Events::Event {
-    public:
-        VIPER_MAKE_EVENT(MouseScroll, MouseScrollEvent);
-        MouseScrollEvent( double xpos, double ypos ) : x( xpos ), y( ypos ) { };
-        double x, y;
-    };
-
     class KeyboardKeyEvent : public Events::Event {
     public:
         VIPER_MAKE_EVENT(KeyboardInputLayer, KeyboardKeyEvent);
@@ -103,7 +96,6 @@ namespace Viper::Graphics {
         ~Window();
 
         void Init();
-
         using fn_EventCallback = std::function< void(Events::Event&) >;
 
         void Initialize();
@@ -152,15 +144,13 @@ namespace Viper::Graphics {
         // Sends an event everytime the mouse position has CHANGED.
         bool OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent& E);
 
-        bool OnWindowMouseScrollEvent(MouseScrollEvent& E);
-
         bool OnWindowKeyEvent(KeyboardKeyEvent& E);
         
     private:
 
-        GLFWwindow *Context;
+        GLFWwindow* Context;
 
-        Layers::LayerStack *LayerStack;
+        Layers::LayerStack* LayerStack;
 
         bool isClosed;
     };

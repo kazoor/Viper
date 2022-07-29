@@ -67,7 +67,7 @@ namespace Viper::Components {
     void Transform::Editor() {
         ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
 
-        if(ImGui::TreeNodeEx( " " ICON_FA_CUBES " Transform", t)) {
+        if(ImGui::TreeNodeEx( " " ICON_FA_CUBES "  Transform", t)) {
             ImGuiTransform3F("Position", position);
             ImGuiTransform3F("Rotation", rotation);
             ImGuiTransform3F("Scale", scale, 1.0f);
