@@ -1,6 +1,7 @@
 #pragma once
 #include "api/vertex.hpp" // vec3 redan inkluderad inuti vertex.hpp
 #include <glm/vec2.hpp>
+#include "sprite2d.hpp"
 #include "camera/orthographic_camera.hpp"
 #include <string>
 
@@ -18,6 +19,8 @@ namespace Viper::Renderer {
         static void DrawQuadRotated( const glm::vec2& pos, float radians, RendererAPI::Color color );
         static void DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color );
 
+        static void DrawTexture( const glm::vec2& pos );
+
         static void Begin( const OrthoGraphicCamera& camera );
         static void Flush();
         static void End();
@@ -32,9 +35,6 @@ namespace Viper::Renderer {
         // Stats.
         static uint32_t GetIndexCount();
         static uint32_t GetQuadCount();
-
-    private:
-        OrthoGraphicCamera m_Camera;
     };
 
     class RenderCommand {

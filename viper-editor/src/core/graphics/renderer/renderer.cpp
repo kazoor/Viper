@@ -39,6 +39,9 @@ struct RendererData {
     Viper::Ref<Viper::Renderer::VertexBuffer> VertexBuffer;
     Viper::Ref<Viper::Renderer::FrameBuffer> FrameBuffer;
     Viper::Ref<Viper::Renderer::OrthoGraphicCamera> OrthoGraphicGamera;
+
+    Viper::Ref<Viper::Renderer::Sprite2D > m_Checkerboard;
+    glm::mat4 m_ViewProjection = glm::mat4(1.0f);
 };
 
 RendererData s_Renderer;
@@ -59,18 +62,25 @@ namespace Viper::Renderer {
 
         s_Renderer.FrameBuffer = FrameBuffer::Create();
 
-        s_Renderer.m_QuadShader = Graphics::Shader::Create("resources/shaders/flat.vert", "resources/shaders/flat.frag");
-        s_Renderer.m_TextureShader = Graphics::Shader::Create("resources/shaders/quad.vert", "resources/shaders/quad.frag");
+        s_Renderer.m_QuadShader = Graphics::Shader::Create("resources/shaders/quad.vert", "resources/shaders/quad.frag");
+        s_Renderer.m_TextureShader = Graphics::Shader::Create("resources/shaders/flat.vert", "resources/shaders/flat.frag");
+        s_Renderer.m_Checkerboard = Sprite2D::Create( "resources/assets/textures/checkerboard.png");
+        s_Renderer.m_TextureShader->Use();
+        s_Renderer.m_TextureShader->SetInt("u_Texture",0);
 
+        // samma logik hos texture.
         s_Renderer.m_QuadTransform[0] = glm::vec4( -0.5f, -0.5f, 0.0f, 1.0f );
 	    s_Renderer.m_QuadTransform[1] = glm::vec4(  0.5f, -0.5f, 0.0f, 1.0f );
 	    s_Renderer.m_QuadTransform[2] = glm::vec4(  0.5f,  0.5f, 0.0f, 1.0f );
 	    s_Renderer.m_QuadTransform[3] = glm::vec4( -0.5f,  0.5f, 0.0f, 1.0f );
 
+        // så detta är samma logik som quad transforms.
+        // -0.5f från quadtransform är 0.0f här. 0.5f från quadtransform är 1.0f här.
         s_Renderer.m_TextureTransform[0] = glm::vec2(0.0f, 0.0f);
         s_Renderer.m_TextureTransform[1] = glm::vec2(1.0f, 0.0f);
         s_Renderer.m_TextureTransform[2] = glm::vec2(1.0f, 1.0f);
         s_Renderer.m_TextureTransform[3] = glm::vec2(0.0f, 1.0f);
+
     };
 
     void Renderer2D::Destroy() {
@@ -82,6 +92,19 @@ namespace Viper::Renderer {
         GLsizeiptr size_ptr = reinterpret_cast< uint8_t* >( s_Renderer.m_VertexBufferPtr ) - reinterpret_cast< uint8_t* >( s_Renderer.m_VertexBuffer );
         glBindBuffer(GL_ARRAY_BUFFER, s_Renderer.VertexBuffer->Get());
         glBufferSubData(GL_ARRAY_BUFFER, 0, size_ptr, s_Renderer.m_VertexBuffer );
+
+        auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        
+        s_Renderer.m_TextureShader->Use();
+        s_Renderer.m_TextureShader->SetUniformMat4("u_ViewProjection", s_Renderer.m_ViewProjection);
+        s_Renderer.m_TextureShader->SetUniformMat4("u_Transform", m_Transform);
+
+        s_Renderer.m_QuadShader->Use();
+        s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", s_Renderer.m_ViewProjection);
+        s_Renderer.m_QuadShader->SetUniformMat4("u_Transform", m_Transform);
+        s_Renderer.m_Checkerboard->Bind(0);
+       
+        RenderCommand::DrawIndexed(s_Renderer.VertexArray->Get(), s_Renderer.m_IndexCount );
 
         s_Renderer.m_PrevIndexCount = s_Renderer.m_IndexCount;
         s_Renderer.m_PrevQuadCount = s_Renderer.m_QuadCount;
@@ -133,12 +156,16 @@ namespace Viper::Renderer {
     };
 
     void Renderer2D::Begin( const OrthoGraphicCamera& camera ) {
-        auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         s_Renderer.m_VertexBufferPtr = s_Renderer.m_VertexBuffer;
        
-        s_Renderer.m_QuadShader->Use();
-        s_Renderer.m_QuadShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-        s_Renderer.m_QuadShader->SetUniformMat4("u_Transform", m_Transform);
+        s_Renderer.m_ViewProjection = camera.GetViewProjectionMatrix();
+    };
+
+    void Renderer2D::DrawTexture( const glm::vec2& pos ) {
+        auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f)) 
+            * glm::scale(glm::mat4(1.0f), { 1.0f, 1.0f, 1.0f } );
+        
+        DrawQuad( m_Transform, RendererAPI::Color::White() );
     };
 
     uint32_t Renderer2D::GetTexture() {
@@ -146,9 +173,8 @@ namespace Viper::Renderer {
     };
 
     void Renderer2D::End() {
-
-        glBindTexture(GL_TEXTURE_2D, s_Renderer.FrameBuffer->GetTex());
-        RenderCommand::DrawIndexed(s_Renderer.VertexArray->Get(), s_Renderer.m_IndexCount );
+        
+        Flush();
 
         s_Renderer.m_IndexCount = 0;
         s_Renderer.m_QuadCount = 0;
