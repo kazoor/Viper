@@ -13,6 +13,7 @@
 
 // utils:
 #include <util/globals/global.hpp>
+#include "../../components/input.hpp"
 
 namespace Viper::Scene {
     class Scene : public Layers::Layer {
@@ -38,7 +39,6 @@ namespace Viper::Scene {
             Graphics::Window::WindowParams_t &WindowData = *(Graphics::Window::WindowParams_t *)glfwGetWindowUserPointer(WindowContext->Ctx());
 
             AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
-
 
             Renderer::Renderer2D::Begin(*m_Camera);
 
@@ -80,7 +80,9 @@ namespace Viper::Scene {
         }
 
         void OnEvent(Events::Event& event) override {
-            printf("call event. [scene.hpp]\n");
+            for(auto& go : *Globals::GlobalsContext::Gom ) {
+                go->OnEvent(event);
+            };
         };
 
         double GetDeltaTime() const {

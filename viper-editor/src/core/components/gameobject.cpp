@@ -72,4 +72,9 @@ namespace Viper::Components {
 
         return components.at( index )->GetName( );
      };
+
+     void GameObject::OnEvent(Viper::Events::Event& e) {
+        for(auto& c : components )
+            c->OnEvent( e );
+     };
 };

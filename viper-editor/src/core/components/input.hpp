@@ -1,42 +1,38 @@
+#pragma once
+
 #include <glm/vec4.hpp>
 #include <map>
+#include <utility>
 #include <memory>
 #include "transform.hpp"
 #include "component.hpp"
 #include "gameobject.hpp"
-#include "../inputlayer/keyboardinputlayer.hpp"
-#include "../inputlayer/mouseinputlayer.hpp"
+#include "../events/event/event.hpp"
+#include "../graphics/window/window.hpp"
 
 namespace Viper::Components {
     class Input : public Component {
-    VIPER_CLASS_DECLARATION(Input)
     public:
+        VIPER_COMPONENT_DECLARE( Input );
+
         Input();
+        Input(GameObject* Parent);
+    
+        void OnEvent(Viper::Events::Event& e) override;
 
-        void OnAwake() override;
+        // Keyboard event callbacks
+        bool OnKeyboardKeyPressedEvent(Viper::Graphics::KeyboardKeyPressedEvent& Event);
+        bool OnKeyboardKeyReleasedEvent(Viper::Graphics::KeyboardKeyReleasedEvent& Event);
 
-        void OnUpdate(double deltatime) override;
-
-        void OnEditor() override;
-
-        const std::unordered_map<int, bool> &GetKeys() const;
-
-        const std::unordered_map<int, bool> &GetMouseButtons() const;
-
-        const std::pair<double, double> &GetMousePos() const;
-
-        const std::pair<double, double> &GetScrollInput() const;
-
+        // Mouse event callbacks
+        bool OnMouseButtonPressedEvent(Viper::Graphics::MouseButtonPressedEvent &Event);
+        bool OnMouseButtonReleasedEvent(Viper::Graphics::MouseButtonReleasedEvent &Event);
     private:
-        void OnKeyboardEventUpdate(Viper::Input::KeyboardInputLayerEvent *E);
+        GameObject* Object;
 
-        void OnMouseEventUpdate(Viper::Input::MouseInputLayerEvent *E);
-    private:
-        std::unordered_map<int, bool> Keys;
+        // Registers both pressed and held
+        std::unordered_map<int, bool> KeyboardKey;
 
-        std::unordered_map<int, bool> MouseButtons;
-        std::pair<double, double> MousePos;
-        std::pair<double, double> ScrollInput;
+        std::unordered_map<int, bool> MouseButton; 
     };
 }
-
