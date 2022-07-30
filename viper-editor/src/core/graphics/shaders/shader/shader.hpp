@@ -19,6 +19,8 @@ namespace Viper::Graphics
         static void UploadFloat( uint32_t ProgramID, const std::string& Name, float Value );
         static void UploadBool( uint32_t ProgramID, const std::string& Name, bool Value );
         static void UploadDouble( uint32_t ProgramID, const std::string& Name, double Value );
+
+        static void UploadIntArray( uint32_t ProgramID, const std::string& Name, int* Values, uint32_t Count );
     };
 
     class Shader
@@ -32,6 +34,7 @@ namespace Viper::Graphics
         // utility uniform functions
         void SetBool(const std::string &Name, bool Value) const;
         void SetInt(const std::string &Name, int Value) const;
+        void SetIntArray(const std::string &Name, int* Values, uint32_t Count) const;
         void SetFloat(const std::string &Name, float Value) const;
         void SetDouble(const std::string &Name, double Value) const;
         void SetUniformMat4(const std::string& Name, const glm::mat4& Value) const;

@@ -13,7 +13,11 @@
 
 // utils:
 #include <util/globals/global.hpp>
-#include "../../components/input.hpp"
+#include <util/timer/timestep.hpp>
+
+// components:
+#include <components/camera.hpp>
+#include <components/input.hpp>
 
 namespace Viper::Scene {
     class Scene : public Layers::Layer {
@@ -24,6 +28,9 @@ namespace Viper::Scene {
             AspectRatio = 0.0f;
 
             Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Success!", "Window has been loaded!", Globals::ConsoleSuccess );
+            
+            m_TexSprite = Renderer::Sprite2D::Create("resources/textures/teamspeak.jpg");
+            m_TexSprite2 = Renderer::Sprite2D::Create("resources/textures/checkerboard.png");
         };
 
         ~Scene() {
@@ -36,10 +43,13 @@ namespace Viper::Scene {
         };
 
         void OnUpdate() override {
+            float m_CurrentFrame = ( float )glfwGetTime();
+            Timestep::Timestep ts = m_CurrentFrame - m_LastFrame;
+            m_LastFrame = m_CurrentFrame;
+            
             Graphics::Window::WindowParams_t &WindowData = *(Graphics::Window::WindowParams_t *)glfwGetWindowUserPointer(WindowContext->Ctx());
-
             AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
-
+            Renderer::Renderer2D::BindFramebuffer();
             Renderer::Renderer2D::Begin(*m_Camera);
 
             for( int y = -20; y < 20; y++ )
@@ -50,33 +60,45 @@ namespace Viper::Scene {
             static float posy = 0.0f;
             static float rad = 0.0f;
 
-            posx = Lerp(posx, Globals::Editor::Position[0], GetDeltaTime() * 3.0f );
-            posy = Lerp(posy, Globals::Editor::Position[1], GetDeltaTime() * 3.0f );
-            rad = Lerp(rad, Globals::Editor::Radians, GetDeltaTime() * 3.0f );
+            posx = Lerp(posx, Globals::Editor::Position[0], ts * 3.0f );
+            posy = Lerp(posy, Globals::Editor::Position[1], ts * 3.0f );
+            rad = Lerp(rad, Globals::Editor::Radians, ts * 3.0f );
 
-            Renderer::Renderer2D::DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
-            Renderer::Renderer2D::DrawTexture(glm::vec2(1.0f, 0.0f));
+            auto line_end_dest = m_Camera->ScreenToWorld( glm::vec3( Globals::Editor::PosX, Globals::Editor::PosY, 0.0f ), glm::vec2( ( float )WindowData.Width, ( float )WindowData.Height ));
 
-            for(auto& go : *Globals::GlobalsContext::Gom ) {
-                go->OnUpdate(GetDeltaTime());
-                
-                if( go->HasComponent< Components::Camera >( ) && Globals::Editor::isPlaying ) {
-                    if(!go->GetComponent< Components::Camera >( ).enabled)
-                        continue;
 
-                    auto camera_position = go->GetComponent< Components::Transform >( ).position;
-                    auto camera_scale = go->GetComponent< Components::Transform >( ).scale;
+            //Renderer::Renderer2D::DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
-                    m_Camera->SetProjection(-AspectRatio * camera_scale.z, AspectRatio * camera_scale.z, camera_scale.z, -camera_scale.z, 1.0f, -1.0f);
-                    m_Camera->SetPosition( glm::vec3( camera_position.x, camera_position.y, 0.0f ) );
-                };
-            };
+            Renderer::Renderer2D::DrawTexture(glm::vec2(1.0f, 0.0f), m_TexSprite2);
+            
+            static float rad_ex = 1.0f;
+
+            rad_ex += 1.0f * ts * 32.0f;
+
+            //Renderer::Renderer2D::DrawRotatedTexture(glm::vec2(2.0f, 1.0f), rad_ex * ( 3.141592f / 180.0f ), m_TexSprite);
+            Renderer::Renderer2D::DrawLine(glm::vec3(0.0f, 0.0f, 0.0f), line_end_dest, RendererAPI::Color::Blue());
+            //Renderer::Renderer2D::DrawLine(glm::vec3(2.0f, 0.0f, 0.0f), glm::vec3(6.0f, 3.0f, 0.0f), RendererAPI::Color::Green());
+            //for(auto& go : *Globals::GlobalsContext::Gom ) {
+            //    go->OnUpdate(ts);
+            //    
+            //    if( go->HasComponent< Components::Camera >( ) && Globals::Editor::isPlaying ) {
+            //        if(!go->GetComponent< Components::Camera >( ).enabled)
+            //            continue;
+//
+            //        auto camera_position = go->GetComponent< Components::Transform >( ).position;
+            //        auto camera_scale = go->GetComponent< Components::Transform >( ).scale;
+//
+            //        m_Camera->SetProjection(-AspectRatio * camera_scale.z, AspectRatio * camera_scale.z, camera_scale.z, -camera_scale.z, 1.0f, -1.0f);
+            //        m_Camera->SetPosition( glm::vec3( camera_position.x, camera_position.y, 0.0f ) );
+            //    };
+            //};
 
             if(!Globals::Editor::isPlaying )
                 m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
 
             Renderer::Renderer2D::End();
+            Renderer::Renderer2D::UnbindFramebuffer();
         }
 
         void OnEvent(Events::Event& event) override {
@@ -85,17 +107,15 @@ namespace Viper::Scene {
             };
         };
 
-        double GetDeltaTime() const {
-            return Globals::Editor::DeltaTime;
-        };
-
         float Lerp( float a, float b, float t ) {
             return a + ( b - a ) * t;
         };
     private:
         Graphics::Window* WindowContext;
         Renderer::OrthoGraphicCamera* m_Camera;
-        
+        Ref< Renderer::Sprite2D > m_TexSprite;
+        Ref< Renderer::Sprite2D > m_TexSprite2;
+        float m_LastFrame = 0.0f;
     private:
         float AspectRatio;
     };

@@ -9,6 +9,7 @@
 #include "../../imguieditor/imguieditor.hpp"
 #include "../../imguieditor/scene/scene.hpp"
 #include "../../util/input/mouse/mouseevents.hpp"
+#include <thread>
 
 namespace Viper::Graphics {
 #define VIPER_GET(wnd) WindowParams_t& data = *(WindowParams_t*)glfwGetWindowUserPointer(wnd)
@@ -24,9 +25,9 @@ namespace Viper::Graphics {
                 nullptr,
                 nullptr};
 
-        //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     }
 
     void Window::ProcessInput(GLFWwindow *Window) {
@@ -54,7 +55,7 @@ namespace Viper::Graphics {
 
         UpdateWindowEvents();
 
-        //PushLayer(new ImGuiEditor(this));
+        PushLayer(new ImGuiEditor(this));
         PushLayer(new Scene::Scene(this));
         //PushLayer(new Input::KeyboardInputLayer());
         //PushLayer(new Input::MouseInputLayer());
@@ -67,7 +68,9 @@ namespace Viper::Graphics {
             Globals::Editor::DeltaTime = current_delta - previous_delta;
             previous_delta = current_delta;
 
+            Renderer::Renderer2D::BindFramebuffer();
             glClear(GL_COLOR_BUFFER_BIT);
+            Renderer::Renderer2D::UnbindFramebuffer();
 
             for (auto Layer: *LayerStack) {
                 //spdlog::info("Updating Layer {0}", Layer->GetLayerName());
@@ -106,6 +109,8 @@ namespace Viper::Graphics {
             dispatcher.Dispatch<MouseButtonPressedEvent>(VIPER_GET_EVENT_FUNC(Window::OnMouseButtonPressedEvent));
 
             dispatcher.Dispatch<MouseButtonReleasedEvent>(VIPER_GET_EVENT_FUNC(Window::OnMouseButtonReleasedEvent));
+
+            dispatcher.Dispatch<WindowFocusEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowFocusEvent));
         }
 
         for( auto it = LayerStack->rbegin(); it != LayerStack->rend(); it++ ) {
@@ -169,7 +174,7 @@ namespace Viper::Graphics {
 
         glfwSetCursorPosCallback(Context, [](GLFWwindow *Window, double xpos, double ypos) {
             VIPER_GET(Window);
-            MouseCursorPositionEvent event((double) xpos, (double) ypos);
+            MouseCursorPositionEvent event((double)xpos, (double) ypos);
             data.EventCallback(event);
         });
 
@@ -223,7 +228,7 @@ namespace Viper::Graphics {
     void Window::Update() const {
         glfwSwapBuffers(Context);
         glfwPollEvents();
-        Input::Input::ResetScroll();
+        //Input::Input::ResetScroll();
     }
 
     void Window::PushLayer(Layers::Layer *Layer) {
@@ -270,7 +275,7 @@ namespace Viper::Graphics {
     }
 
     bool Window::OnWindowMaximizationEvent(WindowMaximizationEvent &E) {
-        spdlog::info("WindowMaximization Event triggered! Value: {0}", E.Maximized);
+       spdlog::info("WindowMaximization Event triggered! Value: {0}", E.Maximized);
         return true;
     }
 
@@ -286,6 +291,8 @@ namespace Viper::Graphics {
 
     bool Window::OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent &E) {
         VIPER_LOG("MouseCursorPositionEvent Event triggered! {0}, {1}", E.x, E.y);
+        Globals::Editor::PosX = E.x;
+        Globals::Editor::PosY = E.y;
         return true;
     };
     

@@ -2467,6 +2467,9 @@ GLAPI PFNGLGENTEXTURESPROC glad_glGenTextures;
 typedef GLboolean (APIENTRYP PFNGLISTEXTUREPROC)(GLuint texture);
 GLAPI PFNGLISTEXTUREPROC glad_glIsTexture;
 #define glIsTexture glad_glIsTexture
+typedef void (APIENTRYP PFNGLTEXTURESUBIMAGE2DPROC)(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
+GLAPI PFNGLTEXTURESUBIMAGE2DPROC glad_glTextureSubImage2D;
+#define glTextureSubImage2D glad_glTextureSubImage2D
 typedef void (APIENTRYP PFNGLARRAYELEMENTPROC)(GLint i);
 GLAPI PFNGLARRAYELEMENTPROC glad_glArrayElement;
 #define glArrayElement glad_glArrayElement

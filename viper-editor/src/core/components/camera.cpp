@@ -26,7 +26,7 @@ namespace Viper::Components {
         return a + ( b - a ) * t;
     };
 
-    void Camera::Update(double deltatime) {
+    void Camera::Update(Timestep::Timestep ts) {
         auto& tr = object->GetComponent< Transform >( );
         if(!enabled)
             return;
@@ -45,8 +45,8 @@ namespace Viper::Components {
         if( Input::Input::IsKeyPressed(83) )
             direction_y = -1.0f;//tr.position.x -= 1.0f;
         
-        tr.position.x += direction_x * 1.0f * deltatime * 3.0f;
-        tr.position.y += direction_y * 1.0f * deltatime * 3.0f;
+        tr.position.x += direction_x * 1.0f * ts.deltatime() * 3.0f;
+        tr.position.y += direction_y * 1.0f * ts.deltatime() * 3.0f;
     };
 
     void Camera::Editor() {

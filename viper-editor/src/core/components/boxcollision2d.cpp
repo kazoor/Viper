@@ -19,7 +19,7 @@ namespace Viper::Components {
 
     }
 
-    void BoxCollision2D::OnUpdate(double deltatime) {
+    void BoxCollision2D::OnUpdate(Timestep::Timestep ts) {
         Tr = Box1->GetComponent<Transform>();
         auto& mod = Box1->GetComponent<Transform>();
 

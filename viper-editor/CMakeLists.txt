@@ -14,6 +14,7 @@ add_library(Viper
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/indexbuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/framebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/vertexarray.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/linebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/sprite2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/component.cpp
@@ -106,6 +107,3 @@ target_link_libraries(Sandbox PUBLIC spdlog)
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/
         DESTINATION ${CMAKE_BINARY_DIR}/bin/resources/)
-
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/imgui.ini
-        DESTINATION ${CMAKE_BINARY_DIR}/bin/)

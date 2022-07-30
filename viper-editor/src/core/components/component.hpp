@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 #include "../events/event/event.hpp"
+#include <util/timer/timestep.hpp>
 
 namespace Viper::Components {
     enum class ComponentType : int {
@@ -52,7 +53,7 @@ namespace Viper::Components {
         virtual void Awake() {};
 
         // Update: Everything related to runtime will be put inside of this function.
-        virtual void Update( double deltaticks) {};
+        virtual void Update( Timestep::Timestep ts ) {};
 
         // Editor: The core UI elements of a component.
         virtual void Editor() {};
