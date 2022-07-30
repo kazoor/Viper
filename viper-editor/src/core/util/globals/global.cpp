@@ -12,6 +12,8 @@ namespace Viper::Globals {
         int SelectedObject = -1;
         bool HasMainCamera = false;
         bool isPlaying = false;
+        float PosX = 0.0f;
+        float PosY = 0.0f;
     };
 
     // == // == // == // == // == // == //

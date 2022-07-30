@@ -33,7 +33,7 @@ namespace Viper::Components {
     void Rigidbody2D::Awake() {
     };
 
-    void Rigidbody2D::Update(double deltatime) {
+    void Rigidbody2D::Update(Timestep::Timestep ts) {
         if(!enabled) {
             velocity = glm::vec3( 0.0f, 0.0f, 0.0f );
             return;
@@ -46,8 +46,8 @@ namespace Viper::Components {
             velocity = glm::vec3( 0.0f, 0.0f, 0.0f );
         }
         
-        tr.position.y += velocity.y * deltatime;
-        velocity.y += -m_Gravity * deltatime;
+        tr.position.y += velocity.y * ts;
+        velocity.y += -m_Gravity * ts;
     };
 
     void Rigidbody2D::AddForce( const glm::vec3& force ) {

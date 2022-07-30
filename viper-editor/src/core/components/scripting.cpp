@@ -11,7 +11,7 @@ namespace Viper::Components {
         parent = object;
     };
 
-    void Scripting::Update(double deltatime) {
+    void Scripting::Update(Timestep::Timestep ts) {
 
     };
 

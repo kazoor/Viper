@@ -27,7 +27,7 @@ namespace Viper::Components {
     void SpriteRenderer::Awake() {
     };
 
-    void SpriteRenderer::Update(double deltatime) {
+    void SpriteRenderer::Update(Timestep::Timestep ts) {
         tr = object->GetComponent< Transform >( );
         if(!enabled)
             return;

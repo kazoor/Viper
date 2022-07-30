@@ -22,7 +22,7 @@ namespace Viper::Components {
 
         void OnAwake() override;
 
-        void OnUpdate(double deltatime) override;
+        void OnUpdate(Timestep::Timestep ts) override;
 
         void OnEditor() override;
 

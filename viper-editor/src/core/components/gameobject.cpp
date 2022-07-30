@@ -57,9 +57,9 @@ namespace Viper::Components {
             c->Awake( );
     };
 
-    void GameObject::OnUpdate( double deltaticks ) {
+    void GameObject::OnUpdate( Timestep::Timestep ts ) {
         for(auto& c : components )
-            c->Update( deltaticks );
+            c->Update( ts );
     };
 
     size_t GameObject::GetComponents( ) const {

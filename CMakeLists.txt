@@ -3,3 +3,6 @@ project(Viper-all)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/viper-editor)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/viper-engine)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/viper-editor/src/resources/imgui.ini
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/)

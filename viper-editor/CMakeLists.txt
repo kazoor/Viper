@@ -107,6 +107,3 @@ target_link_libraries(Sandbox PUBLIC spdlog)
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/
         DESTINATION ${CMAKE_BINARY_DIR}/bin/resources/)
-
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/imgui.ini
-        DESTINATION ${CMAKE_BINARY_DIR}/bin/)
