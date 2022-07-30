@@ -30,6 +30,21 @@ namespace Viper::Renderer {
         stbi_image_free(m_TextureData);
         glBindTexture(GL_TEXTURE_2D, 0);
      };
+
+    Sprite2D::Sprite2D( int width, int height ) {
+        glGenTextures(1, &SpriteID);
+        glBindTexture(GL_TEXTURE_2D, SpriteID);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        Width = width;
+        Height = height;
+    };
     
     Sprite2D::~Sprite2D() {
         glDeleteTextures(1, &SpriteID);
@@ -43,12 +58,21 @@ namespace Viper::Renderer {
         return CreateRef< Sprite2D >( sprite_path, width, height );
     };
 
+    Ref< Sprite2D > Sprite2D::Create( int width, int height ) {
+        return CreateRef< Sprite2D >( width, height );
+    };
+
     uint32_t Sprite2D::GetSprite() const {
         return SpriteID;
     };
 
     void Sprite2D::Bind() {
         glBindTexture(GL_TEXTURE_2D, SpriteID);
+    };
+
+    void Sprite2D::SetData( void* data, uint32_t size ) {
+        
+        glTextureSubImage2D(SpriteID, 0, 0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, data);
     };
 
     void Sprite2D::Unbind() {

@@ -10,4 +10,9 @@ namespace Viper::RendererAPI {
         glm::vec2 texcoords;
         float texindex;
     };
+
+    struct LineVertex_t {
+        glm::vec3 pos;
+        Color color;
+    };
 };
