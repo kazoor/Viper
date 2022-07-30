@@ -14,7 +14,7 @@ namespace Viper::Components {
 
         void Awake();
         
-        void Update(double deltatime);
+        void Update(Timestep::Timestep ts);
 
         void Editor();
 

@@ -12,7 +12,7 @@ namespace Viper::Components {
         Scripting();
         Scripting(GameObject* object);
 
-        void Update(double deltatime);
+        void Update(Timestep::Timestep ts);
 
         void Awake();
 

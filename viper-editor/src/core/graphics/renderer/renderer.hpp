@@ -43,6 +43,8 @@ namespace Viper::Renderer {
         static uint32_t GetIndexCount();
         static uint32_t GetQuadCount();
         static uint32_t GetLineCount();
+    private:
+        static void Next();
     };
 
     class RenderCommand {

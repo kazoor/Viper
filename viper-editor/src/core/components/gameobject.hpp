@@ -79,7 +79,7 @@ namespace Viper::Components {
 
         size_t GetComponents( ) const;
 
-        void OnUpdate( double deltaticks );
+        void OnUpdate( Timestep::Timestep ts );
 
         void OnAwake( );
 

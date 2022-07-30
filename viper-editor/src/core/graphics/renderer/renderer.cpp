@@ -2,6 +2,7 @@
 #include <array>
 #include <glm/mat4x4.hpp>
 #include <glad/glad.h>
+#include <fstream>
 #include <glm/gtc/matrix_transform.hpp> // ortho
 #include <graphics/shaders/shader/shader.hpp>
 
@@ -11,7 +12,7 @@
 #include "framebuffer.hpp"
 #include "linebuffer.hpp"
 
-constexpr uint32_t max_quad_count = 32000;
+constexpr uint32_t max_quad_count = 20000;
 constexpr uint32_t max_line_count = max_quad_count * 2;
 constexpr uint32_t max_vertices_count = max_quad_count * 4;
 constexpr uint32_t max_indices_count = max_quad_count * 6;
@@ -49,7 +50,6 @@ struct RendererData {
     Viper::Ref<Viper::Renderer::LineBuffer> LineBuffer;
     Viper::Ref<Viper::Renderer::FrameBuffer> FrameBuffer;
     Viper::Ref<Viper::Renderer::OrthoGraphicCamera> OrthoGraphicGamera;
-    Viper::Ref<Viper::Renderer::Sprite2D > m_Checkerboard;
     Viper::Ref<Viper::Renderer::Sprite2D > m_EmptyTexture;
     uint32_t m_TextureSlotIndex = 1;
 
@@ -66,7 +66,7 @@ namespace Viper::Renderer {
         s_Renderer.m_LineVertexBuffer = new Viper::RendererAPI::LineVertex_t[ max_quad_count ];
         
         s_Renderer.VertexArray = VertexArray::Create();
-        s_Renderer.VertexArray->Bind();
+        s_Renderer.VertexArray->Bind(); // BIND VAO --!> 
 
         s_Renderer.VertexBuffer = VertexBuffer::Create(max_vertices_count );
         s_Renderer.VertexBuffer->Bind();
@@ -74,16 +74,16 @@ namespace Viper::Renderer {
         s_Renderer.IndexBuffer = IndexBuffer::Create(max_indices_count);
         s_Renderer.IndexBuffer->Bind();
 
-        s_Renderer.VertexArray->Unbind();
+        s_Renderer.VertexArray->Unbind(); // <!-- UNBIND VAO.
 
         // == // == // == // == // == //
 
         s_Renderer.LineVertexArray = VertexArray::Create();
-        s_Renderer.LineVertexArray->Bind();
+        s_Renderer.LineVertexArray->Bind(); // BIND VAO --!>
 
         s_Renderer.LineBuffer = LineBuffer::Create( max_vertices_count );
         s_Renderer.LineBuffer->Bind();
-        s_Renderer.LineVertexArray->Unbind();
+        s_Renderer.LineVertexArray->Unbind(); // <!-- UNBIND VAO.
 
         // == // == // == // == // == //
 
@@ -103,7 +103,6 @@ namespace Viper::Renderer {
             m_Samplers[ i ] = i;
 
         s_Renderer.m_QuadShader->SetIntArray("u_Textures", m_Samplers, max_texture_slots);
-
         s_Renderer.m_TextureSlots[0] = s_Renderer.m_EmptyTexture;
 
         // samma logik hos texture.
@@ -128,6 +127,7 @@ namespace Viper::Renderer {
     
     void Renderer2D::Flush()
     {
+        // Render all the quads.
         {
             GLsizeiptr size_ptr = reinterpret_cast< uint8_t* >( s_Renderer.m_VertexBufferPtr ) - reinterpret_cast< uint8_t* >( s_Renderer.m_VertexBuffer );
             glBindBuffer(GL_ARRAY_BUFFER, s_Renderer.VertexBuffer->Get());
@@ -146,6 +146,8 @@ namespace Viper::Renderer {
             s_Renderer.m_PrevIndexCount = s_Renderer.m_IndexCount;
             s_Renderer.m_PrevQuadCount = s_Renderer.m_QuadCount;
         }
+
+        // Render all the lines.
         {
             GLsizeiptr size_ptr = reinterpret_cast< uint8_t* >( s_Renderer.m_LineVertexBufferPtr ) - reinterpret_cast< uint8_t* >( s_Renderer.m_LineVertexBuffer );
             glBindBuffer(GL_ARRAY_BUFFER, s_Renderer.LineBuffer->Get());
@@ -159,7 +161,6 @@ namespace Viper::Renderer {
             glDrawArrays(GL_LINES, 0, s_Renderer.m_LineCount);
 
             s_Renderer.m_PrevLineCount = s_Renderer.m_LineCount;
-            //RenderCommand::DrawIndexed(s_Renderer.VertexArray->Get(), s_Renderer.m_LineCount );
         }
     }
 
@@ -168,6 +169,19 @@ namespace Viper::Renderer {
     };
 
     void Renderer2D::DrawQuad( const glm::mat4& transform, RendererAPI::Color color ) {
+        if( s_Renderer.m_IndexCount >= max_indices_count ) {
+            Flush();
+            s_Renderer.m_IndexCount = 0;
+        
+            s_Renderer.m_VertexBufferPtr = s_Renderer.m_VertexBuffer;
+            s_Renderer.m_QuadCount = 0;
+
+            s_Renderer.m_LineVertexBufferPtr = s_Renderer.m_LineVertexBuffer;
+            s_Renderer.m_LineCount = 0;
+
+            s_Renderer.m_TextureSlotIndex = 1;
+        }
+            
         for( int i = 0; i < 4; i++ ) {
             s_Renderer.m_VertexBufferPtr->position = transform * s_Renderer.m_QuadTransform[ i ];
             s_Renderer.m_VertexBufferPtr->color = color;
@@ -240,11 +254,15 @@ namespace Viper::Renderer {
     };
 
     void Renderer2D::Begin( const OrthoGraphicCamera& camera ) {
+        s_Renderer.m_IndexCount = 0;
+
         s_Renderer.m_VertexBufferPtr = s_Renderer.m_VertexBuffer;
+        s_Renderer.m_QuadCount = 0;
+
         s_Renderer.m_LineVertexBufferPtr = s_Renderer.m_LineVertexBuffer;
+        s_Renderer.m_LineCount = 0;
 
         s_Renderer.m_ViewProjection = camera.GetViewProjectionMatrix();
-
         s_Renderer.m_TextureSlotIndex = 1;
     };
 
@@ -297,12 +315,7 @@ namespace Viper::Renderer {
     };
 
     void Renderer2D::End() {
-        
         Flush();
-
-        s_Renderer.m_IndexCount = 0;
-        s_Renderer.m_QuadCount = 0;
-        s_Renderer.m_LineCount = 0;
     };
 
     void Renderer2D::BindFramebuffer() {
