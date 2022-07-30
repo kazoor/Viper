@@ -87,6 +87,8 @@ namespace Viper::Components {
 
         void OnDeletion();
 
+        void OnEvent(Viper::Events::Event& e);
+
         static Ref< GameObject > Create();
         static Ref< GameObject > Create(const std::string& tagname);
 
