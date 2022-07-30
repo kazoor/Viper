@@ -67,7 +67,7 @@ namespace Viper::Scene {
             Renderer::Renderer2D::DrawRotatedTexture(glm::vec2(2.0f, 1.0f), rad_ex * ( 3.141592f / 180.0f ), m_TexSprite);
 
             Renderer::Renderer2D::DrawLine(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.0f, 5.0f, 0.0f), RendererAPI::Color::Blue());
-
+            Renderer::Renderer2D::DrawLine(glm::vec3(2.0f, 0.0f, 0.0f), glm::vec3(6.0f, 3.0f, 0.0f), RendererAPI::Color::Green());
             for(auto& go : *Globals::GlobalsContext::Gom ) {
                 go->OnUpdate(GetDeltaTime());
                 
