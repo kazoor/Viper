@@ -1111,6 +1111,7 @@ PFNGLVIEWPORTPROC glad_glViewport = NULL;
 PFNGLVIEWPORTARRAYVPROC glad_glViewportArrayv = NULL;
 PFNGLVIEWPORTINDEXEDFPROC glad_glViewportIndexedf = NULL;
 PFNGLVIEWPORTINDEXEDFVPROC glad_glViewportIndexedfv = NULL;
+PFNGLTEXTURESUBIMAGE2DPROC glad_glTextureSubImage2D = NULL;
 PFNGLWAITSYNCPROC glad_glWaitSync = NULL;
 PFNGLWINDOWPOS2DPROC glad_glWindowPos2d = NULL;
 PFNGLWINDOWPOS2DVPROC glad_glWindowPos2dv = NULL;
@@ -2026,6 +2027,7 @@ static void load_GL_VERSION_4_1(GLADloadproc load) {
 	glad_glViewportArrayv = (PFNGLVIEWPORTARRAYVPROC)load("glViewportArrayv");
 	glad_glViewportIndexedf = (PFNGLVIEWPORTINDEXEDFPROC)load("glViewportIndexedf");
 	glad_glViewportIndexedfv = (PFNGLVIEWPORTINDEXEDFVPROC)load("glViewportIndexedfv");
+	glad_glTextureSubImage2D = (PFNGLTEXTURESUBIMAGE2DPROC)load("glTextureSubImage2D");
 	glad_glScissorArrayv = (PFNGLSCISSORARRAYVPROC)load("glScissorArrayv");
 	glad_glScissorIndexed = (PFNGLSCISSORINDEXEDPROC)load("glScissorIndexed");
 	glad_glScissorIndexedv = (PFNGLSCISSORINDEXEDVPROC)load("glScissorIndexedv");

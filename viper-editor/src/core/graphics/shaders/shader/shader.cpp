@@ -44,6 +44,10 @@ namespace Viper::Graphics {
         glUniform1d(glGetUniformLocation(ProgramID, Name.c_str()), Value);
     };
 
+    void ShaderCommand::UploadIntArray( uint32_t ProgramID, const std::string& Name, int* Values, uint32_t Count ) {
+        glUniform1iv(glGetUniformLocation(ProgramID, Name.c_str()), Count, Values );
+    };
+
     // Shader Class
     Shader::Shader(const std::string &VertexPath, const std::string &FragmentPath) {
 
@@ -90,6 +94,10 @@ namespace Viper::Graphics {
     // ------------------------------------------------------------------------
     void Shader::SetInt(const std::string &Name, int Value) const {
          ShaderCommand::UploadInt(ProgramID, Name, Value);
+    }
+
+    void Shader::SetIntArray(const std::string &Name, int* Values, uint32_t Count) const {
+         ShaderCommand::UploadIntArray(ProgramID, Name, Values, Count);
     }
 
     // ------------------------------------------------------------------------

@@ -14,6 +14,7 @@ add_library(Viper
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/indexbuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/framebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/vertexarray.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/linebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/sprite2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/component.cpp

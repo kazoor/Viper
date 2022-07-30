@@ -24,6 +24,9 @@ namespace Viper::Scene {
             AspectRatio = 0.0f;
 
             Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Success!", "Window has been loaded!", Globals::ConsoleSuccess );
+            
+            m_TexSprite = Renderer::Sprite2D::Create("resources/textures/teamspeak.jpg");
+            m_TexSprite2 = Renderer::Sprite2D::Create("resources/textures/checkerboard.png");
         };
 
         ~Scene() {
@@ -56,8 +59,15 @@ namespace Viper::Scene {
 
             Renderer::Renderer2D::DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
-            Renderer::Renderer2D::DrawTexture(glm::vec2(1.0f, 0.0f));
+            Renderer::Renderer2D::DrawTexture(glm::vec2(1.0f, 0.0f), m_TexSprite2);
+            static float rad_ex = 1.0f;
 
+            rad_ex += 1.0f * GetDeltaTime() * 32.0f;
+
+            Renderer::Renderer2D::DrawRotatedTexture(glm::vec2(2.0f, 1.0f), rad_ex * ( 3.141592f / 180.0f ), m_TexSprite);
+
+            Renderer::Renderer2D::DrawLine(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(3.0f, 5.0f, 0.0f), RendererAPI::Color::Blue());
+            Renderer::Renderer2D::DrawLine(glm::vec3(2.0f, 0.0f, 0.0f), glm::vec3(6.0f, 3.0f, 0.0f), RendererAPI::Color::Green());
             for(auto& go : *Globals::GlobalsContext::Gom ) {
                 go->OnUpdate(GetDeltaTime());
                 
@@ -95,7 +105,8 @@ namespace Viper::Scene {
     private:
         Graphics::Window* WindowContext;
         Renderer::OrthoGraphicCamera* m_Camera;
-        
+        Ref< Renderer::Sprite2D > m_TexSprite;
+        Ref< Renderer::Sprite2D > m_TexSprite2;
     private:
         float AspectRatio;
     };
