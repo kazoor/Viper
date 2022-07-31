@@ -14,6 +14,15 @@ namespace Viper::Globals {
         bool isPlaying = false;
         float PosX = 0.0f;
         float PosY = 0.0f;
+
+        float MousePosX = 0.0f;
+        float MousePosY = 0.0f;
+
+        float SceneW = 2.0f; 
+        float SceneH = 2.0f; 
+
+        float SceneX = 2.0f;
+        float SceneY = 2.0f;
     };
 
     // == // == // == // == // == // == //
