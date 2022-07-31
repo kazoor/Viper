@@ -21,12 +21,12 @@ namespace Viper::Components {
         void OnEvent(Viper::Events::Event& e) override;
 
         // Keyboard event callbacks
-        bool OnKeyboardKeyPressedEvent(Viper::Graphics::KeyboardKeyPressedEvent& Event);
-        bool OnKeyboardKeyReleasedEvent(Viper::Graphics::KeyboardKeyReleasedEvent& Event);
+        bool OnKeyboardKeyPressedEvent(Events::KeyboardKeyPressedEvent& Event);
+        bool OnKeyboardKeyReleasedEvent(Events::KeyboardKeyReleasedEvent& Event);
 
         // Mouse event callbacks
-        bool OnMouseButtonPressedEvent(Viper::Graphics::MouseButtonPressedEvent &Event);
-        bool OnMouseButtonReleasedEvent(Viper::Graphics::MouseButtonReleasedEvent &Event);
+        bool OnMouseButtonPressedEvent(Events::MouseButtonPressedEvent &Event);
+        bool OnMouseButtonReleasedEvent(Events::MouseButtonReleasedEvent &Event);
     private:
         GameObject* Object;
 
