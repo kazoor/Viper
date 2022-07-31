@@ -14,10 +14,14 @@
 // utils:
 #include <util/globals/global.hpp>
 #include <util/timer/timestep.hpp>
+#include <util/physics/physics2d.hpp>
 
 // components:
 #include <components/camera.hpp>
 #include <components/input.hpp>
+#include <components/gameobject.hpp>
+
+#include <vector>
 
 namespace Viper::Scene {
     class Scene : public Layers::Layer {
@@ -48,7 +52,7 @@ namespace Viper::Scene {
             m_LastFrame = m_CurrentFrame;
             
             Graphics::Window::WindowParams_t &WindowData = *(Graphics::Window::WindowParams_t *)glfwGetWindowUserPointer(WindowContext->Ctx());
-            AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
+            AspectRatio = ( float )Globals::Editor::SceneW / ( float )Globals::Editor::SceneH;
             Renderer::Renderer2D::BindFramebuffer();
             Renderer::Renderer2D::Begin(*m_Camera);
 
@@ -65,8 +69,7 @@ namespace Viper::Scene {
             rad = Lerp(rad, Globals::Editor::Radians, ts * 3.0f );
 
 
-            auto line_end_dest = m_Camera->ScreenToWorld( glm::vec3( Globals::Editor::PosX, Globals::Editor::PosY, 0.0f ), glm::vec2( ( float )WindowData.Width, ( float )WindowData.Height ));
-
+            auto line_end_dest = m_Camera->Editor_ScreenToWorld( glm::vec2(Globals::Editor::PosX, Globals::Editor::PosY ), glm::vec2( (float)Globals::Editor::SceneW, (float)Globals::Editor::SceneH));
 
             //Renderer::Renderer2D::DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
@@ -76,23 +79,29 @@ namespace Viper::Scene {
 
             rad_ex += 1.0f * ts * 32.0f;
 
-            //Renderer::Renderer2D::DrawRotatedTexture(glm::vec2(2.0f, 1.0f), rad_ex * ( 3.141592f / 180.0f ), m_TexSprite);
-            Renderer::Renderer2D::DrawLine(glm::vec3(0.0f, 0.0f, 0.0f), line_end_dest, RendererAPI::Color::Blue());
-            //Renderer::Renderer2D::DrawLine(glm::vec3(2.0f, 0.0f, 0.0f), glm::vec3(6.0f, 3.0f, 0.0f), RendererAPI::Color::Green());
-            //for(auto& go : *Globals::GlobalsContext::Gom ) {
-            //    go->OnUpdate(ts);
-            //    
-            //    if( go->HasComponent< Components::Camera >( ) && Globals::Editor::isPlaying ) {
-            //        if(!go->GetComponent< Components::Camera >( ).enabled)
-            //            continue;
+            Renderer::Renderer2D::DrawLine(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(line_end_dest.x, line_end_dest.y, 0.0f), RendererAPI::Color::Blue());
+            
+            Renderer::Renderer2D::DrawQuad(glm::vec2(4.0f, 4.0f), RendererAPI::Color(0.2f, 0.2f, 1.0f));
+
+            for(auto& go : *Globals::GlobalsContext::Gom ) {
+                go->OnUpdate(ts);
+
+                if( go->HasComponent< Components::SpriteRenderer >( ) ) {
+                    auto& spr = go->GetComponent< Components::SpriteRenderer >( );
+                    auto& tr = go->GetComponent< Components::Transform >( );
+                };
+                
+                if( go->HasComponent< Components::Camera >( ) && Globals::Editor::isPlaying ) {
+                    if(!go->GetComponent< Components::Camera >( ).enabled)
+                        continue;
 //
-            //        auto camera_position = go->GetComponent< Components::Transform >( ).position;
-            //        auto camera_scale = go->GetComponent< Components::Transform >( ).scale;
+                    auto camera_position = go->GetComponent< Components::Transform >( ).position;
+                    auto camera_scale = go->GetComponent< Components::Transform >( ).scale;
 //
-            //        m_Camera->SetProjection(-AspectRatio * camera_scale.z, AspectRatio * camera_scale.z, camera_scale.z, -camera_scale.z, 1.0f, -1.0f);
-            //        m_Camera->SetPosition( glm::vec3( camera_position.x, camera_position.y, 0.0f ) );
-            //    };
-            //};
+                    m_Camera->SetProjection(-AspectRatio * camera_scale.z, AspectRatio * camera_scale.z, camera_scale.z, -camera_scale.z, 1.0f, -1.0f);
+                    m_Camera->SetPosition( glm::vec3( camera_position.x, camera_position.y, 0.0f ) );
+                };
+            };
 
             if(!Globals::Editor::isPlaying )
                 m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);

@@ -41,13 +41,19 @@ namespace Viper::Renderer {
     }
 
     // TDL
-    glm::vec3 OrthoGraphicCamera::ScreenToWorld( glm::vec3 in, glm::vec2 screen ) {
+    glm::vec2 OrthoGraphicCamera::ScreenToWorld( glm::vec2 in, glm::vec2 screen ) {
         return glm::inverse(m_ProjectionMatrix * m_ViewMatrix) 
         * ((glm::vec4(in.x ,in.y, 1.0f, 1.0f) - glm::vec4(screen.x / 2.0f, screen.y / 2.0f, 0.0f, 0.0f)) 
         / glm::vec4(screen.x / 2.0f, -screen.y / 2.0f, 1.0f, 1.0f));
     }
 
-    glm::vec3 OrthoGraphicCamera::WorldToScreen( glm::vec3 in, glm::vec2 screen ) {
+    glm::vec2 OrthoGraphicCamera::Editor_ScreenToWorld( glm::vec2 in, glm::vec2 screen ) {
+        return glm::inverse(m_ProjectionMatrix * m_ViewMatrix) 
+        * ((glm::vec4(in.x ,in.y, 1.0f, 1.0f) - glm::vec4(screen.x / 2.0f, screen.y / 2.0f, 0.0f, 0.0f)) 
+        / glm::vec4(screen.x / 2.0f, screen.y / 2.0f, 1.0f, 1.0f));
+    }
+
+    glm::vec2 OrthoGraphicCamera::WorldToScreen( glm::vec2 in, glm::vec2 screen ) {
         return ((m_ProjectionMatrix * m_ViewMatrix) * glm::vec4(in.x, in.y, 1.0f, 1.0f)) 
         * glm::vec4(screen.x / 2.0f, -screen.y / 2.0f, 1.0f, 1.0f) 
         + glm::vec4(screen.x / 2.0f, screen.y / 2.0f, 0.0f, 0.0f);

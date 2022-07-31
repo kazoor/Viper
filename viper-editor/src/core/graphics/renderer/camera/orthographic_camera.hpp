@@ -13,8 +13,10 @@ namespace Viper::Renderer {
         glm::mat4 GetViewMatrix() const;
         glm::mat4 GetProjectionMatrix() const;
         
-        glm::vec3 ScreenToWorld( glm::vec3 in, glm::vec2 screen );
-        glm::vec3 WorldToScreen( glm::vec3 in, glm::vec2 screen );
+        glm::vec2 ScreenToWorld( glm::vec2 in, glm::vec2 screen );
+        glm::vec2 Editor_ScreenToWorld( glm::vec2 in, glm::vec2 screen );
+
+        glm::vec2 WorldToScreen( glm::vec2 in, glm::vec2 screen );
     private:
         glm::mat4 m_ViewMatrix;
         glm::mat4 m_ViewProjectionMatrix;
