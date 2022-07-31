@@ -12,17 +12,32 @@
 #include <components/boxcollision2d.hpp>
 
 #include <ghc/filesystem.hpp>
+#include <util/timer/timer.hpp>
+#include <viper/base.hpp>
+
+static const size_t hash_png = std::hash< std::string >( )(".png");
+static const size_t hash_jpg = std::hash< std::string >( )(".jpg");
+static const size_t hash_vert = std::hash< std::string >( )(".vert");
+static const size_t hash_frag = std::hash< std::string >( )(".frag");
+static const size_t hash_ini = std::hash< std::string >( )(".init");
+static const size_t hash_font_ttf = std::hash< std::string >( )( ".ttf" );
+static const size_t hash_font_otf = std::hash< std::string >( )( ".otf" );
 
 namespace Viper {
     template< typename T >
     void ImGui_CreateComponent( const char* button_name, Ref< Components::GameObject >& object ) {
         if(!object->HasComponent< T >( ) ) {
-            if( ImGui::Button( button_name ) ) {
+            if( ImGui::MenuItem( button_name ) ) {
                 object->AddComponent< T >( object.get() );
-                ImGui::CloseCurrentPopup();
             };
         }
     };
+
+    struct Filemanager_t {
+        std::string filename;
+        std::string fileext;
+    };
+
     ImGuiEditor::ImGuiEditor(void* window)  : Layer("ImGui Editor"), WindowContext((GLFWwindow*)window) {
          ImGui::CreateContext();
             ImGuiIO &io = ImGui::GetIO();
@@ -168,7 +183,7 @@ namespace Viper {
 
                     ImGui::Button( ICON_FA_PLUS " Add Component" );
                     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-                    if (ImGui::BeginPopupContextItem())
+                    if (ImGui::BeginPopupContextWindow(0, 1, false))
                     {
                         ImGui_CreateComponent< Components::Camera >( "Camera", go );
                         ImGui_CreateComponent< Components::SpriteRenderer >( "Sprite Renderer", go );
@@ -225,11 +240,57 @@ namespace Viper {
 
         constexpr char* s_Directory = "resources";
         void ImGuiEditor::ImGui_OnFileExplorer() {
-            if( ImGui::Begin("File Explorer")) {
 
-                for(auto& p : ghc::filesystem::directory_iterator(s_Directory)) {
-                    ImGui::Text("%s", p.path().string().c_str());
+            if( ImGui::Begin("File Explorer")) {
+                Timer::Timer ts;
+
+                static ghc::filesystem::path m_CurrentDir = s_Directory;
+                std::vector< Filemanager_t > m_FilesWithinFolder;
+                ImGui::Columns(2, "##FileExplorer");
+                ImGui::SetColumnWidth(0, 150.0f);
+                if( ghc::filesystem::exists(m_CurrentDir) ) {
+                    for(auto& p : ghc::filesystem::directory_iterator(m_CurrentDir)) {
+                        std::string path = p.path().string();
+                        auto filename = p.path().filename().string();
+                        auto filename_ext = p.path().filename().extension().string();
+
+                        if( p.is_directory()) {
+                            if(ImGui::Button(
+                                VIPER_FORMAT_STRING( ICON_FA_FOLDER " %s", filename.c_str( ) ).c_str( )
+                                )) {
+                                m_CurrentDir /= p.path().filename();
+                            };
+                        } else {
+                            m_FilesWithinFolder.push_back( { filename, filename_ext } );
+                        }
+                    };
+                }
+                ImGui::NextColumn();
+                if( m_CurrentDir != s_Directory ) {
+                    if( !ghc::filesystem::exists(m_CurrentDir) )
+                        m_CurrentDir = m_CurrentDir.parent_path( );
+
+                    if(ImGui::Button(ICON_FA_ARROW_CIRCLE_LEFT " Back")) {
+                        m_CurrentDir = m_CurrentDir.parent_path();
+                    }
                 };
+
+                for( auto f : m_FilesWithinFolder ) {
+                    const size_t m_file_hash = std::hash< std::string >( )( f.fileext );
+
+                    std::string sz_StringSerialized;
+                    if( m_file_hash == hash_frag || m_file_hash == hash_vert )
+                        sz_StringSerialized = VIPER_FORMAT_STRING(ICON_FA_WHEELCHAIR " %s :: %s", f.filename.c_str(), f.fileext.c_str());//ImGui::Text(ICON_FA_WHEELCHAIR " %s :: %s", f.filename.c_str(), f.fileext.c_str());
+                    else if( m_file_hash == hash_png || m_file_hash == hash_jpg )
+                        sz_StringSerialized = VIPER_FORMAT_STRING( ICON_FA_FILE_IMAGE " %s :: %s", f.filename.c_str(), f.fileext.c_str() );//ImGui::Text(ICON_FA_FILE_IMAGE " %s :: %s", f.filename.c_str(), f.fileext.c_str());
+                    else if( m_file_hash == hash_font_ttf || m_file_hash == hash_font_otf )
+                        sz_StringSerialized = VIPER_FORMAT_STRING( ICON_FA_FONT " %s :: %s", f.filename.c_str(), f.fileext.c_str() );//ImGui::Text(ICON_FA_FONT " %s :: %s", f.filename.c_str(), f.fileext.c_str());
+                    else
+                        sz_StringSerialized = VIPER_FORMAT_STRING( ICON_FA_FILE " %s :: %s", f.filename.c_str(), f.fileext.c_str() );//ImGui::Text(ICON_FA_FILE " %s :: %s", f.filename.c_str(), f.fileext.c_str());
+                
+                    ImGui::Text(sz_StringSerialized.c_str());
+                };
+                ImGui::Columns(1);
                 
                 ImGui::End();
             };
@@ -254,7 +315,7 @@ namespace Viper {
 
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
                 if (ImGui::Button(ICON_FA_PLUS " Add GameObject")) {
-                    if (strlen(buff) > 1) {
+                    if (strlen(buff) > 0) {
                         auto go = Components::GameObject::Create(buff);
                         [&](Ref< Components::GameObject >&) {
                         }(go);
@@ -345,5 +406,4 @@ namespace Viper {
                 ImGui::End();
             };
         };
-
 };
