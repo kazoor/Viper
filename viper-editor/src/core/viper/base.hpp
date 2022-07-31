@@ -1,10 +1,12 @@
 
 #pragma once
-#include <spdlog/spdlog.h>
+//#include <spdlog/spdlog.h>
 #include <cstdint>
 #include <cstdarg>
+#include <memory>
+#include <string>
 
-#define VIPER_LOG(fmt, ...) spdlog::info(fmt, __VA_ARGS__)
+#define VIPER_LOG(fmt, ...) //spdlog::info(fmt, __VA_ARGS__)
 
 #define VIPER_ERR(fmt) spdlog::error(fmt)
 

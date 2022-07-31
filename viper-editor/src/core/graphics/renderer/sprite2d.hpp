@@ -6,14 +6,18 @@ namespace Viper::Renderer {
     public:
         Sprite2D();
         Sprite2D( const std::string& str, int width, int height );
+        Sprite2D( int width, int height );
         ~Sprite2D();
         static Ref< Sprite2D > Create( const std::string& sprite_path );
         static Ref< Sprite2D > Create( const std::string& sprite_path, int width, int height );
+        static Ref< Sprite2D > Create( int width, int height );
 
         uint32_t GetSprite() const;
 
         void Bind();
         void Unbind();
+        void Bind( uint32_t slot );
+        void SetData( void* data, uint32_t size );
     private:
         int Width;
         int Height;

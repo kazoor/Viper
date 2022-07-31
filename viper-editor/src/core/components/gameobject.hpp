@@ -79,13 +79,15 @@ namespace Viper::Components {
 
         size_t GetComponents( ) const;
 
-        void OnUpdate( double deltaticks );
+        void OnUpdate( Timestep::Timestep ts );
 
         void OnAwake( );
 
         void OnEditor( );
 
         void OnDeletion();
+
+        void OnEvent(Viper::Events::Event& e);
 
         static Ref< GameObject > Create();
         static Ref< GameObject > Create(const std::string& tagname);

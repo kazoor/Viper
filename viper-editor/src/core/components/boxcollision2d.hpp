@@ -13,23 +13,19 @@ namespace Viper::Components {
         GameObject* Second;
     };
 
-    class BoxCollision2D : public Component {
-    VIPER_CLASS_DECLARATION(BoxCollision2D)
+    class BoxCollider2D : public Component {
     public:
-        BoxCollision2D();
+        VIPER_COMPONENT_DECLARE( BoxCollider2D );
 
-        BoxCollision2D(GameObject* Box1);
+        BoxCollider2D();
 
-        void OnAwake() override;
+        BoxCollider2D(GameObject* Box1);
 
-        void OnUpdate(double deltatime) override;
+        void Update(Timestep::Timestep ts);
 
-        void OnEditor() override;
+        void Editor() override;
 
         bool IsColliding(GameObject *Box2);
-
-    private:
-        bool CheckCollision(Transform T1, Transform T2);
     private:
         Transform Tr;
         GameObject* Box1;
