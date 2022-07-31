@@ -50,6 +50,8 @@ namespace Viper {
         void ImGui_OnViewport( const Graphics::WindowParams_t& WindowData);
 
         void ImGUi_OnPlaymode();
+
+        void ImGui_OnFileExplorer();
     private:
         GLFWwindow* WindowContext;
     };

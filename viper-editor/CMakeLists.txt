@@ -1,18 +1,17 @@
-cmake_minimum_required(VERSION  3.3)
+cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(Viper)
 
 add_compile_definitions(VIPER_API VIPER_EXPORT)
-
 #add_compile_definitions(VIPER_API)
 
 add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/viper/application.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/window/window.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/shaders/shader/shader.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/vertexbuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/indexbuffer.cpp
@@ -21,6 +20,7 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/linebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/sprite2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/imguieditor.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/scene.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/component.cpp
