@@ -1,10 +1,12 @@
 
 #pragma once
-#include <spdlog/spdlog.h>
+//#include <spdlog/spdlog.h>
 #include <cstdint>
 #include <cstdarg>
+#include <memory>
+#include <string>
 
-#define VIPER_LOG(fmt, ...) spdlog::info(fmt, __VA_ARGS__)
+#define VIPER_LOG(fmt, ...) //spdlog::info(fmt, __VA_ARGS__)
 
 #define VIPER_ERR(fmt) spdlog::error(fmt)
 
@@ -36,4 +38,16 @@ std::string VIPER_FORMAT_STRING( const std::string& format, Args ... args ) {
     #elif VIPER_ENFORCE_RADEON_DEDICATED_GRAPHICS
         extern "C" { __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1; }
     #endif
+
+    
+#endif
+
+#ifdef VIPER_API
+    #ifdef VIPER_EXPORT
+        #define VIPER_CLASS __declspec(dllexport)
+    #else
+        #define VIPER_CLASS __declspec(dllimport)
+    #endif
+#else
+    #error "Unsupported type for build. see base.hpp / viper."
 #endif

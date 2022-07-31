@@ -52,5 +52,14 @@ namespace Viper::Globals {
         extern bool isPlaying;
         extern float PosX;
         extern float PosY;
+
+        extern float SceneW;
+        extern float SceneH;
+
+        extern float SceneX;
+        extern float SceneY;
+
+        extern float MousePosX;
+        extern float MousePosY;
     };
 };

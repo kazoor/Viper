@@ -2,7 +2,7 @@
 #include "window.hpp"
 #include "../../viper/base.hpp"
 
-namespace Viper {
+namespace Viper::App {
     Application::Application() {
         m_Window = new Graphics::Window(1280, 720, "Viper");
         m_Window->SetCallback([this](Events::Event& e) { return Application::OnEvent(e);});

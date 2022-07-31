@@ -291,8 +291,8 @@ namespace Viper::Graphics {
 
     bool Window::OnWindowMouseCursorPositionEvent(MouseCursorPositionEvent &E) {
         VIPER_LOG("MouseCursorPositionEvent Event triggered! {0}, {1}", E.x, E.y);
-        Globals::Editor::PosX = E.x;
-        Globals::Editor::PosY = E.y;
+        Globals::Editor::MousePosX = E.x;
+        Globals::Editor::MousePosY = E.y;
         return true;
     };
     

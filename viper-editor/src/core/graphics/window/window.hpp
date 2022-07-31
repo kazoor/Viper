@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
-#include <glfw/glfw3.h>
+#include "../../external/glfw/include/GLFW/glfw3.h"
 #include "../../events/event/event.hpp"
 #include "../../util/input/mouse/mouseevents.hpp"
 #include "../../layers/layer/layer.hpp"

@@ -6,6 +6,7 @@
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_glfw.h>
 #include <ImGui/imgui_impl_opengl3.h>
+#include <ImGui/ImGuizmo.h>
 
 // layer:
 #include <layers/layer/layer.hpp>
@@ -29,6 +30,7 @@
 #include <components/spriterenderer.hpp>
 #include <components/scripting.hpp>
 #include <components/rigidbody2d.hpp>
+#include <components/boxcollision2d.hpp>
 //#include "../components/boxcollision2d.hpp"
 
 namespace Viper {
@@ -116,6 +118,9 @@ namespace Viper {
 
             ImGui::NewFrame();
 
+            ImGuizmo::BeginFrame();
+
+
             ImGui_OnViewport(WindowData);
 
             ImGui_OnScene();
@@ -134,6 +139,7 @@ namespace Viper {
 
             ImGui::Render();
 
+            Globals::ConsoleContext::ResizeLogs( 10U );                    
             
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
@@ -181,6 +187,8 @@ namespace Viper {
                         ImGui_CreateComponent< Components::SpriteRenderer >( "Sprite Renderer", go );
                         ImGui_CreateComponent< Components::TestScript >( "Test Script", go );
                         ImGui_CreateComponent< Components::Rigidbody2D >( "Rigidbody2D", go );
+                        ImGui_CreateComponent< Components::BoxCollider2D >( "BoxCollider2D", go );
+
                         ImGui::EndPopup();
                     }
                     ImGui::PopStyleVar();
@@ -195,6 +203,16 @@ namespace Viper {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
             if (ImGui::Begin(ICON_FA_GAMEPAD "  Scene")) {
                 ImVec2 SceneSize = ImGui::GetContentRegionAvail();
+                ImVec2 ScenePos = ImGui::GetWindowPos();
+                Globals::Editor::SceneX = ScenePos.x;
+                Globals::Editor::SceneY = ScenePos.y;
+
+                Globals::Editor::SceneW = SceneSize.x;
+                Globals::Editor::SceneH = SceneSize.y;
+
+                Globals::Editor::PosX = Globals::Editor::MousePosX - Globals::Editor::SceneX;
+                Globals::Editor::PosY = ( float )( Globals::Editor::MousePosY - Globals::Editor::SceneY );
+                
                 ImGui::Image(
                         reinterpret_cast< ImTextureID * >( Renderer::Renderer2D::GetTexture()),
                         ImVec2(SceneSize.x, SceneSize.y));
@@ -210,7 +228,6 @@ namespace Viper {
         void ImGui_OnConsole() {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
             if(ImGui::Begin(ICON_FA_TERMINAL "  Debug Console")) {
-                Globals::ConsoleContext::ResizeLogs( 10U );                    
                 for( auto info : Globals::ConsoleContext::GetLogs( ) ) {
                     auto color = Globals::ConsoleContext::GetConsoleColor( info.Flag );
                     ImGui::TextColored(ImVec4(color[0], color[1], color[2], 1.0f), info.StringType.c_str( ) );
