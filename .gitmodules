@@ -13,3 +13,6 @@
 [submodule "viper-editor/external/json"]
 	path = viper-editor/external/json
 	url = git@github.com:nlohmann/json.git
+[submodule "viper-editor/external/entt"]
+	path = viper-editor/external/entt
+	url = git@github.com:skypjack/entt.git
