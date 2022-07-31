@@ -17,12 +17,8 @@ namespace Viper {
 
     void Application::Run() {
         Globals::GlobalsContext::CreateContext();
-        ApplyLayers(m_Window->Ctx());
+        ApplyLayers( GetContext( ) );
         while(m_Window->IsRunning()) {
-            Renderer::Renderer2D::BindFramebuffer();
-            glClear(GL_COLOR_BUFFER_BIT);
-            Renderer::Renderer2D::UnbindFramebuffer();
-            m_Window->UpdateLayers();
             m_Window->Update();
         };
     };
