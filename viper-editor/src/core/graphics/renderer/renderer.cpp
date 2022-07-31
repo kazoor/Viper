@@ -359,7 +359,7 @@ namespace Viper::Renderer {
         glClear(GL_COLOR_BUFFER_BIT);
     };
 
-    void RenderCommand::SetClearColor(float color[3]) {
-        glClearColor(color[0], color[1], color[2], color[3]);
+    void RenderCommand::SetClearColor(const glm::vec4& color) {
+        glClearColor(color.x, color.y, color.z, color.w);
     };
 };

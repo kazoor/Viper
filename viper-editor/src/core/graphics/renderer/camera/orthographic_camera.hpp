@@ -1,8 +1,9 @@
 #pragma once
+#include <viper/viper.hpp>
 #include <glm/gtc/matrix_transform.hpp> // ortho
 
 namespace Viper::Renderer {
-    class OrthoGraphicCamera {
+    class VIPER_API OrthoGraphicCamera {
     public:
         OrthoGraphicCamera();
         OrthoGraphicCamera(float left, float right, float bottom, float top, float z_near = -1.0f, float z_far = 1.0f );

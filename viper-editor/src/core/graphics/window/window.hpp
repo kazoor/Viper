@@ -10,19 +10,18 @@
 #include "../../viper/viper.hpp"
 
 namespace Viper::Graphics {
+    using fn_EventCallback = std::function< void(Events::Event&) >;
+    struct VIPER_API WindowParams_t {
+        int Width;            // Window width.
+        int Height;           // Window height.
+        std::string Title;    // Window title.
+        GLFWmonitor *Monitor; // The monitor to use for full screen mode, or `NULL` for windowed mode.
+        GLFWwindow *Share;    // The window whose context to share resources with, or `NULL` to not share resources.
+
+        fn_EventCallback EventCallback;
+    };
     class VIPER_API Window {
     public:
-        using fn_EventCallback = std::function< void(Events::Event&) >;
-        struct WindowParams_t {
-            int Width;            // Window width.
-            int Height;           // Window height.
-            std::string Title;    // Window title.
-            GLFWmonitor *Monitor; // The monitor to use for full screen mode, or `NULL` for windowed mode.
-            GLFWwindow *Share;    // The window whose context to share resources with, or `NULL` to not share resources.
-
-            fn_EventCallback EventCallback;
-        };
-
         Window(int Width, int Height, const std::string &WindowName);
         ~Window();
 

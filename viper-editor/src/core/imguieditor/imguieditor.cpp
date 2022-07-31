@@ -91,8 +91,8 @@ namespace Viper {
         Destroy();
     }
 
-    void ImGuiEditor::OnUpdate() {
-            Graphics::Window::WindowParams_t &WindowData = *(Graphics::Window::WindowParams_t *) glfwGetWindowUserPointer(
+    void ImGuiEditor::OnUpdate(Timestep::Timestep ts) {
+            Graphics::WindowParams_t &WindowData = *(Graphics::WindowParams_t *) glfwGetWindowUserPointer(
                     WindowContext);
 
             ImGui_ImplGlfw_NewFrame();
@@ -297,7 +297,7 @@ namespace Viper {
             ImGui::PopStyleVar();
         };
 
-        void ImGuiEditor::ImGui_OnViewport( const Graphics::Window::WindowParams_t& WindowData)
+        void ImGuiEditor::ImGui_OnViewport( const Graphics::WindowParams_t& WindowData)
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
             if (ImGui::Begin(VIPER_TITLE, NULL,

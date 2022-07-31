@@ -12,6 +12,7 @@
 #include <thread>
 
 namespace Viper::Graphics {
+    static float m_LastFrame = 0.0f;
     #define VIPER_GET(wnd) WindowParams_t& data = *(WindowParams_t*)glfwGetWindowUserPointer(wnd)
     Window::Window(int Width, int Height, const std::string &WindowName) {
         glfwInit();
@@ -133,6 +134,14 @@ namespace Viper::Graphics {
     }
 
     void Window::Update() {
+        float m_CurrentFrame = ( float )glfwGetTime();
+        Timestep::Timestep ts = m_CurrentFrame - m_LastFrame;
+        m_LastFrame = m_CurrentFrame;
+        
+        for (auto Layer: *LayerStack) {
+            Layer->OnUpdate(ts);
+        }
+
         glfwSwapBuffers(Context);
         glfwPollEvents();
     };
@@ -142,9 +151,7 @@ namespace Viper::Graphics {
     };
 
     void Window::UpdateLayers() {
-        for (auto Layer: *LayerStack) {
-            Layer->OnUpdate();
-        }
+        
     };
 
     void Window::Setup() {
@@ -161,8 +168,8 @@ namespace Viper::Graphics {
         if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
             spdlog::error("Failed to initialize GLAD");
         }
-        LayerStack = new Layers::LayerStack();
         CreateEvents();
+        LayerStack = new Layers::LayerStack();
     };
 
     GLFWwindow* Window::CreateWindowEx(WindowParams_t Params) {

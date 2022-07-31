@@ -30,16 +30,12 @@ namespace Viper {
         Renderer::Renderer2D::Destroy();
     };
 
-    void Scene::OnUpdate() {
-        float m_CurrentFrame = ( float )glfwGetTime();
-        Timestep::Timestep ts = m_CurrentFrame - m_LastFrame;
-        m_LastFrame = m_CurrentFrame;
+    void Scene::OnUpdate(Timestep::Timestep ts) {
         
-        Graphics::Window::WindowParams_t &WindowData = *(Graphics::Window::WindowParams_t *)glfwGetWindowUserPointer(WindowContext);
-        AspectRatio = ( float )Globals::Editor::SceneW / ( float )Globals::Editor::SceneH;
-        Renderer::Renderer2D::BindFramebuffer();
-        Renderer::Renderer2D::Begin(*m_Camera);
+        Graphics::WindowParams_t &WindowData = *(Graphics::WindowParams_t *)glfwGetWindowUserPointer(WindowContext);
+        AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
 
+        Renderer::Renderer2D::Begin(*m_Camera);
         for( int y = -20; y < 20; y++ )
             for( int x = -20; x < 20; x++ )
                 Renderer::Renderer2D::DrawQuad(glm::vec2(x, y), ( x + y ) % 2 ? RendererAPI::Color(0.6f, 0.6f, 0.6f) : RendererAPI::Color(0.7f, 0.7f, 0.7f));
@@ -86,7 +82,6 @@ namespace Viper {
             m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
 
         Renderer::Renderer2D::End();
-        Renderer::Renderer2D::UnbindFramebuffer();
     }
 
     void Scene::OnEvent(Events::Event& event) {

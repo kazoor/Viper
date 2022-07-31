@@ -1,7 +1,7 @@
 #pragma once
-//https://youtu.be/pctGOMDW-HQ?t=1205
+#include <viper/viper.hpp>
 namespace Viper::Timestep {
-    class Timestep {
+    class VIPER_API Timestep {
     public:
         Timestep( ) : timer( 0.0f ) { };
         Timestep( float time ) : timer( time ) { };

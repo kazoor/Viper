@@ -31,7 +31,7 @@ namespace Viper {
 
         ~ImGuiEditor();
 
-        void OnUpdate();
+        void OnUpdate(Timestep::Timestep ts);
 
         void OnEvent(Events::Event& event);
 
@@ -47,7 +47,7 @@ namespace Viper {
 
         void ImGui_OnHierarchy();
 
-        void ImGui_OnViewport( const Graphics::Window::WindowParams_t& WindowData);
+        void ImGui_OnViewport( const Graphics::WindowParams_t& WindowData);
 
         void ImGUi_OnPlaymode();
     private:

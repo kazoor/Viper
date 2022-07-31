@@ -1,7 +1,8 @@
 #pragma once
 #include <chrono>
+#include <viper/viper.hpp>
 namespace Viper::Timer {
-    class Timer {
+    class VIPER_API Timer {
     public:
         Timer() {
             Reset();

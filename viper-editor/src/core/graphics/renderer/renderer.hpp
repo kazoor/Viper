@@ -1,5 +1,6 @@
 #pragma once
 #include "api/vertex.hpp" // vec3 redan inkluderad inuti vertex.hpp
+#include <viper/viper.hpp>
 #include <glm/vec2.hpp>
 #include "sprite2d.hpp"
 #include "camera/orthographic_camera.hpp"
@@ -7,7 +8,7 @@
 
 namespace Viper::Renderer {
     
-    class Renderer2D {
+    class VIPER_API Renderer2D {
     public:
         static void Instantiate();
         static void Destroy();
@@ -47,7 +48,7 @@ namespace Viper::Renderer {
         static void Next();
     };
 
-    class RenderCommand {
+    class VIPER_API RenderCommand {
     public:
         static void DrawIndexed( uint32_t Vao, uint32_t IndexCount );
         static void DrawArrayed( uint32_t Vao, uint32_t IndexCount );
@@ -55,6 +56,6 @@ namespace Viper::Renderer {
         static void UnbindFramebuffer( );
         static void ResizeTexture( uint32_t TextureID, int Width, int Height );
         static void Clear();
-        static void SetClearColor(float color[3]);
+        static void SetClearColor(const glm::vec4& color);
     };
 };

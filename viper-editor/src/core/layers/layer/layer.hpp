@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <viper/viper.hpp>
+#include <util/timer/timestep.hpp>
 #include "../../events/event/event.hpp"
 
 namespace Viper::Layers {
@@ -11,7 +12,7 @@ namespace Viper::Layers {
 
         virtual void OnAttach() {}
         virtual void OnDetach() {}
-        virtual void OnUpdate() {}
+        virtual void OnUpdate(Timestep::Timestep ts) {}
         virtual void OnEvent(Events::Event& event) = 0;
 
         inline const std::string &GetLayerName() const { return LayerName; }
