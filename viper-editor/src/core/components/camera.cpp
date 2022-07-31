@@ -25,7 +25,7 @@ namespace Viper::Components {
     float Lerp( float a, float b, float t ) {
         return a + ( b - a ) * t;
     };
-
+    
     void Camera::Update(Timestep::Timestep ts) {
         auto& tr = object->GetComponent< Transform >( );
         if(!enabled)
