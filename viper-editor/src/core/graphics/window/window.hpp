@@ -32,7 +32,6 @@ namespace Viper::Graphics {
         void PushOverlay( Layers::Layer* overlay);
 
         void Update();
-        void UpdateLayers();
 
         bool IsRunning();
         void OnEvent(Events::Event& event);

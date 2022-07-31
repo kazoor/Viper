@@ -45,7 +45,7 @@ namespace Viper {
 
         void ImGui_OnConsole();
 
-        void ImGui_OnHierarchy();
+        void ImGui_OnHierarchy(Timestep::Timestep ts);
 
         void ImGui_OnViewport( const Graphics::WindowParams_t& WindowData);
 

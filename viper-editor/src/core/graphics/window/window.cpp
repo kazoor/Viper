@@ -130,8 +130,7 @@ namespace Viper::Graphics {
                 }
             }
         });
-
-    }
+    };
 
     void Window::Update() {
         float m_CurrentFrame = ( float )glfwGetTime();
@@ -148,10 +147,6 @@ namespace Viper::Graphics {
 
     bool Window::IsRunning() {
         return !glfwWindowShouldClose(Context);
-    };
-
-    void Window::UpdateLayers() {
-        
     };
 
     void Window::Setup() {
@@ -269,6 +264,8 @@ namespace Viper::Graphics {
 
     bool Window::OnWindowMouseCursorPositionEvent(Events::MouseCursorPositionEvent &E) {
         VIPER_LOG("MouseCursorPositionEvent Event triggered! {0}, {1}", E.x, E.y);
+        Globals::Editor::MousePosX = E.x;
+        Globals::Editor::MousePosY = E.y;
         return true;
     };
     

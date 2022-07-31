@@ -6,8 +6,6 @@
 #include <graphics/renderer/api/color.hpp>
 #include <graphics/renderer/renderer.hpp>
 
-#include <util/timer/timestep.hpp>
-
 using namespace Viper::Renderer;
 using namespace Viper::RendererAPI;
 using namespace Viper::Events;

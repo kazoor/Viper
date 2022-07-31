@@ -107,7 +107,7 @@ namespace Viper {
 //
             ImGui_OnScene();
 //
-            ImGui_OnHierarchy();
+            ImGui_OnHierarchy(ts);
 //
             ImGui_OnInspector();
 //
@@ -192,9 +192,6 @@ namespace Viper {
                 Globals::Editor::SceneW = SceneSize.x;
                 Globals::Editor::SceneH = SceneSize.y;
 
-                Globals::Editor::PosX = Globals::Editor::MousePosX - Globals::Editor::SceneX;
-                Globals::Editor::PosY = ( float )( Globals::Editor::MousePosY - Globals::Editor::SceneY );
-                
                 ImGui::Image(
                         reinterpret_cast< ImTextureID * >( Renderer::Renderer2D::GetTexture()),
                         ImVec2(SceneSize.x, SceneSize.y));
@@ -221,7 +218,7 @@ namespace Viper {
             ImGui::PopStyleVar();
         };
 
-        void ImGuiEditor::ImGui_OnHierarchy()
+        void ImGuiEditor::ImGui_OnHierarchy(Timestep::Timestep ts)
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
             if (ImGui::Begin(ICON_FA_SITEMAP "  Hierarchy")) {
@@ -287,10 +284,11 @@ namespace Viper {
                 };
 
                 ImGui::Text("GameObjects: %i", Globals::GlobalsContext::Gom->GameObjectSize());
-                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f * Globals::Editor::DeltaTime,
-                           1.0f / Globals::Editor::DeltaTime );
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", ts.milliseconds(),
+                           1.0f / ts.seconds() );
                 ImGui::Text("Quads Rendered: %i", Renderer::Renderer2D::GetQuadCount());
                 ImGui::Text("Indices used: %i", Renderer::Renderer2D::GetIndexCount());
+                ImGui::Text("Lines used: %i", Renderer::Renderer2D::GetLineCount());
 
                 ImGui::End();
             };

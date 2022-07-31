@@ -31,9 +31,15 @@ namespace Viper {
     };
 
     void Scene::OnUpdate(Timestep::Timestep ts) {
-        
+        Renderer::Renderer2D::BindFramebuffer();
+        Renderer::RenderCommand::Clear();
+        Renderer::Renderer2D::UnbindFramebuffer();
+
+
+        Renderer::Renderer2D::BindFramebuffer();
         Graphics::WindowParams_t &WindowData = *(Graphics::WindowParams_t *)glfwGetWindowUserPointer(WindowContext);
-        AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
+
+        AspectRatio = ( float )Globals::Editor::SceneW / ( float )Globals::Editor::SceneH;
 
         Renderer::Renderer2D::Begin(*m_Camera);
         for( int y = -20; y < 20; y++ )
@@ -44,8 +50,6 @@ namespace Viper {
         static float posy = 0.0f;
         static float rad = 0.0f;
 
-        auto line_end_dest = m_Camera->Editor_ScreenToWorld( glm::vec2(Globals::Editor::PosX, Globals::Editor::PosY ), glm::vec2( (float)Globals::Editor::SceneW, (float)Globals::Editor::SceneH));
-
         //Renderer::Renderer2D::DrawQuadRotated(glm::vec2(posx, posy), rad * ( 3.141592f / 180.0f ), RendererAPI::Color::Green());
 
         Renderer::Renderer2D::DrawTexture(glm::vec2(1.0f, 0.0f), m_TexSprite2);
@@ -54,7 +58,7 @@ namespace Viper {
 
         rad_ex += 1.0f * ts * 32.0f;
 
-        Renderer::Renderer2D::DrawLine(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(line_end_dest.x, line_end_dest.y, 0.0f), RendererAPI::Color::Blue());
+        Renderer::Renderer2D::DrawLine(glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(15.0f, 15.0f, 0.0f), RendererAPI::Color::Blue());
         
         Renderer::Renderer2D::DrawQuad(glm::vec2(4.0f, 4.0f), RendererAPI::Color(0.2f, 0.2f, 1.0f));
 
@@ -82,6 +86,7 @@ namespace Viper {
             m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
 
         Renderer::Renderer2D::End();
+        Renderer::Renderer2D::UnbindFramebuffer();
     }
 
     void Scene::OnEvent(Events::Event& event) {

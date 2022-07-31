@@ -50,8 +50,6 @@ namespace Viper::Globals {
         extern int SelectedObject;
         extern bool HasMainCamera;
         extern bool isPlaying;
-        extern float PosX;
-        extern float PosY;
 
         extern float SceneW;
         extern float SceneH;

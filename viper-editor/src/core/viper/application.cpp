@@ -20,7 +20,6 @@ namespace Viper {
         ApplyLayers( GetContext( ) );
         while(m_Window->IsRunning()) {
             m_Window->Update();
-            m_Window->UpdateLayers();
         };
     };
 
