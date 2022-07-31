@@ -57,8 +57,8 @@ set_target_properties( Viper
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         PREFIX ""
         OUTPUT_NAME "ViperPlayer"
+        CXX_STANDARD 20
         )
-
 
 # Make sure we also compile glad.c
 message(STATUS "Compiling glad")
