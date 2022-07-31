@@ -10,6 +10,9 @@
 #include <components/scripting.hpp>
 #include <components/rigidbody2d.hpp>
 #include <components/boxcollision2d.hpp>
+
+#include <ghc/filesystem.hpp>
+
 namespace Viper {
     template< typename T >
     void ImGui_CreateComponent( const char* button_name, Ref< Components::GameObject >& object ) {
@@ -115,6 +118,8 @@ namespace Viper {
 //
             ImGUi_OnPlaymode();
 
+            ImGui_OnFileExplorer();
+
             ImGui::ShowDemoWindow();
             
             ImGui::EndFrame();
@@ -216,6 +221,18 @@ namespace Viper {
                 ImGui::End();
             };
             ImGui::PopStyleVar();
+        };
+
+        constexpr char* s_Directory = "resources";
+        void ImGuiEditor::ImGui_OnFileExplorer() {
+            if( ImGui::Begin("File Explorer")) {
+
+                for(auto& p : ghc::filesystem::directory_iterator(s_Directory)) {
+                    ImGui::Text("%s", p.path().string().c_str());
+                };
+                
+                ImGui::End();
+            };
         };
 
         void ImGuiEditor::ImGui_OnHierarchy(Timestep::Timestep ts)
