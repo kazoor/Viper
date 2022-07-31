@@ -12,7 +12,7 @@
 
 #define VIPER_ENV "dev"
 
-#define VIPER_VERSION "0.0.2"
+#define VIPER_VERSION "0.0.3"
 
 #define VIPER_TITLE "Viper " VIPER_VERSION "-" VIPER_ENV
 
