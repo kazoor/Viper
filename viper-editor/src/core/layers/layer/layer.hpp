@@ -1,9 +1,10 @@
 #pragma once
 #include <string>
+#include <viper/viper.hpp>
 #include "../../events/event/event.hpp"
 
 namespace Viper::Layers {
-    class Layer {
+    class VIPER_API Layer {
     public:
         Layer(const std::string &LayerName = "NewLayer") : LayerName(LayerName) {}
         virtual ~Layer() {}

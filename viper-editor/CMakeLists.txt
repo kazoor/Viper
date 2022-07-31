@@ -9,7 +9,7 @@ add_compile_definitions(VIPER_API VIPER_EXPORT)
 #add_compile_definitions(VIPER_API)
 
 add_library(Viper MODULE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/window/application.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/viper/application.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/window/window.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/shaders/shader/shader.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
@@ -21,6 +21,8 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/linebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/sprite2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/imguieditor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/scene.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/component.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/transform.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/spriterenderer.cpp
@@ -44,7 +46,6 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_widgets.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_tables.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/ImGuizmo.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/export/main.cpp
         )
 
 # Set target folders
@@ -95,6 +96,7 @@ target_include_directories(Viper SYSTEM PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core")
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/glm/")
 
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/

@@ -38,16 +38,4 @@ std::string VIPER_FORMAT_STRING( const std::string& format, Args ... args ) {
     #elif VIPER_ENFORCE_RADEON_DEDICATED_GRAPHICS
         extern "C" { __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1; }
     #endif
-
-    
-#endif
-
-#ifdef VIPER_API
-    #ifdef VIPER_EXPORT
-        #define VIPER_CLASS __declspec(dllexport)
-    #else
-        #define VIPER_CLASS __declspec(dllimport)
-    #endif
-#else
-    #error "Unsupported type for build. see base.hpp / viper."
 #endif
