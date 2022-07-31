@@ -7,3 +7,4 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/viper-sandbox)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/viper-editor/src/resources/imgui.ini
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/)
+        

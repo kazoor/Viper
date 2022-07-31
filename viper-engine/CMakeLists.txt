@@ -28,6 +28,7 @@ set_target_properties( ViperEngine
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     PREFIX ""
     OUTPUT_NAME "Editor"
+    CXX_STANDARD 20
 )
 # Other includes
 target_include_directories(ViperEngine SYSTEM PUBLIC 
