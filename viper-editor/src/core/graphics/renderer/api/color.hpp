@@ -1,8 +1,9 @@
 #pragma once
 #include <cstring>
+#include <viper/viper.hpp>
 
 namespace Viper::RendererAPI {
-    struct Color {
+    struct VIPER_API Color {
         float colors[ 4U ];
         Color() {
             memset( colors, 0, sizeof( colors ) );

@@ -20,7 +20,7 @@ namespace Viper {
 
         void Destroy();
 
-        void OnUpdate() override;
+        void OnUpdate(Timestep::Timestep ts) override;
 
         void OnEvent(Events::Event& event) override;
     private:
