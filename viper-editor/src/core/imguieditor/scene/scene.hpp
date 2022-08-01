@@ -11,6 +11,8 @@
 #include <graphics/renderer/sprite2d.hpp>
 #include <graphics/renderer/camera/orthographic_camera.hpp>
 
+#include <entt/entt.hpp>
+
 namespace Viper {
     class VIPER_API Scene : public Layers::Layer {
     public:
@@ -31,5 +33,7 @@ namespace Viper {
         float m_LastFrame = 0.0f;
     private:
         float AspectRatio;
+        
+        entt::registry m_Registry;
     };
 }

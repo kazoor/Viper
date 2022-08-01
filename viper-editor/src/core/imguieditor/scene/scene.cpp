@@ -9,6 +9,16 @@
 #include <components/input.hpp>
 #include <components/gameobject.hpp>
 #include <components/spriterenderer.hpp>
+
+#include <entt/entt.hpp>
+
+struct EnTT_Transform {
+    glm::vec3 position;
+    EnTT_Transform() = default;
+    EnTT_Transform( const EnTT_Transform& ) = default;
+    EnTT_Transform( const glm::vec3& pos ) : position( pos ) { };
+};
+
 namespace Viper {
     Scene::Scene(void* context) : Layer("Scene"), WindowContext((GLFWwindow*)context) {
         m_Camera = new Renderer::OrthoGraphicCamera(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
@@ -19,6 +29,17 @@ namespace Viper {
         
         m_TexSprite = Renderer::Sprite2D::Create("resources/textures/teamspeak.jpg");
         m_TexSprite2 = Renderer::Sprite2D::Create("resources/textures/checkerboard.png");
+
+        entt::entity ent = m_Registry.create(); // Skapar en uint32_t entity id.
+        
+        // Denna gör samma sak som vi hade gjort med vårt gamla system.
+        // object->AddComponent< Transform >( glm::vec3(1.0f, 0.2f, 0.3f ) );
+        m_Registry.emplace< EnTT_Transform >( ent, glm::vec3(1.0f, 0.2f, 0.3f ) );
+
+        // Som vårt gamla. Transform& has_component = GetComponent< Transform >( )
+        auto& has_component = m_Registry.get< EnTT_Transform >( ent );
+
+        
     };
 
     Scene::~Scene() {
