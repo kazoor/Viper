@@ -41,9 +41,11 @@ namespace Viper {
 
     void Application::PushLayer(Layers::Layer* layer) {
         m_Window->PushLayer( layer );
+        layer->OnAttach();
     };
 
     void Application::PushOverlay(Layers::Layer* overlay) {
         m_Window->PushLayer( overlay );
+        overlay->OnAttach();
     };
 };
