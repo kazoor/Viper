@@ -12,6 +12,7 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/viper/application.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/window/window.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/shaders/shader/shader.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/vertexbuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/indexbuffer.cpp
@@ -20,9 +21,15 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/linebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/sprite2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/imguieditor.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/scene.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/hierarchy.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/inspector.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/viewport.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/filexplorer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/scenelayer.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/component.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/transform.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/spriterenderer.cpp
@@ -32,13 +39,17 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gameobject.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/camera.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gom.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/input.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/inputhandler/inputhandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/mouse/mouseevents.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/globals/global.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/physics/physics2d.cpp
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/scene.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/sceneentity.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_demo.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_draw.cpp
