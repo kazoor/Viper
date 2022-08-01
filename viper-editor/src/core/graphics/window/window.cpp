@@ -5,10 +5,10 @@
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
 #include "window.hpp"
-#include "../../util/input/inputhandler/inputhandler.hpp"
-#include "../../imguieditor/imguieditor.hpp"
-#include "../../imguieditor/scene/scene.hpp"
-#include "../../util/input/mouse/mouseevents.hpp"
+#include <util/input/inputhandler/inputhandler.hpp>
+#include <util/input/mouse/mouseevents.hpp>
+#include <imguieditor/imguieditor.hpp>
+#include <imguieditor/scene/scenelayer.hpp>
 #include <thread>
 
 namespace Viper::Graphics {

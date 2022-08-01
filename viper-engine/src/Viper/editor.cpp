@@ -1,7 +1,7 @@
 #include "editor.hpp"
 #include <viper/application.hpp>
 #include <imguieditor/imguieditor.hpp>
-#include <imguieditor/scene/scene.hpp>
+#include <imguieditor/scene/scenelayer.hpp>
 
 class CTest : public Viper::Application {
 public:
@@ -9,8 +9,8 @@ public:
     };
 
     void ApplyLayers(void* appcontext) override {
-        PushOverlay(new Viper::ImGuiEditor(appcontext));
-        PushLayer(new Viper::Scene(appcontext));
+        //PushOverlay(new Viper::ImGuiEditor(appcontext));
+        PushLayer(new Viper::SceneLayer(appcontext));
     };
 };
 int main() {
