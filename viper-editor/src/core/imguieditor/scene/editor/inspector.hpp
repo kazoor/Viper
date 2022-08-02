@@ -3,14 +3,14 @@
 #include <util/timer/timestep.hpp>
 #include <scene/scene.hpp>
 
-namespace Viper::Editor {
+namespace Viper {
     class SceneInspector {
     public:
         SceneInspector() = default;
-        SceneInspector(const Ref< Scene >& SceneContext );
+        SceneInspector(Scene* SceneContext );
 
         void OnImGuiRender( Timestep::Timestep ts);
     private:
-        Ref< Scene > m_Context;
+        Scene* m_Context;
     };
 };

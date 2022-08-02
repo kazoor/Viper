@@ -48,9 +48,9 @@ namespace Viper {
         float AspectRatio;
 
 
-        Editor::SceneFilexplorer m_Filexplorer;
-        Editor::SceneHierarchy m_Hierarchy;
-        Editor::SceneInspector m_Inspector;
-        Editor::SceneViewport m_Viewport;
+        SceneFilexplorer m_Filexplorer;
+        SceneHierarchy m_Hierarchy;
+        SceneInspector m_Inspector;
+        SceneViewport m_Viewport;
     };
 }
