@@ -7,7 +7,7 @@
 #include <scene/sceneentity.hpp>
 #include <scene/scene.hpp>
 
-static void ImGuiTransform3F(const std::string& string, glm::vec3& values, float reset_value = 0.0f) {
+static void imgui_gizmo_transform(const std::string& string, glm::vec3& values, float reset_value = 0.0f) {
     ImGui::Columns(2, std::string("##").append(string).c_str( ), false);
     ImGui::SetColumnWidth(0, 70.0f);
     ImGui::Text( string.c_str( ) );
@@ -52,12 +52,18 @@ namespace Viper {
             if( m_Context->m_selected_entity != entt::null ) {
                 Entity ent = { m_Context->m_selected_entity, m_Context };
 
-                if( ent.has< tag_t >( ) )
-                    ImGui::Text("Component name: %s", ent.get< tag_t >( ).tag.c_str( ) );
+                if( ent.has< tag_t >( ) ) {
+                    auto name = ent.get< tag_t >( );
+                    ImGui::Text("Component name: %s", name.tag.c_str( ) );
+                };
 
-                if( ent.has< transform_t >( ) )
-                    ImGuiTransform3F("position", ent.get< transform_t >( ).pos, 0.0 );
-                    //ImGui::Text("has transform.\n");
+                if( ent.has< transform_t >( ) ) {
+                    auto &[pos, scale, rot] = ent.get< transform_t >( );
+
+                    imgui_gizmo_transform("Position", pos, 0.0 );
+                    imgui_gizmo_transform("Scale", scale, 0.0 );
+                    imgui_gizmo_transform("Rotation", rot, 0.0 );
+                };
             };
             ImGui::End();
         };

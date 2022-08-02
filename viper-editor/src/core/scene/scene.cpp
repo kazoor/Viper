@@ -26,7 +26,7 @@ namespace Viper {
             auto [t, tr] = view.get< transform_t, tag_t >( entity );
 
             const auto& name = tr.tag.c_str( );
-            printf("name: %s :: %.2f %.2f %.2f\n", name, t.pos.x, t.pos.y, t.pos.z );
+            printf("name: %s :: %.2f %.2f %.2f\n", name, t.position.x, t.position.y, t.position.z );
         };
     };
 
