@@ -87,25 +87,4 @@ namespace Viper::Components {
 
         enabled = true;
     };
-
-    void Transform::Editor() {
-        ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        
-        if(ImGui::TreeNodeEx( " " ICON_FA_CUBES "  Transform", t)) {
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
-            ImGui::Checkbox("Enabled##Transform", &enabled);
-            ImGui::PopStyleVar();
-
-            if(!enabled)
-                ImGui::BeginDisabled();
-
-            ImGuiTransform3F("Position", position);
-            ImGuiTransform3F("Rotation", rotation);
-            ImGuiTransform3F("Scale", scale, 1.0f);
-            
-            if(!enabled)
-                ImGui::EndDisabled();
-            ImGui::TreePop();
-        };
-    };
 };
