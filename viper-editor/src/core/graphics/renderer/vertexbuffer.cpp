@@ -19,6 +19,9 @@ namespace Viper::Renderer {
 
         glEnableVertexAttribArray(3);
         glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof( RendererAPI::Vertex_t ), ( const void* )offsetof(RendererAPI::Vertex_t, texindex));
+
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof( RendererAPI::Vertex_t ), ( const void* )offsetof(RendererAPI::Vertex_t, tilefactor));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 

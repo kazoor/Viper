@@ -20,6 +20,7 @@ static const size_t hash_font_otf = std::hash< std::string >( )( ".otf" );
 struct FileManager_t {
     std::string filename;
     std::string fileext;
+    std::string relative_path;
 };
 
 constexpr const char* s_Directory = "resources";
@@ -38,6 +39,7 @@ namespace Viper {
                     std::string path = p.path().string();
                     auto filename = p.path().filename().string();
                     auto filename_ext = p.path().filename().extension().string();
+                    auto filename_rel = p.path().relative_path().string();
 
                     if( p.is_directory()) {
                         if(ImGui::Button(
@@ -46,7 +48,7 @@ namespace Viper {
                             m_CurrentDir /= p.path().filename();
                         };
                     } else {
-                        m_FilesWithinFolder.push_back( { filename, filename_ext } );
+                        m_FilesWithinFolder.push_back( { filename, filename_ext, filename_rel } );
                     }
                 };
             }
@@ -59,11 +61,11 @@ namespace Viper {
                     m_CurrentDir = m_CurrentDir.parent_path();
                 }
             };
-
+            int imgui_next_id = 0;
             for( auto f : m_FilesWithinFolder ) {
                 const size_t m_file_hash = std::hash< std::string >( )( f.fileext );
-
                 std::string sz_StringSerialized;
+
                 if( m_file_hash == hash_frag || m_file_hash == hash_vert )
                     sz_StringSerialized = VIPER_FORMAT_STRING(ICON_FA_WHEELCHAIR " %s :: %s", f.filename.c_str(), f.fileext.c_str());//ImGui::Text(ICON_FA_WHEELCHAIR " %s :: %s", f.filename.c_str(), f.fileext.c_str());
                 else if( m_file_hash == hash_png || m_file_hash == hash_jpg )
@@ -72,8 +74,16 @@ namespace Viper {
                     sz_StringSerialized = VIPER_FORMAT_STRING( ICON_FA_FONT " %s :: %s", f.filename.c_str(), f.fileext.c_str() );//ImGui::Text(ICON_FA_FONT " %s :: %s", f.filename.c_str(), f.fileext.c_str());
                 else
                     sz_StringSerialized = VIPER_FORMAT_STRING( ICON_FA_FILE " %s :: %s", f.filename.c_str(), f.fileext.c_str() );//ImGui::Text(ICON_FA_FILE " %s :: %s", f.filename.c_str(), f.fileext.c_str());
-            
-                ImGui::Text(sz_StringSerialized.c_str());
+                
+                ImGui::Text("%s -> rel: %s", sz_StringSerialized.c_str(), f.relative_path.c_str() );
+                ImGui::PushID(imgui_next_id++);
+                ImGui::Button("DragSource");
+                if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                    const char* relative_path_location = f.relative_path.c_str( );
+                    ImGui::SetDragDropPayload("FILE_EXPLORER_DRAG_DROP", relative_path_location, ( strlen(relative_path_location) + 1 ) * sizeof( char* ) );
+                    ImGui::EndDragDropSource();
+                };
+                ImGui::PopID();
             };
             ImGui::Columns(1);
             

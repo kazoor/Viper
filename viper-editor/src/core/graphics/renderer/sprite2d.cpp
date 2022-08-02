@@ -11,8 +11,8 @@ namespace Viper::Renderer {
     Sprite2D::Sprite2D( const std::string& path, int width, int height ) : Path(path), Width( width ), Height( height ) {
         glGenTextures(1, &SpriteID);
         glBindTexture(GL_TEXTURE_2D, SpriteID);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         int m_TexWidth, m_TexHeight, m_TexChannels;
@@ -34,12 +34,12 @@ namespace Viper::Renderer {
     Sprite2D::Sprite2D( int width, int height ) {
         glGenTextures(1, &SpriteID);
         glBindTexture(GL_TEXTURE_2D, SpriteID);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+       
         glBindTexture(GL_TEXTURE_2D, 0);
 
         Width = width;
@@ -47,6 +47,11 @@ namespace Viper::Renderer {
     };
     
     Sprite2D::~Sprite2D() {
+        Delete();
+        //glDeleteTextures(1, &SpriteID);
+    };
+
+    void Sprite2D::Delete() {
         glDeleteTextures(1, &SpriteID);
     };
 
@@ -81,5 +86,24 @@ namespace Viper::Renderer {
 
     void Sprite2D::Bind( uint32_t slot ) {
         glBindTextureUnit( slot, SpriteID );
+    };
+
+    void Sprite2D::Change( const std::string& location ) {
+        Bind();
+        Path = location;
+        int m_TexWidth, m_TexHeight, m_TexChannels;
+        unsigned char* m_TextureData = stbi_load(location.c_str( ), &m_TexWidth, &m_TexHeight, NULL, 4);
+
+        if( m_TextureData ) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_TexWidth, m_TexHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_TextureData);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        };
+
+        stbi_image_free(m_TextureData);
+        Unbind();
+    };
+
+    std::string Sprite2D::GetCurrentPath() {
+        return Path;
     };
 };

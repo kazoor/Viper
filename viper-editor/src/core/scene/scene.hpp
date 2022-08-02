@@ -17,6 +17,8 @@ namespace Viper {
         
         void OnUpdate( Timestep::Timestep ts );
 
+        void OnPhysics( );
+
         void ResetViewport( );
     private:
         friend class Entity;
