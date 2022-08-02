@@ -5,6 +5,7 @@
 #include <fstream>
 #include <glm/gtc/matrix_transform.hpp> // ortho
 #include <graphics/shaders/shader/shader.hpp>
+#include <util/timer/timer.hpp>
 
 #include "vertexarray.hpp"
 #include "vertexbuffer.hpp"
@@ -113,10 +114,12 @@ namespace Viper::Renderer {
 
         // så detta är samma logik som quad transforms.
         // -0.5f från quadtransform är 0.0f här. 0.5f från quadtransform är 1.0f här.
-        s_Renderer.m_TextureTransform[0] = glm::vec2(0.0f, 0.0f);
-        s_Renderer.m_TextureTransform[1] = glm::vec2(1.0f, 0.0f);
-        s_Renderer.m_TextureTransform[2] = glm::vec2(1.0f, 1.0f);
-        s_Renderer.m_TextureTransform[3] = glm::vec2(0.0f, 1.0f);
+        // AOR: Vi blev tvungna att manuellt flippa texturen. det finns stbi_flip_vertically_on_load( bool ).
+        // men grejen är det att då kommer den flippa texturen i Inspector istället.
+        s_Renderer.m_TextureTransform[3] = glm::vec2(0.0f, 0.0f);
+        s_Renderer.m_TextureTransform[2] = glm::vec2(1.0f, 0.0f);
+        s_Renderer.m_TextureTransform[1] = glm::vec2(1.0f, 1.0f);
+        s_Renderer.m_TextureTransform[0] = glm::vec2(0.0f, 1.0f);
 
     };
 
@@ -134,7 +137,7 @@ namespace Viper::Renderer {
             glBufferSubData(GL_ARRAY_BUFFER, 0, size_ptr, s_Renderer.m_VertexBuffer );
 
             for (uint32_t i = 0; i < s_Renderer.m_TextureSlotIndex; i++) {
-		    		s_Renderer.m_TextureSlots[i]->Bind(i);
+		    	s_Renderer.m_TextureSlots[i]->Bind(i);
             }
 
             s_Renderer.m_QuadShader->Use();
@@ -187,6 +190,7 @@ namespace Viper::Renderer {
             s_Renderer.m_VertexBufferPtr->color = color;
             s_Renderer.m_VertexBufferPtr->texcoords = s_Renderer.m_TextureTransform[ i ];
             s_Renderer.m_VertexBufferPtr->texindex = ( float )0;
+            s_Renderer.m_VertexBufferPtr->tilefactor = 1.0f;
             s_Renderer.m_VertexBufferPtr++;
         };
         s_Renderer.m_IndexCount += 6;
@@ -200,34 +204,34 @@ namespace Viper::Renderer {
         DrawQuad(m_Transform, color);
     };
 
-    void Renderer2D::DrawTexture( const glm::vec2& pos, const Ref< Sprite2D >& texture ) {
+    void Renderer2D::DrawTexture( const glm::vec2& pos, const Ref< Sprite2D >& texture, RendererAPI::Color color, const float tiling ) {
             auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f)) 
              * glm::scale(glm::mat4(1.0f), { 1.0f, 1.0f, 1.0f } );
 
-        DrawTexture(m_Transform, texture);
+        DrawTexture(m_Transform, texture, color, tiling);
     };
 
-    void Renderer2D::DrawTexture( const glm::vec2& pos, const glm::vec2& size, const Ref< Sprite2D >& texture ) {
+    void Renderer2D::DrawTexture( const glm::vec2& pos, const glm::vec2& size, const Ref< Sprite2D >& texture, RendererAPI::Color color, const float tiling ) {
             auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f)) 
              * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f } );
 
-        DrawTexture(m_Transform, texture);
+        DrawTexture(m_Transform, texture, color, tiling);
     };
 
-    void Renderer2D::DrawRotatedTexture( const glm::vec2& pos, float radians, const Ref< Sprite2D >& texture ) {
+    void Renderer2D::DrawRotatedTexture( const glm::vec2& pos, float radians, const Ref< Sprite2D >& texture, RendererAPI::Color color, const float tiling ) {
         auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f)) 
             * glm::rotate(glm::mat4(1.0f), radians, { 0.0f,0.0f,1.0f } )
             * glm::scale(glm::mat4(1.0f), { 1.0f, 1.0f, 1.0f } );
         
-        DrawTexture(m_Transform, texture);
+        DrawTexture(m_Transform, texture, color, tiling);
     };
 
-    void Renderer2D::DrawRotatedTexture( const glm::vec2& pos, const glm::vec2& size, float radians, const Ref< Sprite2D >& texture ) {
+    void Renderer2D::DrawRotatedTexture( const glm::vec2& pos, const glm::vec2& size, float radians, const Ref< Sprite2D >& texture, RendererAPI::Color color, const float tiling ) {
         auto m_Transform = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f)) 
             * glm::rotate(glm::mat4(1.0f), radians, { 0.0f,0.0f,1.0f } )
             * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f } );
         
-        DrawTexture(m_Transform, texture);
+        DrawTexture(m_Transform, texture, color, tiling);
     };
     
     void Renderer2D::DrawQuad( const glm::vec2& pos, const glm::vec2& size, RendererAPI::Color color ) {
@@ -266,7 +270,7 @@ namespace Viper::Renderer {
         s_Renderer.m_TextureSlotIndex = 1;
     };
 
-    void Renderer2D::DrawTexture( const glm::mat4& transform, const Ref< Sprite2D >& texture ) {
+    void Renderer2D::DrawTexture( const glm::mat4& transform, const Ref< Sprite2D >& texture, RendererAPI::Color color, const float tiling ) {
         float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Renderer.m_TextureSlotIndex; i++)
 		{
@@ -289,9 +293,10 @@ namespace Viper::Renderer {
         
         for( int i = 0; i < 4; i++ ) {
             s_Renderer.m_VertexBufferPtr->position = transform * s_Renderer.m_QuadTransform[ i ];
-            s_Renderer.m_VertexBufferPtr->color = RendererAPI::Color::White();
+            s_Renderer.m_VertexBufferPtr->color = color;
             s_Renderer.m_VertexBufferPtr->texcoords = s_Renderer.m_TextureTransform[ i ];
             s_Renderer.m_VertexBufferPtr->texindex = ( float )textureIndex;
+            s_Renderer.m_VertexBufferPtr->tilefactor = tiling;
             s_Renderer.m_VertexBufferPtr++;
         };
         s_Renderer.m_IndexCount += 6;

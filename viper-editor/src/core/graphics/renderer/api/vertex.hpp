@@ -9,6 +9,7 @@ namespace Viper::RendererAPI {
         Color color;
         glm::vec2 texcoords;
         float texindex;
+        float tilefactor;
     };
 
     struct LineVertex_t {

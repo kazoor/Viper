@@ -18,6 +18,10 @@ namespace Viper::Renderer {
         void Unbind();
         void Bind( uint32_t slot );
         void SetData( void* data, uint32_t size );
+        void Delete();
+        void Change( const std::string& location );
+
+        std::string GetCurrentPath();
     private:
         int Width;
         int Height;

@@ -35,7 +35,6 @@ namespace Viper {
 
     void Application::OnEvent(Events::Event& e) {
         //m_Window->OnEvent(e);
-        printf("event: %s\n", e.GetName());
         m_Window->OnEvent(e);
      };
 

@@ -34,10 +34,10 @@ namespace Viper {
     };
 
     void SceneHierarchy::OnImGuiRenderItems( Timestep::Timestep ts ) {
-        auto view = m_Context->m_register.view< Viper::tag_t >( );
+        auto view = m_Context->m_register.view< TagComponent >( );
 
         for( auto entity : view ) {
-            auto tag_component = view.get< Viper::tag_t >( entity );
+            auto tag_component = view.get< TagComponent >( entity );
 
             ImGuiTreeNodeFlags flag = ( ( m_Context->m_selected_entity == entity ) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
             bool is_open = ImGui::TreeNodeEx( tag_component.tag.c_str( ), flag, tag_component.tag.c_str( ) );

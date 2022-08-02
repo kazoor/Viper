@@ -20,12 +20,12 @@ namespace Viper::Renderer {
         static void DrawQuadRotated( const glm::vec2& pos, float radians, RendererAPI::Color color );
         static void DrawQuadRotated( const glm::vec2& pos, const glm::vec2& size, float radians, RendererAPI::Color color );
 
-        static void DrawTexture( const glm::mat4& transform, const Ref< Sprite2D >& texture );
-        static void DrawTexture( const glm::vec2& pos, const Ref< Sprite2D >& texture );
-        static void DrawTexture( const glm::vec2& pos, const glm::vec2& size, const Ref< Sprite2D >& texture );
+        static void DrawTexture( const glm::mat4& transform, const Ref< Sprite2D >& texture, RendererAPI::Color color, const float tiling = 1.0f );
+        static void DrawTexture( const glm::vec2& pos, const Ref< Sprite2D >& texture, RendererAPI::Color color, const float tiling = 1.0f);
+        static void DrawTexture( const glm::vec2& pos, const glm::vec2& size, const Ref< Sprite2D >& texture, RendererAPI::Color color, const float tiling = 1.0f );
 
-        static void DrawRotatedTexture( const glm::vec2& pos, float radians, const Ref< Sprite2D >& texture );
-        static void DrawRotatedTexture( const glm::vec2& pos, const glm::vec2& size, float radians, const Ref< Sprite2D >& texture );
+        static void DrawRotatedTexture( const glm::vec2& pos, float radians, const Ref< Sprite2D >& texture, RendererAPI::Color color, const float tiling = 1.0f);
+        static void DrawRotatedTexture( const glm::vec2& pos, const glm::vec2& size, float radians, const Ref< Sprite2D >& texture, RendererAPI::Color color, const float tiling = 1.0f );
 
         static void DrawLine( const glm::vec3& p0, const glm::vec3& p1, RendererAPI::Color color );
 
