@@ -1,6 +1,7 @@
 #pragma once
 #include <cstring>
 #include <viper/viper.hpp>
+#include <glm/vec4.hpp>
 
 namespace Viper::RendererAPI {
     struct VIPER_API Color {
@@ -57,6 +58,10 @@ namespace Viper::RendererAPI {
 
         inline bool operator!=( const Color& color ) {
             return ( colors != color.colors );
+        };
+
+        inline operator glm::vec4() const {
+            return glm::vec4( colors[0], colors[1], colors[2], colors[3] );
         };
     };
 };

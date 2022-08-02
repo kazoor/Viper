@@ -1,6 +1,11 @@
 #pragma once
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <string.h>
+
+#define VIPER_INCOMPLETE_COMP( CompDef ) struct CompDef { \
+    CompDef() { printf("error, comp not complete for " #CompDef ); } \
+};
 
 namespace Viper {
     struct transform_t {
@@ -21,4 +26,17 @@ namespace Viper {
 
         std::string tag;
     };
+
+    struct spriterenderer_t {
+        spriterenderer_t() = default;
+        spriterenderer_t( const spriterenderer_t& o ) = default;
+        spriterenderer_t( const glm::vec4& col ) : color( col ) { };
+
+        glm::vec4 color;
+    };
+
+    VIPER_INCOMPLETE_COMP(rigidbody2d_t)
+    VIPER_INCOMPLETE_COMP(boxcollider2d_t)
+    VIPER_INCOMPLETE_COMP(camera_t)
+    VIPER_INCOMPLETE_COMP(nativescript_t)
 };

@@ -7,6 +7,8 @@
 #include <scene/sceneentity.hpp>
 #include <scene/scene.hpp>
 
+#include <glm/gtc/type_ptr.hpp>
+
 static void imgui_gizmo_transform(const std::string& string, glm::vec3& values, float reset_value = 0.0f) {
     ImGui::Columns(2, std::string("##").append(string).c_str( ), false);
     ImGui::SetColumnWidth(0, 70.0f);
@@ -63,6 +65,20 @@ namespace Viper {
                     imgui_gizmo_transform("Position", pos, 0.0 );
                     imgui_gizmo_transform("Scale", scale, 0.0 );
                     imgui_gizmo_transform("Rotation", rot, 0.0 );
+                };
+
+                if( ent.has< spriterenderer_t >( ) ) {
+                    auto& sprite = ent.get< spriterenderer_t >( );
+                    
+                    ImGui::ColorPicker3( "##SprColor", glm::value_ptr(sprite.color) );
+                };
+
+                if(ImGui::BeginPopupContextWindow("##AddComponent", 1, false)) {
+                    if( ImGui::MenuItem("SpriteRenderer") && !ent.has< spriterenderer_t >( ) ) {
+                        ent.add< spriterenderer_t >( glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+                    };
+
+                    ImGui::EndPopup();
                 };
             };
             ImGui::End();
