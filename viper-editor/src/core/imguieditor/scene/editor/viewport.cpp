@@ -6,8 +6,8 @@
 #include <viper/base.hpp>
 #include <ImGui/imgui.h>
 
-namespace Viper::Editor {
-    SceneViewport::SceneViewport( const Ref< Scene >& SceneContext, void* WindowContext ) : m_Context( SceneContext ), m_WindowContext( WindowContext ) { };
+namespace Viper {
+    SceneViewport::SceneViewport( Scene* SceneContext, void* WindowContext ) : m_Context( SceneContext ), m_WindowContext( WindowContext ) { };
 
     // FBO Texture, should be rendered here.
     void SceneViewport::OnImGuiRender( Timestep::Timestep ts ) {
@@ -44,7 +44,7 @@ namespace Viper::Editor {
                     ImVec2(SceneSize.x, SceneSize.y));
 
             if (ImGui::IsItemClicked())
-                Globals::Editor::SelectedObject = -1;
+                m_Context->ResetViewport();
 
             ImGui::End();
         };

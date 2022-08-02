@@ -1,7 +1,7 @@
 #pragma once
 #include <util/timer/timestep.hpp>
 
-namespace Viper::Editor {
+namespace Viper {
     class SceneFilexplorer {
     public:
         SceneFilexplorer() = default;

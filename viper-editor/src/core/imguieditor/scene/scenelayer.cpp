@@ -29,14 +29,10 @@ namespace Viper {
 
         m_ActiveScene = CreateRef< Scene >( );
 
-        auto temp = m_ActiveScene->CreateEntity();
-        Entity entity = { temp, m_ActiveScene.get() };
-        temp = entity;
-
-        m_Viewport = Editor::SceneViewport( m_ActiveScene, context );
-        m_Hierarchy = Editor::SceneHierarchy( m_ActiveScene );
-        m_Inspector = Editor::SceneInspector( m_ActiveScene );
-        m_Filexplorer = Editor::SceneFilexplorer();
+        m_Viewport = SceneViewport( m_ActiveScene.get(), context );
+        m_Hierarchy = SceneHierarchy( m_ActiveScene.get() );
+        m_Inspector = SceneInspector( m_ActiveScene.get() );
+        m_Filexplorer = SceneFilexplorer();
 
         OnImGuiInit();
     };

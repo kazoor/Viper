@@ -24,7 +24,7 @@ struct FileManager_t {
 
 constexpr const char* s_Directory = "resources";
 
-namespace Viper::Editor {
+namespace Viper {
     void SceneFilexplorer::OnImGuiRender( Timestep::Timestep ts ) {
         if( ImGui::Begin("File Explorer")) {
             Timer::Timer ts;
@@ -86,15 +86,15 @@ namespace Viper::Editor {
     // <!-- Creating a new file for this would be necessary. --!>
     void SceneFilexplorer::OnImGuiConsole( Timestep::Timestep ts ) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
-            if(ImGui::Begin(ICON_FA_TERMINAL "  Debug Console")) {
-                for( auto info : Globals::ConsoleContext::GetLogs( ) ) {
-                    auto color = Globals::ConsoleContext::GetConsoleColor( info.Flag );
-                    ImGui::TextColored(ImVec4(color[0], color[1], color[2], 1.0f), info.StringType.c_str( ) );
-                    ImGui::Text(info.ConsoleMessage.c_str( ) );
-                    ImGui::Separator();
-                }
-                ImGui::End();
-            };
-            ImGui::PopStyleVar();
-    }
+        if(ImGui::Begin(ICON_FA_TERMINAL "  Debug Console")) {
+            for( auto info : Globals::ConsoleContext::GetLogs( ) ) {
+                auto color = Globals::ConsoleContext::GetConsoleColor( info.Flag );
+                ImGui::TextColored(ImVec4(color[0], color[1], color[2], 1.0f), info.StringType.c_str( ) );
+                ImGui::Text(info.ConsoleMessage.c_str( ) );
+                ImGui::Separator();
+            }
+            ImGui::End();
+        };
+        ImGui::PopStyleVar();
+    };
 };
