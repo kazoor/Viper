@@ -11,12 +11,8 @@ namespace Viper::Components {
         Rigidbody2D();
 
         Rigidbody2D(GameObject* parent);
-
-        void Awake();
-        
+       
         void Update(Timestep::Timestep ts);
-
-        void Editor();
 
         void AddForce( const glm::vec3& force );
 

@@ -19,9 +19,6 @@ namespace Viper::Components {
         enabled = true;
     };
 
-    void Camera::Awake() {
-    };
-
     float Lerp( float a, float b, float t ) {
         return a + ( b - a ) * t;
     };
@@ -47,16 +44,5 @@ namespace Viper::Components {
         
         tr.position.x += direction_x * 1.0f * ts.deltatime() * 3.0f;
         tr.position.y += direction_y * 1.0f * ts.deltatime() * 3.0f;
-    };
-
-    void Camera::Editor() {
-        ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        if(ImGui::TreeNodeEx( " " ICON_FA_CAMERA "  Camera", t)) {
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
-            ImGui::Checkbox("Enabled##Camera", &enabled);
-            ImGui::PopStyleVar();
-
-            ImGui::TreePop();
-        };
     };
 };
