@@ -13,8 +13,8 @@ namespace Viper {
 
     Entity Scene::CreateEntity( const std::string& tag_name ) {
         Entity ent = { m_register.create(), this };
-        ent.add< tag_t >( tag_name );
-        ent.add< transform_t >( 
+        ent.add< TagComponent >( tag_name );
+        ent.add< TransformComponent >( 
                 glm::vec3( 1.0f, 1.0f, 0.0f ),
                 glm::vec3( 1.0f, 1.0f, 0.0f ),
                 glm::vec3( 0.0f, 0.0f, 0.0f ) );
@@ -26,14 +26,25 @@ namespace Viper {
     };
 
     void Scene::OnUpdate(Timestep::Timestep ts) {
-        auto view = m_register.view< transform_t, spriterenderer_t >( );
+        auto view = m_register.view< TransformComponent, SpriteRendererComponent >( );
 
         for( auto entity : view ) {
-            auto [tr, spr] = view.get< transform_t, spriterenderer_t >( entity );
+            auto [tr, spr] = view.get< TransformComponent, SpriteRendererComponent >( entity );
 
             //printf("name: %.2f %.2f %.2f\n", t.position.x, t.position.y, t.position.z );
-            Renderer2D::DrawQuad( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, Color(spr.color.x, spr.color.y, spr.color.z, spr.color.w));
+            if( spr.sprite_texture.get( ) ) {
+                Renderer2D::DrawTexture( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, spr.sprite_texture, Color(spr.color.x, spr.color.y, spr.color.z, spr.color.w), spr.tiling );
+            }
+            else
+                Renderer2D::DrawQuad( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, Color(spr.color.x, spr.color.y, spr.color.z, spr.color.w));
         };
+    };
+
+    void Scene::OnPhysics() {
+        //auto view = m_register.view< TransformComponent, Rigidbody2DComponent >( );
+        //for( auto entity : view ) {
+        //    auto [tr, rg] = view.get< TransformComponent, Rigidbody2DComponent >( entity );
+        //};
     };
 
     void Scene::ResetViewport( ) {
