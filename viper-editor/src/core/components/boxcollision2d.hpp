@@ -23,8 +23,6 @@ namespace Viper::Components {
 
         void Update(Timestep::Timestep ts);
 
-        void Editor() override;
-
         bool IsColliding(GameObject *Box2);
     private:
         Transform Tr;

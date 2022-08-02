@@ -30,9 +30,6 @@ namespace Viper::Components {
         boundary = true;
     };
 
-    void Rigidbody2D::Awake() {
-    };
-
     void Rigidbody2D::Update(Timestep::Timestep ts) {
         if(!enabled) {
             velocity = glm::vec3( 0.0f, 0.0f, 0.0f );
@@ -52,22 +49,5 @@ namespace Viper::Components {
 
     void Rigidbody2D::AddForce( const glm::vec3& force ) {
         velocity = force;
-    };
-
-    void Rigidbody2D::Editor() {
-        ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        if(ImGui::TreeNodeEx( " " ICON_FA_GOLF_BALL "  Rigidbody2D", t)) {
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
-            ImGui::Checkbox("Enabled##Rigidbody2D", &enabled);
-            ImGui::PopStyleVar();
-
-            ImGui::DragFloat( "Force", &m_Force );
-            ImGui::DragFloat( "Mass", &m_Mass );
-            ImGui::DragFloat( "Gravity", &m_Gravity );
-
-            ImGui::Checkbox( "Boundary", &boundary);
-
-            ImGui::TreePop();
-        };
     };
 };
