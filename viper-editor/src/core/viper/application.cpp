@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include "application.hpp"
-#include <graphics/renderer/renderer.hpp>
+//#include <graphics/renderer/renderer.hpp>
 #include <util/globals/global.hpp>
 
 namespace Viper {

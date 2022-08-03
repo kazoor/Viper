@@ -29,9 +29,6 @@ namespace Viper::Components {
         if(!enabled)
             return;
 
-        Renderer::Renderer2D::DrawQuad(
-        glm::vec2(tr.position.x, tr.position.y),
-        glm::vec2(tr.scale.x, tr.scale.y),
-        RendererAPI::Color(color.x, color.y, color.z, color.w));
+        
     };
 };
