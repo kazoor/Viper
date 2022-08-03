@@ -39,6 +39,7 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gom.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/jsonfilehandler/jsonfilehandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/inputhandler/inputhandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/mouse/mouseevents.cpp
@@ -99,9 +100,9 @@ target_link_libraries(Viper PUBLIC spdlog)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/entt")
 
 # Add nlohmann/json subdirectory and link it
-#message(STATUS "Compiling & Linking json")
-#add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/json")
-#target_link_libraries(Viper PUBLIC json)
+message(STATUS "Compiling & Linking json")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/json")
+target_link_libraries(Viper PUBLIC nlohmann_json)
 
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
