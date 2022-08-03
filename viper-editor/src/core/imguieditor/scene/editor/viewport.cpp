@@ -16,11 +16,17 @@ namespace Viper {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::Begin(VIPER_TITLE, NULL,
                          ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove)) {
-            ImGui::SetWindowPos(ImVec2(0.0f, 0.0f));
+            ImGui::SetWindowPos(ImVec2(0.0f, 20.0f));
             ImGui::SetWindowSize(
-                    ImVec2(static_cast< float >( windowdata.Width ), static_cast< float >( windowdata.Height )));
+                    ImVec2(static_cast< float >( windowdata.Width ), static_cast< float >( windowdata.Height ) - 20.0f ));
             static auto m_dock_space = ImGui::GetID( "m_view_id" );
             ImGui::DockSpace(m_dock_space, ImVec2(0, 0));
+
+            if(ImGui::BeginMenuBar()) {
+                if(ImGui::MenuItem("sss"))
+                    ImGui::Text("xxx");
+                ImGui::EndMenuBar();
+            };
             ImGui::End();
         }
         ImGui::PopStyleVar();

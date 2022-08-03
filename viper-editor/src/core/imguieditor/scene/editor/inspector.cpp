@@ -120,5 +120,13 @@ namespace Viper {
             ImGui::End();
         };
         ImGui::PopStyleVar();
+
+        ImGui::ShowDemoWindow();
+
+        if( ImGui::BeginMainMenuBar()) {
+            if(ImGui::MenuItem("hello"))
+                ImGui::Text("ss");
+            ImGui::EndMainMenuBar();
+        };
     };
 };
