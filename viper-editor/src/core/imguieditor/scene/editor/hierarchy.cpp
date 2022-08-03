@@ -1,12 +1,13 @@
 #include "hierarchy.hpp"
 
-#include <graphics/renderer/renderer.hpp>
+//#include <graphics/renderer/renderer.hpp>
 #include <imguieditor/fontawesome5.hpp>
 #include <ImGui/imgui.h>
 
 #include <scene/entitycomponents.hpp>
 #include <scene/sceneentity.hpp>
 #include <scene/scene.hpp>
+#include <graphics/renderer/renderer2d.hpp>
 
 namespace Viper {
     static char buff[80] = { '\0' };
@@ -17,7 +18,12 @@ namespace Viper {
 
         if (ImGui::Begin(ICON_FA_SITEMAP "  Hierarchy") ) {
             ImGui::Text("engine fps: %.2f, average %.3fms/frame", 1.0f / ts.seconds(), ts.milliseconds());
-
+            auto stats = Renderer2D::GetStats();
+            ImGui::Text("draw calls: %d", stats.calls_this_frame);
+            ImGui::Text("max verts: %d", stats.max_vertices_allowed);
+            ImGui::Text("max indices: %d", stats.max_indices_allowed);
+            ImGui::Text("max quads: %d", stats.max_quads_allowed);
+            
             OnImGuiRenderItems( ts );
             if( ImGui::BeginPopupContextWindow(0, 1, false)) {
                 if(ImGui::MenuItem("Create Empty Entity"))

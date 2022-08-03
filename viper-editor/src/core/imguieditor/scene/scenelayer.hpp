@@ -8,7 +8,6 @@
 
 // graphics:
 #include <graphics/window/window.hpp>
-#include <graphics/renderer/sprite2d.hpp>
 #include <graphics/renderer/camera/orthographic_camera.hpp>
 
 #include <scene/scene.hpp>
@@ -40,8 +39,6 @@ namespace Viper {
     private:
         GLFWwindow* WindowContext;
         Renderer::OrthoGraphicCamera* m_Camera;
-        Ref< Renderer::Sprite2D > m_TexSprite;
-        Ref< Renderer::Sprite2D > m_TexSprite2;
         Ref< Scene > m_ActiveScene;
 
         float m_LastFrame = 0.0f;

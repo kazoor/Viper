@@ -81,39 +81,33 @@ namespace Viper {
 
                 if( ent.has< SpriteRendererComponent >( ) ) {
                     auto& sprite = ent.get< SpriteRendererComponent >( );
-                    ImGui::Button("DragDrop Target");
-                    //if(ImGui::BeginDragDropTarget()) {
-                    //    if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FILE_EXPLORER_DRAG_DROP") ) {
-                    //        const char* sz_output = ( const char* )payload->Data;
-                    //        m_Nullified = sz_output;
-                    //    }
-                    //    ImGui::EndDragDropTarget();
-                    //};
 
                     if(ImGui::TreeNodeEx(" " ICON_FA_PAINT_BRUSH "  SpriteRenderer", t)) {
                         ImGui::ColorEdit4("Sprite Color", glm::value_ptr(sprite.color));
-                        if(sprite.sprite_texture.get() == nullptr) {
+                         
+                        if(sprite.sprite.get() == nullptr) {
                             if(ImGui::Button("Bake Texture")) {
-                                sprite.sprite_texture = Renderer::Sprite2D::Create( "resources/textures/checkerboard.png", 64, 64 );
+                                sprite.sprite = Sprite2D::Create( "resources/textures/checkerboard.png" );
                             };
                         } else {
                             ImGui::DragFloat("Tiling", &sprite.tiling, 0.05f, 1.0f, 100.0f );
-                            ImGui::Image( reinterpret_cast< ImTextureID >( sprite.sprite_texture->GetSprite( ) ),
+                            ImGui::Image( reinterpret_cast< ImTextureID >( sprite.sprite->GetSprite( ) ),
                                 ImVec2(64.0f, 64.0f ) 
                             );
 
                             if(ImGui::BeginDragDropTarget()) {
                                 if( const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FILE_EXPLORER_DRAG_DROP") ) {
                                     const char* sz_output = ( const char* )payload->Data;
-                                    sprite.sprite_texture->Change( sz_output );
+                                    sprite.sprite->Change( sz_output );
                                 }
                                 ImGui::EndDragDropTarget();
                             };
 
                             if(ImGui::Button("Delete texture")) {
-                                sprite.sprite_texture.reset();
+                                sprite.sprite.reset();
                             }
                         };
+                        
                         ImGui::TreePop();
                     };
                 };
@@ -126,5 +120,13 @@ namespace Viper {
             ImGui::End();
         };
         ImGui::PopStyleVar();
+
+        ImGui::ShowDemoWindow();
+
+        if( ImGui::BeginMainMenuBar()) {
+            if(ImGui::MenuItem("hello"))
+                ImGui::Text("ss");
+            ImGui::EndMainMenuBar();
+        };
     };
 };
