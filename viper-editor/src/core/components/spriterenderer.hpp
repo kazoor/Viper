@@ -15,12 +15,8 @@ namespace Viper::Components {
         SpriteRenderer(GameObject* obj);
 
         SpriteRenderer(GameObject* obj, glm::vec4 col );
-
-        void Awake();
         
-        void Update(Timestep::Timestep ts);
-
-        void Editor();
+        void OnUpdate(Timestep::Timestep ts);
 
         glm::vec4 color;
     private:

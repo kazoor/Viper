@@ -24,29 +24,11 @@ namespace Viper::Components {
         enabled = true;
     };
 
-    void SpriteRenderer::Awake() {
-    };
-
-    void SpriteRenderer::Update(Timestep::Timestep ts) {
+    void SpriteRenderer::OnUpdate(Timestep::Timestep ts) {
         tr = object->GetComponent< Transform >( );
         if(!enabled)
             return;
 
-        Renderer::Renderer2D::DrawQuad(
-        glm::vec2(tr.position.x, tr.position.y),
-        glm::vec2(tr.scale.x, tr.scale.y),
-        RendererAPI::Color(color.x, color.y, color.z, color.w));
-    };
-
-    void SpriteRenderer::Editor() {
-        ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
-        if(ImGui::TreeNodeEx(" " ICON_FA_PAINT_BRUSH "  SpriteRenderer", t)) {
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
-            ImGui::Checkbox("Enabled##SpriteRenderer", &enabled);
-            ImGui::PopStyleVar();
-
-            ImGui::ColorEdit4("Sprite Color", glm::value_ptr(color));
-            ImGui::TreePop();
-        };
+        
     };
 };

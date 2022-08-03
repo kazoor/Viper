@@ -25,6 +25,7 @@ namespace Viper::Layers {
     void LayerStack::PopLayer(Layer *Lay) {
         auto It = std::find(Layers.begin(), Layers.end(), Lay);
         if (It != Layers.end()) {
+            Lay->OnDetach();
             Layers.erase(It);
             LayerInsert--;
         }
@@ -33,6 +34,7 @@ namespace Viper::Layers {
     void LayerStack::PopOverlay(Layer *Overlay) {
         auto It = std::find(Layers.begin(), Layers.end(), Overlay);
         if (It != Layers.end()) {
+            Overlay->OnDetach();
             Layers.erase(It);
         }
     }

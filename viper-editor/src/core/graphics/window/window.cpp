@@ -5,10 +5,11 @@
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
 #include "window.hpp"
-#include "../../util/input/inputhandler/inputhandler.hpp"
-#include "../../imguieditor/imguieditor.hpp"
-#include "../../imguieditor/scene/scene.hpp"
-#include "../../util/input/mouse/mouseevents.hpp"
+#include <util/input/inputhandler/inputhandler.hpp>
+#include <util/input/mouse/mouseevents.hpp>
+#include <imguieditor/imguieditor.hpp>
+#include <graphics/renderer/rendercommand.hpp>
+#include <imguieditor/scene/scenelayer.hpp>
 #include <thread>
 
 namespace Viper::Graphics {
@@ -24,14 +25,18 @@ namespace Viper::Graphics {
                 nullptr,
                 nullptr,
                 nullptr};
-
+//
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+        //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     };
 
     Window::~Window() {
         printf("bye bye window.\n");
+    };
+
+    static void glfwErrorHandleCallback( int errormode, const char* message ) {
+        printf("[GLFW ERROR!] Error Type: %d, Message: %s\n", errormode, message);
     };
 
     void Window::CreateEvents() {
@@ -92,6 +97,7 @@ namespace Viper::Graphics {
             Events::MouseScrollEvent event(xpos, ypos);
             data.EventCallback(event);
         });
+
 
         glfwSetKeyCallback(Context, [](GLFWwindow *Window, int Key, int ScanCode, int Action, int Mods) {
             VIPER_GET(Window);
@@ -158,13 +164,13 @@ namespace Viper::Graphics {
 
         glfwMakeContextCurrent(Context);
         glfwSetWindowUserPointer(Context, &WindowParams);
-        glfwSwapInterval(1); // Vsync on for now.
-
+        glfwSetErrorCallback(glfwErrorHandleCallback);
         if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
             spdlog::error("Failed to initialize GLAD");
         }
         CreateEvents();
         LayerStack = new Layers::LayerStack();
+        glfwSwapInterval(1); // Vsync on for now.
     };
 
     GLFWwindow* Window::CreateWindowEx(WindowParams_t Params) {
@@ -225,7 +231,7 @@ namespace Viper::Graphics {
         glViewport(0, 0, E.Width, E.Height);
         WindowParams.Width = E.Width;
         WindowParams.Height = E.Height;
-        Renderer::Renderer2D::ResizeFBO(E.Width, E.Height);
+        RenderCommand::Resize(E.Width, E.Height);
         return true;
     }
 
@@ -233,7 +239,7 @@ namespace Viper::Graphics {
         spdlog::info("WindowResize Event triggered! New size is {0}x{1}", E.Width, E.Height);
         WindowParams.Width = E.Width;
         WindowParams.Height = E.Height;
-        Renderer::Renderer2D::ResizeFBO(E.Width, E.Height);
+        RenderCommand::Resize(E.Width, E.Height);
         return true;
     }
 

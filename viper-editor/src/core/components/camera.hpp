@@ -12,11 +12,8 @@ namespace Viper::Components {
 
         Camera(GameObject* parent);
 
-        void Awake();
-        
         void Update(Timestep::Timestep ts);
-
-        void Editor();
+        
     private:
         GameObject* object;
     };

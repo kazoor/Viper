@@ -1,28 +1,33 @@
-cmake_minimum_required(VERSION  3.3)
+cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(Viper)
 
 add_compile_definitions(VIPER_API VIPER_EXPORT)
-
 #add_compile_definitions(VIPER_API)
 
 add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/viper/application.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/window/window.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/shaders/shader/shader.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/vertexbuffer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/indexbuffer.cpp
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/rendercommand.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer2d.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer3d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/framebuffer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/vertexarray.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/linebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/sprite2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/imguieditor.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/scene.cpp
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
+        #${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/imguieditor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/hierarchy.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/inspector.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/viewport.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/filexplorer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/scenelayer.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/component.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/transform.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/spriterenderer.cpp
@@ -32,12 +37,18 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gameobject.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/camera.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gom.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/jsonfilehandler/jsonfilehandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/inputhandler/inputhandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/mouse/mouseevents.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/globals/global.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/physics/physics2d.cpp
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/scene.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/sceneentity.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_demo.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_draw.cpp
@@ -57,8 +68,8 @@ set_target_properties( Viper
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         PREFIX ""
         OUTPUT_NAME "ViperPlayer"
+        CXX_STANDARD 20
         )
-
 
 # Make sure we also compile glad.c
 message(STATUS "Compiling glad")
@@ -85,10 +96,13 @@ message(STATUS "Compiling & Linking SPDLOG")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/spdlog")
 target_link_libraries(Viper PUBLIC spdlog)
 
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/entt")
+
 # Add nlohmann/json subdirectory and link it
-#message(STATUS "Compiling & Linking json")
-#add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/json")
-#target_link_libraries(Viper PUBLIC json)
+message(STATUS "Compiling & Linking json")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/json")
+target_link_libraries(Viper PUBLIC nlohmann_json)
 
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
@@ -97,6 +111,7 @@ target_include_directories(Viper SYSTEM PUBLIC
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/glm/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/entt/single_include/")
 
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/

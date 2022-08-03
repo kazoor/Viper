@@ -31,11 +31,7 @@ namespace Viper::Components {
             }
         }
     }
-
-    void BoxCollider2D::Editor() {
-
-    }
-
+    
     bool BoxCollider2D::IsColliding(GameObject *Box2) {
         if (!Box2->HasComponent<Transform>())
             return false;

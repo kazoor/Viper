@@ -28,6 +28,7 @@ set_target_properties( ViperEngine
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     PREFIX ""
     OUTPUT_NAME "Editor"
+    CXX_STANDARD 20
 )
 # Other includes
 target_include_directories(ViperEngine SYSTEM PUBLIC 
@@ -39,3 +40,4 @@ target_include_directories(ViperEngine SYSTEM PUBLIC
 include_directories("${VIPER_EDITOR_ABSOLUTTE_DIR}/external/glm/")
 include_directories("${VIPER_EDITOR_ABSOLUTTE_DIR}/external/glfw/include/")
 include_directories("${VIPER_EDITOR_ABSOLUTTE_DIR}/external/ImGui/")
+include_directories("${VIPER_EDITOR_ABSOLUTTE_DIR}/external/entt/single_include/")

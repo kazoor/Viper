@@ -14,28 +14,32 @@ namespace Viper::Components {
     void Input::OnEvent(Viper::Events::Event& Event) {
         // Dispatch all the callbacks.
         Events::EventDispatcher Dispatcher(Event);
-        Dispatcher.Dispatch<Viper::Graphics::KeyboardKeyPressedEvent>(VIPER_GET_EVENT_FUNC(Input::OnKeyboardKeyPressedEvent));
-        Dispatcher.Dispatch<Viper::Graphics::KeyboardKeyReleasedEvent>(VIPER_GET_EVENT_FUNC(Input::OnKeyboardKeyReleasedEvent));
-        Dispatcher.Dispatch<Viper::Graphics::MouseButtonPressedEvent>(VIPER_GET_EVENT_FUNC(Input::OnMouseButtonPressedEvent));
-        Dispatcher.Dispatch<Viper::Graphics::MouseButtonPressedEvent>(VIPER_GET_EVENT_FUNC(Input::OnMouseButtonReleasedEvent));
+        Dispatcher.Dispatch<Events::KeyboardKeyPressedEvent>(VIPER_GET_EVENT_FUNC(Input::OnKeyboardKeyPressedEvent));
+        Dispatcher.Dispatch<Events::KeyboardKeyReleasedEvent>(VIPER_GET_EVENT_FUNC(Input::OnKeyboardKeyReleasedEvent));
+        Dispatcher.Dispatch<Events::MouseButtonPressedEvent>(VIPER_GET_EVENT_FUNC(Input::OnMouseButtonPressedEvent));
+        Dispatcher.Dispatch<Events::MouseButtonReleasedEvent>(VIPER_GET_EVENT_FUNC(Input::OnMouseButtonReleasedEvent));
     }
 
     // Keyboard event callbacks
-    bool Input::OnKeyboardKeyPressedEvent(Viper::Graphics::KeyboardKeyPressedEvent& Event) {
+    bool Input::OnKeyboardKeyPressedEvent(Events::KeyboardKeyPressedEvent& Event) {
         // TODO: Add check for IsHeld (now we handle both pressed and held in the same map, not too sure if we want to keep it like that).
         KeyboardKey[Event.Key] = true;
+        return true;
     }
 
-    bool Input::OnKeyboardKeyReleasedEvent(Viper::Graphics::KeyboardKeyReleasedEvent& Event) {
+    bool Input::OnKeyboardKeyReleasedEvent(Events::KeyboardKeyReleasedEvent& Event) {
        KeyboardKey[Event.Key] = false;
+       return true;
     }
 
     // Mouse event callbacks
-    bool Input::OnMouseButtonPressedEvent(Viper::Graphics::MouseButtonPressedEvent &Event) {
+    bool Input::OnMouseButtonPressedEvent(Events::MouseButtonPressedEvent &Event) {
         MouseButton[Event.Button] = true;
+        return true;
     }
 
-    bool Input::OnMouseButtonReleasedEvent(Viper::Graphics::MouseButtonReleasedEvent &Event) {
+    bool Input::OnMouseButtonReleasedEvent(Events::MouseButtonReleasedEvent &Event) {
         MouseButton[Event.Button] = true;
+        return true;
     }
 }

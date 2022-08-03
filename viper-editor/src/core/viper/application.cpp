@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include "application.hpp"
-#include <graphics/renderer/renderer.hpp>
+//#include <graphics/renderer/renderer.hpp>
 #include <util/globals/global.hpp>
 
 namespace Viper {
@@ -35,15 +35,16 @@ namespace Viper {
 
     void Application::OnEvent(Events::Event& e) {
         //m_Window->OnEvent(e);
-        printf("event: %s\n", e.GetName());
         m_Window->OnEvent(e);
      };
 
     void Application::PushLayer(Layers::Layer* layer) {
         m_Window->PushLayer( layer );
+        layer->OnAttach();
     };
 
     void Application::PushOverlay(Layers::Layer* overlay) {
         m_Window->PushLayer( overlay );
+        overlay->OnAttach();
     };
 };
