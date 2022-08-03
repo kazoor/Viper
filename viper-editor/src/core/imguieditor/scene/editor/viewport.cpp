@@ -5,6 +5,7 @@
 #include <util/globals/global.hpp>
 #include <viper/base.hpp>
 #include <ImGui/imgui.h>
+#include <graphics/renderer/rendercommand.hpp>
 
 namespace Viper {
     SceneViewport::SceneViewport( Scene* SceneContext, void* WindowContext ) : m_Context( SceneContext ), m_WindowContext( WindowContext ) { };
@@ -40,8 +41,9 @@ namespace Viper {
             Globals::Editor::SceneH = SceneSize.y;
 
             ImGui::Image(
-                    reinterpret_cast< ImTextureID * >( Renderer::Renderer2D::GetTexture()),
-                    ImVec2(SceneSize.x, SceneSize.y));
+                    reinterpret_cast< ImTextureID >( RenderCommand::FrameID( ) ),
+                    ImVec2(SceneSize.x, SceneSize.y),
+                    ImVec2( 0, 1 ), ImVec2( 1, 0));
 
             if (ImGui::IsItemClicked())
                 m_Context->ResetViewport();

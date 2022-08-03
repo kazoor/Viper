@@ -16,17 +16,22 @@
 #include <ImGui/imgui_impl_glfw.h>
 #include <ImGui/imgui_impl_opengl3.h>
 
+#include <graphics/renderer/rendercommand.hpp>
+#include <graphics/renderer/renderer2d.hpp>
+
 namespace Viper {
+    Ref< Sprite2D > m_Texture;
     SceneLayer::SceneLayer(void* context) : Layer("Scene"), WindowContext((GLFWwindow*)context) {
         m_Camera = new Renderer::OrthoGraphicCamera(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
-        Renderer::Renderer2D::Instantiate();
+
+        Renderer2D::Init();
+        RenderCommand::Init();
+        m_Texture = Sprite2D::Create( "resources/textures/checkerboard.png" );
+
         AspectRatio = 0.0f;
 
         Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Success!", "Window has been loaded!", Globals::ConsoleSuccess );
         
-        m_TexSprite = Renderer::Sprite2D::Create("resources/textures/teamspeak.jpg");
-        m_TexSprite2 = Renderer::Sprite2D::Create("resources/textures/checkerboard.png");
-
         m_ActiveScene = CreateRef< Scene >( );
 
         m_Viewport = SceneViewport( m_ActiveScene.get(), context );
@@ -43,7 +48,7 @@ namespace Viper {
 
     void SceneLayer::Destroy() {
         delete m_Camera;
-        Renderer::Renderer2D::Destroy();
+        Renderer2D::Shutdown();
 
         OnImGuiExit();
     };
@@ -51,21 +56,29 @@ namespace Viper {
     void SceneLayer::OnUpdate(Timestep::Timestep ts) {
         Graphics::WindowParams_t &WindowData = *(Graphics::WindowParams_t *)glfwGetWindowUserPointer(WindowContext);
         
-        Renderer::RenderCommand::SetClearColor( { 0.05f, 0.05f, 0.05f, 1.0f } );
-        Renderer::RenderCommand::Clear();
+        //Renderer::RenderCommand::SetClearColor( { 0.05f, 0.05f, 0.05f, 1.0f } );
+        //Renderer::RenderCommand::Clear();
 
-        Renderer::Renderer2D::BindFramebuffer();
-        Renderer::RenderCommand::Clear();
-        AspectRatio = ( float )Globals::Editor::SceneW / ( float )Globals::Editor::SceneH;
+        RenderCommand::SetColor({ 0.05f, 0.05f, 0.05f, 1.0f });
+        RenderCommand::Clear();
+        
 
-        Renderer::Renderer2D::Begin(*m_Camera);
+        //Renderer::Renderer2D::BindFramebuffer();
+        RenderCommand::BindFBO();
+        //Renderer::RenderCommand::Clear();
+        RenderCommand::Clear();
+
+        AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
         m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
-      
-        m_ActiveScene->OnUpdate( ts ); // Rendera alla gameobjects här.
+        
+        Renderer2D::Begin( *m_Camera );
+        
+        Viper::Renderer2D::DrawTexture(glm::vec2(-200.0f, -200.0f), glm::vec2(1800.0f, 1800.0f), m_Texture, 100.0f, glm::vec4(1.0f));
 
-        Renderer::Renderer2D::End();
+        m_ActiveScene->OnUpdate(ts);
 
-        Renderer::Renderer2D::UnbindFramebuffer();
+        Viper::Renderer2D::End();
+        RenderCommand::UnbindFBO();
 
         OnImGuiRender(ts);
     }
@@ -138,7 +151,7 @@ namespace Viper {
             style.ScrollbarSize = 10.0f;
 
             ImGui_ImplGlfw_InitForOpenGL(WindowContext, true);
-            ImGui_ImplOpenGL3_Init("#version 410");
+            ImGui_ImplOpenGL3_Init("#version 460");
 
             style.GrabRounding = 2.0f;
     };

@@ -34,12 +34,12 @@ namespace Viper {
     struct SpriteRendererComponent {
         SpriteRendererComponent() = default;
         SpriteRendererComponent( const SpriteRendererComponent& o ) = default;
-        SpriteRendererComponent( const glm::vec4& col ) : color( col ), sprite_texture( ) { };
-        SpriteRendererComponent( const glm::vec4& col, const Ref< Renderer::Sprite2D >& sprite ) : color( col ), sprite_texture( sprite ) { };
+        SpriteRendererComponent( const glm::vec4& col ) : color( col ), sprite( ) { };
+        SpriteRendererComponent( const glm::vec4& col, const Ref< Sprite2D >& texture ) : color( col ), sprite( texture ) { };
 
         glm::vec4 color;
-        Ref< Renderer::Sprite2D > sprite_texture;
         float tiling = 1.0f;
+        Ref< Sprite2D > sprite;
     };
 
     VIPER_INCOMPLETE_COMP(Rigidbody2DComponent)
