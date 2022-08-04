@@ -96,7 +96,6 @@ message(STATUS "Compiling & Linking SPDLOG")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/spdlog")
 target_link_libraries(Viper PUBLIC spdlog)
 
-
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/entt")
 
 # Add nlohmann/json subdirectory and link it
@@ -112,6 +111,7 @@ target_include_directories(Viper SYSTEM PUBLIC
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/glm/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/entt/single_include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/")
 
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/

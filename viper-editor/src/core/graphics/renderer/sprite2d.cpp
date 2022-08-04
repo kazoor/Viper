@@ -12,13 +12,13 @@ namespace Viper {
     };
 
     Sprite2D::Sprite2D( const std::string& path ) : Path(path) {
-        int m_texture_width, m_texture_height;
-        unsigned char* m_TextureData = stbi_load(path.c_str( ), &m_texture_width, &m_texture_height, NULL, 4);
+        int m_texture_width, m_texture_height, m_texture_channels;
+        unsigned char* m_TextureData = stbi_load(path.c_str( ), &m_texture_width, &m_texture_height, &m_texture_channels, 0);
         if( m_TextureData )
             Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Loaded texture.", VIPER_FORMAT_STRING( "Loaded texture: %s, dimensions: %dx%d", path.c_str( ), m_texture_width, m_texture_height ), Globals::ConsoleFlag::ConsoleSuccess );
         else
             Globals::ConsoleContext::AddLog( VIPER_ICON_ERR " Unable to load texture.", VIPER_FORMAT_STRING( "Unable to locate: %s, no such file or directory.", path.c_str( ) ), Globals::ConsoleFlag::ConsoleError );
-
+        
         if( m_TextureData ) {
             Width = m_texture_width;
             Height = m_texture_height;
@@ -26,14 +26,23 @@ namespace Viper {
             glCreateTextures(GL_TEXTURE_2D, 1, &SpriteID);
             glBindTexture(GL_TEXTURE_2D, SpriteID);
 
-            glTextureStorage2D(SpriteID, 1, GL_RGBA8, Width, Height );
+            GLenum m_internal_format = 0, m_external_format = 0;
+            if( m_texture_channels == 4 ) { // r, g, b, a
+                m_internal_format = GL_RGBA8;
+                m_external_format = GL_RGBA;
+            } else if( m_texture_channels == 3 ) { // r, g, b
+                m_internal_format = GL_RGB8;
+                m_external_format = GL_RGB;
+            };
+
+            glTextureStorage2D(SpriteID, 1, m_internal_format, Width, Height );
 
             glTextureParameteri(SpriteID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTextureParameteri(SpriteID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTextureParameteri(SpriteID, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTextureParameteri(SpriteID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-            glTextureSubImage2D(SpriteID, 0, 0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, m_TextureData);
+            glTextureSubImage2D(SpriteID, 0, 0, 0, Width, Height, m_external_format, GL_UNSIGNED_BYTE, m_TextureData);
 
             stbi_image_free(m_TextureData);
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -95,24 +104,15 @@ namespace Viper {
 
     void Sprite2D::Change( const std::string& location ) {
         Path = location;
-        int m_TexWidth, m_TexHeight, m_TexChannels;
-        unsigned char* m_TextureData = stbi_load(location.c_str( ), &m_TexWidth, &m_TexHeight, NULL, 4);
 
-        printf("location: %s\n", location.c_str());
+        int m_texture_width, m_texture_height, m_texture_channels;
+        unsigned char* m_texture_data = stbi_load( location.c_str( ), &m_texture_width, &m_texture_height, &m_texture_channels, 0);
 
-        if( m_TextureData ) {
-            Width = m_TexWidth;
-            Height = m_TexHeight;
-            
-            glTextureStorage2D(SpriteID, 1, GL_RGBA8, m_TexWidth, m_TexHeight );
-            
-            //glTextureSubImage2D(SpriteID, 0, 0, 0, m_TexWidth, m_TexHeight, GL_RGBA, GL_UNSIGNED_BYTE, m_TextureData);
-            SetData(m_TextureData);
-            //SetData(m_TextureData);
-            //glTextureSubImage2D(SpriteID, 0, 0, 0, m_TexWidth, m_TexHeight, GL_RGBA, GL_UNSIGNED_BYTE, m_TextureData);
-            stbi_image_free(m_TextureData);
+        if( m_texture_data ) {
+            GLenum m_external_format = ( m_texture_channels == 4 ) ? GL_RGBA : GL_RGB;
+            glTextureSubImage2D(SpriteID, 0, 0, 0, Width, Height, m_external_format, GL_UNSIGNED_BYTE, m_texture_data);
+            stbi_image_free(m_texture_data);
         };
-        printf("should change\n");
     };
 
     std::string Sprite2D::GetCurrentPath() {

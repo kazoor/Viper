@@ -8,6 +8,9 @@
 #include <graphics/renderer/renderer2d.hpp>
 #include <graphics/renderer/sprite2d.hpp>
 
+#include <random>
+#include <chrono>
+
 using namespace Viper::Events;
 using namespace Viper::Timestep;
 
@@ -18,7 +21,8 @@ public:
         Viper::RenderCommand::Init();
         Viper::Renderer2D::Init();
 
-        m_Texture = Viper::Sprite2D::Create("resources/textures/checkerboard.png");
+        m_Texture = Viper::Sprite2D::Create("resources/textures/xd.webp");
+        m_Texture2 = Viper::Sprite2D::Create("resources/textures/checkerboard.png");
 
         m_Width = 1280.0f;
         m_Height = 720.0f;
@@ -38,19 +42,13 @@ public:
 
         float aspect = m_Width / m_Height;
         auto camera = Viper::Renderer::OrthoGraphicCamera(-aspect * 2.0f, aspect * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
-//
-        Viper::Renderer2D::Begin(camera);
-        Viper::Renderer2D::DrawQuad(glm::vec2(0.0f,0.0f), glm::vec4(0.2f, 0.2f, 0.8f, 1.0f));
-        
-        static float rad = 0.25f;
-        rad += ts.deltatime() * 100.0f;
-        Viper::Renderer2D::DrawQuadRotated(glm::vec2(1.0f,0.0f), glm::vec2(4.0f,1.0f), rad * ( 3.141592f / 180.0f ), glm::vec4(1.0f, 0.2f, 1.0f, 1.0f));
-        Viper::Renderer2D::DrawLine(glm::vec3(0.0f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec4(1.0f));
-        Viper::Renderer2D::DrawTexture(glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 1.0f), m_Texture, 1.0f, glm::vec4(1.0f));
-        Viper::Renderer2D::DrawRotatedTexture(glm::vec2(-1.0f, -1.0f), glm::vec2(2.0f, 2.0f), m_Texture, 15.0f, 45.0f * ( 3.141592f / 180.0f ), glm::vec4(1.0f));
-        Viper::Renderer2D::End();
 
-        printf("ts: %.2f\n", ts.seconds());
+        Viper::Renderer2D::Begin(camera);
+        Viper::Renderer2D::DrawTexture({ 0.0f, 0.0f }, {2.0f, 2.0f }, m_Texture2, 8.0f, glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f));
+        for( float y = 0.0f; y < 1.0f; y += 0.1f ) {
+            Viper::Renderer2D::DrawTexture({ y, y }, {0.2f, 0.2f }, m_Texture, 1.0f, glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f - y));
+        }
+        Viper::Renderer2D::End();
     };
 
     void OnEvent(Viper::Events::Event& event) {
@@ -60,7 +58,7 @@ private:
     float m_Width = 0.0f;
     float m_Height = 0.0f;
 
-    Viper::Ref< Viper::Sprite2D > m_Texture;
+    Viper::Ref< Viper::Sprite2D > m_Texture, m_Texture2;
 };
 
 class CTest : public Viper::Application {
