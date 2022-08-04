@@ -8,6 +8,8 @@
 #include <scene/scene.hpp>
 
 #include <glm/gtc/type_ptr.hpp>
+#include <nlohmann/json.hpp>
+#include <util/jsonfilehandler/jsonfilehandler.hpp>
 
 static void imgui_gizmo_transform(const std::string& string, glm::vec3& values, float reset_value = 0.0f) {
     ImGui::Columns(2, std::string("##").append(string).c_str( ), false);
@@ -48,6 +50,15 @@ static void imgui_gizmo_transform(const std::string& string, glm::vec3& values, 
 namespace Viper {
     SceneInspector::SceneInspector( Scene* SceneContext ) : m_Context( SceneContext ) { };
     static std::string m_Nullified = "";
+
+    void SerializeEntity( Entity entity, std::uint32_t entity_id, nlohmann::json& data ) {
+        data.push_back({
+            entity_id,
+            {
+                "tag", entity.get< TagComponent >( ).tag.c_str( )
+            }
+        });
+    }
     void SceneInspector::OnImGuiPopulateComponents( Entity entity ) {
         if( ImGui::MenuItem("SpriteRenderer") && !entity.has< SpriteRendererComponent >( ) ) {
             entity.add< SpriteRendererComponent >( glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f ) );
@@ -124,8 +135,27 @@ namespace Viper {
         ImGui::ShowDemoWindow();
 
         if( ImGui::BeginMainMenuBar()) {
-            if(ImGui::MenuItem("hello"))
-                ImGui::Text("ss");
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
+            if(ImGui::BeginMenu("File")) {
+                if(ImGui::MenuItem("New", "CTRL+N")) {
+
+                    nlohmann::json data = nlohmann::json::array();
+                    m_Context->m_register.each([&](auto entity_id ){
+                        Entity ent = { entity_id, m_Context };
+                        if(!ent) // ent = 0
+                            return;
+                            
+                        });
+                };
+                if(ImGui::MenuItem("Save", "CTRL+S")) {
+                    printf("ctrl+s\n");
+                };
+                if(ImGui::MenuItem("Open", "CTRL+O")) {
+
+                };
+                ImGui::EndMenu();
+            };
+            ImGui::PopStyleVar();
             ImGui::EndMainMenuBar();
         };
     };

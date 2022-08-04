@@ -13,7 +13,7 @@ static const size_t hash_png = std::hash< std::string >( )(".png");
 static const size_t hash_jpg = std::hash< std::string >( )(".jpg");
 static const size_t hash_vert = std::hash< std::string >( )(".vert");
 static const size_t hash_frag = std::hash< std::string >( )(".frag");
-static const size_t hash_ini = std::hash< std::string >( )(".init");
+static const size_t hash_ini = std::hash< std::string >( )(".ini");
 static const size_t hash_font_ttf = std::hash< std::string >( )( ".ttf" );
 static const size_t hash_font_otf = std::hash< std::string >( )( ".otf" );
 

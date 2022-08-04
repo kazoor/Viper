@@ -8,8 +8,8 @@ namespace Viper::Util {
     public:
         JSONFileHandler() = default;
 
-        nlohmann::json Read(const std::string &FilePath) const;
+        static nlohmann::json Read(const std::string &FilePath);
 
-        void Write(const std::string &FilePath, const nlohmann::json &JSONObj);
+        static void Write(const std::string &FilePath, const nlohmann::json &JSONObj);
     };
 }
