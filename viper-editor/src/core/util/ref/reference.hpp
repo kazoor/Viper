@@ -19,4 +19,5 @@ namespace Viper {
     };
 };
 
-#define MAKE_REF( x, y ) Viper::Scope< x > g_ ##x = Viper::CreateScope< x >y
+#define MAKE_SCOPE( x, ... ) Viper::Scope< x > g_ ##x = Viper::CreateScope< x >(__VA_ARGS__)
+#define MAKE_REF( x, ... ) Viper::Ref< x > g_ ##x = Viper::CreateRef< x >(__VA_ARGS__)
