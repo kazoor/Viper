@@ -1,4 +1,5 @@
 #include "hierarchy.hpp"
+#include <windows.h>
 
 //#include <graphics/renderer/renderer.hpp>
 #include <imguieditor/fontawesome5.hpp>
@@ -23,6 +24,24 @@ namespace Viper {
             ImGui::Text("max verts: %d", stats.max_vertices_allowed);
             ImGui::Text("max indices: %d", stats.max_indices_allowed);
             ImGui::Text("max quads: %d", stats.max_quads_allowed);
+
+            if(ImGui::Button("Open file dialogue")) {
+                OPENFILENAME ofn;
+                char fileName[256] = "";
+                ZeroMemory(&ofn, sizeof(ofn));
+
+                ofn.lStructSize = sizeof(OPENFILENAME);
+                ofn.hwndOwner = NULL;
+                ofn.lpstrFilter = "Viper scene (*.viper)\0*.viper\0";
+                ofn.lpstrFile = fileName;
+                ofn.nMaxFile = MAX_PATH;
+                ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+                ofn.lpstrDefExt = "";
+
+                if ( GetOpenFileName(&ofn) ) {
+                    printf("%s\n", fileName);
+                };
+            };
             
             OnImGuiRenderItems( ts );
             if( ImGui::BeginPopupContextWindow(0, 1, false)) {

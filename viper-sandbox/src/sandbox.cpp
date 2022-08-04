@@ -21,8 +21,8 @@ public:
         Viper::RenderCommand::Init();
         Viper::Renderer2D::Init();
 
-        m_Texture = Viper::Sprite2D::Create("resources/textures/xd.webp");
-        m_Texture2 = Viper::Sprite2D::Create("resources/textures/checkerboard.png");
+        m_Texture = Viper::Sprite2D::Create("resources/textures/checkerboard.png");
+        m_Texture2 = Viper::Sprite2D::Create("resources/textures/viper.png");
 
         m_Width = 1280.0f;
         m_Height = 720.0f;
@@ -40,14 +40,14 @@ public:
         Viper::RenderCommand::SetColor({ 0.05f, 0.05f, 0.05f, 1.0f });
         Viper::RenderCommand::Clear();
 
+        printf("fps :: %.2f\n", 1.0f / ts.seconds());
+
         float aspect = m_Width / m_Height;
-        auto camera = Viper::Renderer::OrthoGraphicCamera(-aspect * 2.0f, aspect * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
+        auto camera = Viper::Renderer::OrthoGraphicCamera(-aspect * 5.0f, aspect * 5.0f, 5.0f, -5.0f, 1.0f, -1.0f);
 
         Viper::Renderer2D::Begin(camera);
-        Viper::Renderer2D::DrawTexture({ 0.0f, 0.0f }, {2.0f, 2.0f }, m_Texture2, 8.0f, glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f));
-        for( float y = 0.0f; y < 1.0f; y += 0.1f ) {
-            Viper::Renderer2D::DrawTexture({ y, y }, {0.2f, 0.2f }, m_Texture, 1.0f, glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f - y));
-        }
+        Viper::Renderer2D::DrawTexture(glm::vec2(-2.0f, -2.0f), glm::vec2(40.0f, 40.0f), m_Texture, 20.0f, glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));
+        Viper::Renderer2D::DrawTexture(glm::vec2(-5.5f, -3.5f), glm::vec2(2.0f, 2.0f), m_Texture2, 1.0f, glm::vec4(1.0f));
         Viper::Renderer2D::End();
     };
 
