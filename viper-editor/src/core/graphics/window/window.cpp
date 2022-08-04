@@ -171,6 +171,9 @@ namespace Viper::Graphics {
         CreateEvents();
         LayerStack = new Layers::LayerStack();
         glfwSwapInterval(1); // Vsync on for now.
+
+        glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     };
 
     GLFWwindow* Window::CreateWindowEx(WindowParams_t Params) {
