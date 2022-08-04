@@ -4,7 +4,7 @@
 #include "jsonfilehandler.hpp"
 
 namespace Viper::Util {
-    nlohmann::json JSONFileHandler::Read(const std::string &FilePath) const {
+    nlohmann::json JSONFileHandler::Read(const std::string &FilePath) {
         std::ifstream InStream(FilePath);
 
         // Use nlohmann's built in function to 
