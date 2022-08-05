@@ -59,5 +59,8 @@ namespace Viper::Globals {
 
         extern float MousePosX;
         extern float MousePosY;
+
+        extern bool IsSceneFocused;
+        extern bool IsSceneHovered;
     };
 };

@@ -28,6 +28,14 @@ namespace Viper::Renderer {
         m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
     };
 
+    void OrthoGraphicCamera::SetPerspective( float fov, float aspect_ratio, float nearclip, float farclip ) {
+        //m_ProjectionMatrix = glm::perspective( fov, )
+        m_ProjectionMatrix = glm::perspective( fov, aspect_ratio, nearclip, farclip );//glm::ortho(left, right, bottom, top, z_near, z_far);
+        m_ViewMatrix = glm::mat4(1.0f);
+
+        m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
+    };
+
     glm::mat4 OrthoGraphicCamera::GetViewProjectionMatrix() const {
         return m_ViewProjectionMatrix;
     }
