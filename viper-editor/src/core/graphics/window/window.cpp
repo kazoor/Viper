@@ -207,7 +207,7 @@ namespace Viper::Graphics {
             
             dispatcher.Dispatch<Events::MouseCursorPositionEvent>(
                     VIPER_GET_EVENT_FUNC(Window::OnWindowMouseCursorPositionEvent));
-            dispatcher.Dispatch<Events::MouseScrollEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowMouseScrollEvent));
+            //dispatcher.Dispatch<Events::MouseScrollEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowMouseScrollEvent));
 
             dispatcher.Dispatch<Events::KeyboardKeyPressedEvent>(VIPER_GET_EVENT_FUNC(Window::OnKeyboardKeyPressedEvent));
 

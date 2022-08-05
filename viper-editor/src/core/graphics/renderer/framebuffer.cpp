@@ -67,6 +67,10 @@ namespace Viper::Renderer {
         Setup( width, height );
     };
 
+    void FrameBuffer::BindTexture( uint32_t texture ) {
+        glBindTexture(GL_TEXTURE_2D, texture );
+    };
+
     Ref<FrameBuffer> FrameBuffer::Create() {
         return CreateRef<FrameBuffer>();
     };

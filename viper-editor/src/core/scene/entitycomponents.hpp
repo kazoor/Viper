@@ -71,6 +71,9 @@ namespace Viper {
         BoxCollider2DComponent( const BoxCollider2DComponent&) = default;
     };
 
-    VIPER_INCOMPLETE_COMP(CameraComponent)
+    struct CameraComponent {
+        
+    };
+
     VIPER_INCOMPLETE_COMP(NativeScriptComponent)
 };

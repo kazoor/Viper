@@ -1,3 +1,4 @@
+#include <glad/glad.h>
 #include <viper/application.hpp>
 #include <imguieditor/imguieditor.hpp>
 #include <imguieditor/scene/scenelayer.hpp>
@@ -8,6 +9,8 @@
 #include <graphics/renderer/renderer2d.hpp>
 #include <graphics/renderer/light2d.hpp>
 #include <graphics/renderer/sprite2d.hpp>
+
+#include <graphics/renderer/framebuffer.hpp>
 
 #include <random>
 #include <chrono>
@@ -37,6 +40,7 @@ public:
 
     void Destroy() {
         Viper::Renderer2D::Shutdown();
+        delete m_Lights;
     };
 
     void OnUpdate( Timestep ts ) {
