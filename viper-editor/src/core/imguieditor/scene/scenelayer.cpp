@@ -22,13 +22,13 @@
 namespace Viper {
     Ref< Sprite2D > m_Texture;
     SceneLayer::SceneLayer(void* context) : Layer("Scene"), WindowContext((GLFWwindow*)context) {
-        m_Camera = new Renderer::OrthoGraphicCamera(-AspectRatio * 2.0f, AspectRatio * 2.0f, 2.0f, -2.0f, 1.0f, -1.0f);
+        AspectRatio = 2.0f;
+        m_Camera = new OrthoGraphicCameraController(1280.0f/720.0f, true);
 
         Renderer2D::Init();
         RenderCommand::Init();
         m_Texture = Sprite2D::Create( "resources/textures/checkerboard.png" );
 
-        AspectRatio = 0.0f;
 
         Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Success!", "Window has been loaded!", Globals::ConsoleSuccess );
         
@@ -55,6 +55,7 @@ namespace Viper {
 
     void SceneLayer::OnUpdate(Timestep::Timestep ts) {
         Graphics::WindowParams_t &WindowData = *(Graphics::WindowParams_t *)glfwGetWindowUserPointer(WindowContext);
+        m_Camera->OnUpdate( ts );
         
         RenderCommand::SetColor({ 0.05f, 0.05f, 0.05f, 1.0f });
         RenderCommand::Clear();
@@ -63,11 +64,9 @@ namespace Viper {
         RenderCommand::Clear();
 
         AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
-        m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
-        m_Camera->SetRotation(Globals::Editor::Radians);
         //m_Camera->SetPerspective(glm::radians( Globals::Editor::Radians ), AspectRatio, 0.01f, 1000.0f);
         
-        Renderer2D::Begin( *m_Camera );
+        Renderer2D::Begin( m_Camera->GetCamera() );
         Viper::Renderer2D::DrawTexture(glm::vec2(-200.0f, -200.0f), glm::vec2(1800.0f, 1800.0f), m_Texture, 150.0f, glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));
 
         m_ActiveScene->OnUpdate(ts);
@@ -79,9 +78,7 @@ namespace Viper {
     }
 
     void SceneLayer::OnEvent(Events::Event& event) {
-        for(auto& go : *Globals::GlobalsContext::Gom ) {
-            go->OnEvent(event);
-        };
+        m_Camera->OnEvent(event);
     };
 
     void SceneLayer::OnImGuiInit() {

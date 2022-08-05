@@ -275,14 +275,14 @@ namespace Viper {
                     // Before we load in a scene we want to clear the scene from all objects first.
                     m_Context->m_register.clear();
 
-                    nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
-
-                    for(int i = 0; i != data.size(); ++i ) {
-                        auto objects = data[i][1];
-
-                        if(!objects["Transform"]["Position"].is_null())
-                            std::cout << Objects["Transform"]["Position"] << std::endl;
-                    }
+                    //nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
+//
+                    //for(int i = 0; i != data.size(); ++i ) {
+                    //    auto objects = data[i][1];
+//
+                    //    if(!objects["Transform"]["Position"].is_null())
+                    //        std::cout << Objects["Transform"]["Position"] << std::endl;
+                    //}
                 };
                 ImGui::EndMenu();
             };

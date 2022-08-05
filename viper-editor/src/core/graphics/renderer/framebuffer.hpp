@@ -6,9 +6,10 @@
 #define VIPER_FRAMEBUFFER_HPP
 #include <cstdint>
 #include <util/ref/reference.hpp>
+#include <viper/viper.hpp>
 
 namespace Viper::Renderer {
-    class FrameBuffer {
+    class VIPER_API FrameBuffer {
     public:
         FrameBuffer( );
         ~FrameBuffer();
@@ -21,6 +22,8 @@ namespace Viper::Renderer {
         void Bind();
         void Unbind();
         void Resize( int width, int height );
+
+        void BindTexture( uint32_t texture );
 
         static Ref< FrameBuffer > Create( );
     private:
