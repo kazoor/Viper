@@ -161,8 +161,8 @@ namespace Viper {
     };
 
     void Renderer2D::Shutdown() {
-        delete m_Ptr;
-        delete m_LinePtr;
+        delete[] m_Ptr;
+        delete[] m_LinePtr;
 
         delete m_ShaderDebug__Square;
         delete m_ShaderDebug__Line;
