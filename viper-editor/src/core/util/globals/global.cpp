@@ -23,6 +23,9 @@ namespace Viper::Globals {
 
         float SceneX = 2.0f;
         float SceneY = 2.0f;
+
+        bool IsSceneFocused = false;
+        bool IsSceneHovered = false;
     };
 
     // == // == // == // == // == // == //

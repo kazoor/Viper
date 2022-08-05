@@ -10,6 +10,8 @@ namespace Viper::Renderer {
 
         void SetProjection(float left, float right, float bottom, float top, float z_near = -1.0f, float z_far = 1.0f );
         void SetPosition( const glm::vec3& position );
+        void SetPerspective( float aspect_ratio, float fov, float nearclip, float farclip );
+
         glm::mat4 GetViewProjectionMatrix() const;
         glm::mat4 GetViewMatrix() const;
         glm::mat4 GetProjectionMatrix() const;

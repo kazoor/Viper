@@ -9,6 +9,7 @@
 #include <scene/sceneentity.hpp>
 #include <scene/scene.hpp>
 #include <graphics/renderer/renderer2d.hpp>
+#include <util/globals/global.hpp>
 
 namespace Viper {
     static char buff[80] = { '\0' };
@@ -24,6 +25,16 @@ namespace Viper {
             ImGui::Text("max verts: %d", stats.max_vertices_allowed);
             ImGui::Text("max indices: %d", stats.max_indices_allowed);
             ImGui::Text("max quads: %d", stats.max_quads_allowed);
+
+            ImGui::DragFloat("Rad", &Globals::Editor::Radians );
+
+            if( m_Context->m_box_world != nullptr ) {
+                if( ImGui::Button("Stop simulation"))
+                    m_Context->OnPhysicsEnd();
+            } else {
+                if( ImGui::Button("Start simulation"))
+                    m_Context->OnPhysicsStart();
+            };
 
             if(ImGui::Button("Open file dialogue")) {
                 OPENFILENAME ofn;
@@ -50,6 +61,7 @@ namespace Viper {
                     auto ent = m_Context->CreateEntity( "hentai maker" );
                     Entity entity = { ent, m_Context };
                     ent = entity;
+                    m_Context->m_selected_entity = ent;
                 }
                 ImGui::EndPopup();
             };

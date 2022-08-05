@@ -47,6 +47,8 @@ static void imgui_gizmo_transform(const std::string& string, glm::vec3& values, 
     ImGui::Columns(1);
 };
 
+constexpr const char* RigidbodyTypes[] = { "Static", "Dynamic", "Kinematic" };
+
 namespace Viper {
     SceneInspector::SceneInspector( Scene* SceneContext ) : m_Context( SceneContext ) { };
     static std::string m_Nullified = "";
@@ -63,6 +65,14 @@ namespace Viper {
         if( ImGui::MenuItem("SpriteRenderer") && !entity.has< SpriteRendererComponent >( ) ) {
             entity.add< SpriteRendererComponent >( glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f ) );
         };
+
+        if( ImGui::MenuItem("Rigidbody2D") && !entity.has< Rigidbody2DComponent >( ) ) {
+            entity.add< Rigidbody2DComponent >( );
+        };
+
+        if( ImGui::MenuItem("BoxCollider2D") && !entity.has< BoxCollider2DComponent >( ) ) {
+            entity.add< BoxCollider2DComponent >( );
+        };
     };
 
     void SceneInspector::OnImGuiRender( Timestep::Timestep ts ) {
@@ -72,10 +82,16 @@ namespace Viper {
                 ImGuiTreeNodeFlags t = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Framed;
                 
                 Entity ent = { m_Context->m_selected_entity, m_Context };
-
+                static char tag_buffer[ 32 ] = { '\0' };
                 if( ent.has< TransformComponent >( ) ) {
-                    auto name = ent.get< TagComponent >( );
+                    auto& name = ent.get< TagComponent >( );
                     ImGui::Text("Component name: %s", name.tag.c_str( ) );
+                    ImGui::InputText("##comp_new_name", tag_buffer, 32 );
+                    ImGui::SameLine();
+                    if(ImGui::Button("Set name")) {
+                        name.tag = tag_buffer;
+                        tag_buffer[0] = '\0';
+                    };
                 };
 
                 if( ent.has< TransformComponent >( ) ) {
@@ -86,6 +102,52 @@ namespace Viper {
                         imgui_gizmo_transform("Rotation", rot);
                         imgui_gizmo_transform("Scale", scale, 1.0f);
                         
+                        ImGui::TreePop();
+                    };
+                };
+
+                if( ent.has< Rigidbody2DComponent >( ) ) {
+                    auto& rb2d = ent.get< Rigidbody2DComponent >( );
+                    if(ImGui::TreeNodeEx( " " ICON_FA_CUBES "  Rigidbody2D", t)) {
+                        if( ImGui::Button("Change to dynamic"))
+                            rb2d.Type = Rigidbody2DComponent::BodyType::body_dynamic;
+
+                        const char* current_body_type = RigidbodyTypes[(int)rb2d.Type];
+                        if(ImGui::BeginCombo("Body type", current_body_type)) {
+                            for( int i = 0; i < 2; i++ ) {
+                                bool is_selected = current_body_type == RigidbodyTypes[i];
+                                if( ImGui::Selectable(RigidbodyTypes[i], is_selected)) {
+                                    current_body_type = RigidbodyTypes[i];
+                                    rb2d.Type = (Rigidbody2DComponent::BodyType)i;
+                                };
+
+                                if( is_selected )
+                                    ImGui::SetItemDefaultFocus();
+                            }
+                            ImGui::EndCombo();
+                        };
+
+                        ImGui::Checkbox("Fixed Rotation", &rb2d.FixedRotation);
+                        if(ImGui::Button("Add Force")) {
+                            b2Body* body = ( b2Body* )rb2d.Rigidbody;
+                            auto pos = glm::vec2(0.0f, 1.0f);
+                            auto point = glm::vec2(0.0f, 0.0f);
+
+                            body->ApplyForce({ pos.x, pos.y },{0.0f, 0.0f}, true);
+                        }
+                        ImGui::TreePop();
+                    };
+                };
+
+                if( ent.has< BoxCollider2DComponent >( ) ) {
+                    auto& box2d = ent.get< BoxCollider2DComponent >( );
+                    if(ImGui::TreeNodeEx( " " ICON_FA_CUBES "  BoxCollider2D", t)) {
+                        ImGui::DragFloat2("Offset", glm::value_ptr(box2d.offset));
+                        ImGui::DragFloat2("Size", glm::value_ptr(box2d.size));
+                        ImGui::DragFloat("Density", &box2d.density);
+                        ImGui::DragFloat("Friction", &box2d.friction);
+                        ImGui::DragFloat("Restitution", &box2d.restitution);
+                        ImGui::DragFloat("Restitution Threshold", &box2d.restitutionthreshold);
                         ImGui::TreePop();
                     };
                 };

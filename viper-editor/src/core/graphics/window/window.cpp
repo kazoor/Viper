@@ -280,7 +280,7 @@ namespace Viper::Graphics {
     
     bool Window::OnWindowMouseScrollEvent(Events::MouseScrollEvent &E) {
         VIPER_LOG("MouseScrollEvent Event triggered! {0}, {1}", E.x, E.y);
-        if (!Globals::Editor::isPlaying)
+        if( Globals::Editor::IsSceneHovered)
             Globals::Editor::ZoomLevel -= static_cast< float >( E.y );
         return true;
     };

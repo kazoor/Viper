@@ -5,6 +5,7 @@
 #include <util/globals/global.hpp>
 #include <viper/base.hpp>
 #include <ImGui/imgui.h>
+#include <ImGui/imgui_internal.h>
 #include <graphics/renderer/rendercommand.hpp>
 
 namespace Viper {
@@ -45,6 +46,9 @@ namespace Viper {
 
             Globals::Editor::SceneW = SceneSize.x;
             Globals::Editor::SceneH = SceneSize.y;
+
+            Globals::Editor::IsSceneHovered = ImGui::IsWindowHovered();
+            Globals::Editor::IsSceneFocused = ImGui::IsWindowFocused();
 
             ImGui::Image(
                     reinterpret_cast< ImTextureID >( RenderCommand::FrameID( ) ),

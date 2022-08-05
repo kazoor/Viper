@@ -103,6 +103,9 @@ message(STATUS "Compiling & Linking json")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/json")
 target_link_libraries(Viper PUBLIC nlohmann_json)
 
+message(STATUS "Compiling & Linking box2d")
+target_link_libraries(Viper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/libbox2d.a)
+
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/external"

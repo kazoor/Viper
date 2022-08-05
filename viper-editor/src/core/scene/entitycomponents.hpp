@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <graphics/renderer/sprite2d.hpp>
@@ -42,8 +43,34 @@ namespace Viper {
         Ref< Sprite2D > sprite;
     };
 
-    VIPER_INCOMPLETE_COMP(Rigidbody2DComponent)
-    VIPER_INCOMPLETE_COMP(BoxCollider2DComponent)
+    struct Rigidbody2DComponent {
+        enum class BodyType : int {
+            body_static = 0,
+            body_dynamic,
+            body_kinematic
+        };
+
+        BodyType Type = BodyType::body_static;
+        bool FixedRotation = false;
+        void* Rigidbody = nullptr;
+
+        Rigidbody2DComponent() = default;
+        Rigidbody2DComponent( const Rigidbody2DComponent& ) = default;
+    };
+
+    struct BoxCollider2DComponent {
+        glm::vec2 offset = { 0.0f, 0.0f };
+        glm::vec2 size = { 0.5f, 0.5f };
+        float density = 1.0f;
+        float friction = 0.5f;
+        float restitution = 0.0f;
+        float restitutionthreshold = 0.5f;
+        void* RuntimeFixture = nullptr;
+
+        BoxCollider2DComponent() = default;
+        BoxCollider2DComponent( const BoxCollider2DComponent&) = default;
+    };
+
     VIPER_INCOMPLETE_COMP(CameraComponent)
     VIPER_INCOMPLETE_COMP(NativeScriptComponent)
 };
