@@ -64,6 +64,7 @@ namespace Viper {
 
         AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
         m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
+        m_Camera->SetRotation(Globals::Editor::Radians);
         //m_Camera->SetPerspective(glm::radians( Globals::Editor::Radians ), AspectRatio, 0.01f, 1000.0f);
         
         Renderer2D::Begin( *m_Camera );

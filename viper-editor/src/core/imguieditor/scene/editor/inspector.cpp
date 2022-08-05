@@ -94,6 +94,9 @@ namespace Viper {
                     };
                 };
 
+                if( m_Context->m_SceneState == SceneStates::State_Simulating )
+                    ImGui::BeginDisabled();
+
                 if( ent.has< TransformComponent >( ) ) {
                     auto &[pos, scale, rot] = ent.get< TransformComponent >( );
 
@@ -184,6 +187,9 @@ namespace Viper {
                         ImGui::TreePop();
                     };
                 };
+
+                if( m_Context->m_SceneState == SceneStates::State_Simulating )
+                    ImGui::EndDisabled();
 
                 if(ImGui::BeginPopupContextWindow("##AddComponent", 1, false)) {
                     OnImGuiPopulateComponents(ent);
