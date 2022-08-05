@@ -1,3 +1,4 @@
+#include <glad/glad.h>
 #include <viper/application.hpp>
 #include <imguieditor/imguieditor.hpp>
 #include <imguieditor/scene/scenelayer.hpp>
@@ -6,7 +7,10 @@
 #include <graphics/renderer/api/color.hpp>
 #include <graphics/renderer/rendercommand.hpp>
 #include <graphics/renderer/renderer2d.hpp>
+#include <graphics/renderer/light2d.hpp>
 #include <graphics/renderer/sprite2d.hpp>
+
+#include <graphics/renderer/framebuffer.hpp>
 
 #include <random>
 #include <chrono>
@@ -24,6 +28,8 @@ public:
         m_Texture = Viper::Sprite2D::Create("resources/textures/checkerboard.png");
         m_Texture2 = Viper::Sprite2D::Create("resources/textures/viper.png");
 
+        m_Lights = new Viper::Light2D( );
+
         m_Width = 1280.0f;
         m_Height = 720.0f;
     };
@@ -34,6 +40,7 @@ public:
 
     void Destroy() {
         Viper::Renderer2D::Shutdown();
+        delete m_Lights;
     };
 
     void OnUpdate( Timestep ts ) {
@@ -48,7 +55,14 @@ public:
         Viper::Renderer2D::Begin(camera);
         Viper::Renderer2D::DrawTexture(glm::vec2(-2.0f, -2.0f), glm::vec2(40.0f, 40.0f), m_Texture, 20.0f, glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));
         Viper::Renderer2D::DrawTexture(glm::vec2(-5.5f, -3.5f), glm::vec2(2.0f, 2.0f), m_Texture2, 1.0f, glm::vec4(1.0f));
+            
         Viper::Renderer2D::End();
+
+        m_Lights->Begin( camera );
+            m_Lights->Light(glm::vec2(0.0f, 0.0f), glm::vec4(0.2f, 1.0f, 0.2f, 1.0f));
+            m_Lights->Light(glm::vec2(1.0f, 1.0f), glm::vec4(0.2f, 1.0f, 0.2f, 1.0f), 45.0f);
+            m_Lights->Light(glm::vec2(-1.0f, -1.0f), glm::vec4(0.2f, 1.0f, 0.2f, 1.0f), 78.0f);
+        m_Lights->End();
     };
 
     void OnEvent(Viper::Events::Event& event) {
@@ -59,6 +73,7 @@ private:
     float m_Height = 0.0f;
 
     Viper::Ref< Viper::Sprite2D > m_Texture, m_Texture2;
+    Viper::Light2D* m_Lights;
 };
 
 class CTest : public Viper::Application {

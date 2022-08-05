@@ -8,7 +8,7 @@
 
 // graphics:
 #include <graphics/window/window.hpp>
-#include <graphics/renderer/camera/orthographic_camera.hpp>
+#include <graphics/renderer/camera/orthographic_camera_controller.hpp>
 
 #include <scene/scene.hpp>
 
@@ -38,7 +38,7 @@ namespace Viper {
         void OnImGuiRender(Timestep::Timestep ts);
     private:
         GLFWwindow* WindowContext;
-        Renderer::OrthoGraphicCamera* m_Camera;
+        OrthoGraphicCameraController* m_Camera;
         Ref< Scene > m_ActiveScene;
 
         float m_LastFrame = 0.0f;

@@ -91,7 +91,7 @@ namespace Viper {
     };
 
     void Scene::OnPhysicsStart() {
-        m_box_world = new b2World({0.0f, 9.8f});
+        m_box_world = new b2World({0.0f, -9.8f});
 
         auto view = m_register.view< Rigidbody2DComponent >( );
         for( auto entity : view ) {
@@ -125,6 +125,8 @@ namespace Viper {
                 fixture.restitution = bc2d.restitution;
                 fixture.restitutionThreshold = bc2d.restitutionthreshold;
                 body_body->CreateFixture(&fixture);
+
+                
             };
         };
     };

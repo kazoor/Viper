@@ -14,11 +14,13 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/shaders/shader/shader.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/rendercommand.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/light2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer3d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/framebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/sprite2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera_controller.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
         #${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/imguieditor.cpp
@@ -58,6 +60,11 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_tables.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/ImGuizmo.cpp
         )
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/include/box2d/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/glm/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/entt/single_include/")
 
 # Set target folders
 message(STATUS "Setting up output directories.")
@@ -103,18 +110,15 @@ message(STATUS "Compiling & Linking json")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/json")
 target_link_libraries(Viper PUBLIC nlohmann_json)
 
+
 message(STATUS "Compiling & Linking box2d")
-target_link_libraries(Viper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/libbox2d.a)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/box2d")
+target_link_libraries(Viper PUBLIC box2d)
 
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/external"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core")
-
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/glm/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/entt/single_include/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/")
 
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/
