@@ -1,11 +1,13 @@
 #include "inspector.hpp"
 
+#include <iostream>
 #include <imguieditor/fontawesome5.hpp>
 #include <ImGui/imgui.h>
 
 #include <scene/entitycomponents.hpp>
 #include <scene/sceneentity.hpp>
 #include <scene/scene.hpp>
+#include <components/transform.hpp>
 
 #include <glm/gtc/type_ptr.hpp>
 #include <nlohmann/json.hpp>
@@ -52,13 +54,61 @@ namespace Viper {
     static std::string m_Nullified = "";
 
     void SerializeEntity( Entity entity, std::uint32_t entity_id, nlohmann::json& data ) {
-        data.push_back({
-            entity_id,
-            {
-                "tag", entity.get< TagComponent >( ).tag.c_str( )
-            }
-        });
+        TransformComponent tr;
+        SpriteRendererComponent sr;
+
+        if(entity.has<TransformComponent>()) {
+            tr = entity.get<TransformComponent>();
+            data.push_back({
+                entity_id,
+                {
+                    {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
+                    {"Transform", {
+                        {"Position", {
+                            {"X", tr.position.x},
+                            {"Y", tr.position.y},
+                            {"Z", tr.position.z}
+                        }},
+                        {"Scale", {
+                            {"X", tr.scale.x},
+                            {"Y", tr.scale.y},
+                            {"Z", tr.scale.z}
+                        }},
+                        {"Rotation", {
+                            {"X", tr.rotation.x},
+                            {"Y", tr.rotation.y},
+                            {"Z", tr.rotation.z}
+                        }}
+                 }},
+            }});
+        }
+
+        if(entity.has<SpriteRendererComponent>()) {
+            sr = entity.get<SpriteRendererComponent>();
+            data.push_back({
+                entity_id,
+                {
+                    {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
+                    {"SpriteRenderer", {
+                        {"Color", {
+                            {"R", sr.color.r},
+                            {"G", sr.color.g},
+                            {"B", sr.color.b},
+                            {"A", sr.color.a}
+                        }},
+                        {"Sprite", {
+                            {"Width", sr.sprite.get()->GetWidth()},
+                            {"Height", sr.sprite.get()->GetHeight()},
+                            {"Path", sr.sprite.get()->GetPath()},
+                            {"SpriteID", sr.sprite.get()->GetSpriteID()},
+                            {"Tiling", sr.tiling}
+                        }}
+                    }}
+                }
+            });
+        }
     }
+
     void SceneInspector::OnImGuiPopulateComponents( Entity entity ) {
         if( ImGui::MenuItem("SpriteRenderer") && !entity.has< SpriteRendererComponent >( ) ) {
             entity.add< SpriteRendererComponent >( glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f ) );
@@ -139,19 +189,32 @@ namespace Viper {
             if(ImGui::BeginMenu("File")) {
                 if(ImGui::MenuItem("New", "CTRL+N")) {
 
-                    nlohmann::json data = nlohmann::json::array();
-                    m_Context->m_register.each([&](auto entity_id ){
-                        Entity ent = { entity_id, m_Context };
-                        if(!ent) // ent = 0
-                            return;
-                            
-                        });
                 };
                 if(ImGui::MenuItem("Save", "CTRL+S")) {
-                    printf("ctrl+s\n");
+                    nlohmann::json data = nlohmann::json::array();
+
+                    m_Context->m_register.each([&](auto entity_id ){
+                        Entity ent = { entity_id, m_Context };
+                            if(!ent) // ent = 0
+                                return;
+                            SerializeEntity(ent, static_cast<uint32_t>(entity_id), data);
+                        });
+                        
+                    Viper::Util::JSONFileHandler().Write("test.json", data);
                 };
                 if(ImGui::MenuItem("Open", "CTRL+O")) {
 
+                    // Before we load in a scene we want to clear the scene from all objects first.
+                    m_Context->m_register.clear();
+
+                    nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
+
+                    for(int i = 0; i != data.size(); ++i ) {
+                        auto objects = data[i][1];
+
+                        if(!objects["Transform"]["Position"].is_null())
+                            std::cout << Objects["Transform"]["Position"] << std::endl;
+                    }
                 };
                 ImGui::EndMenu();
             };

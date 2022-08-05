@@ -118,4 +118,20 @@ namespace Viper {
     std::string Sprite2D::GetCurrentPath() {
         return Path;
     };
+
+    int Sprite2D::GetWidth() const {
+        return Width;
+    }
+
+    int Sprite2D::GetHeight() const {
+        return Height;
+    }
+
+    std::string Sprite2D::GetPath() const {
+        return Path;
+    }
+
+    uint32_t Sprite2D::GetSpriteID() const {
+        return SpriteID;
+    }
 };
