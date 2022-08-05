@@ -21,9 +21,7 @@ namespace Viper {
     };
 
     void RenderCommand::Resize(const int width, const int height) {
-        glBindTexture(GL_TEXTURE_2D, s_Command.Framebuffer->GetTex());
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        s_Command.Framebuffer->Resize( width, height );
     };
 
     void RenderCommand::BindFBO() {
@@ -34,7 +32,6 @@ namespace Viper {
         s_Command.Framebuffer->Unbind();
     };
 
-    uint32_t RenderCommand::FrameID() {
-        return s_Command.Framebuffer->GetTex();
-    };
+    uint32_t RenderCommand::GetColorAttachment( ) { return s_Command.Framebuffer->GetColorAttachment();};
+    uint32_t RenderCommand::GetDepthAttachment( ) { return s_Command.Framebuffer->GetDepthAttachment();};
 };

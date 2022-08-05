@@ -14,15 +14,19 @@ namespace Viper::Renderer {
         ~FrameBuffer();
 
         uint32_t Get() const;
-        uint32_t GetTex() const;
+        uint32_t GetColorAttachment() const;
+        uint32_t GetDepthAttachment() const;
 
+        void Setup( int width, int height );
         void Bind();
         void Unbind();
+        void Resize( int width, int height );
 
         static Ref< FrameBuffer > Create( );
     private:
         uint32_t FBO;
-        uint32_t TEX;
+        uint32_t m_ColorAttachment;
+        uint32_t m_DepthBufferAttachment;
     };
 };
 
