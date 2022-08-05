@@ -11,6 +11,7 @@
 #include <graphics/renderer/rendercommand.hpp>
 #include <imguieditor/scene/scenelayer.hpp>
 #include <thread>
+#include <algorithm>
 
 namespace Viper::Graphics {
     static float m_LastFrame = 0.0f;
@@ -280,6 +281,8 @@ namespace Viper::Graphics {
     
     bool Window::OnWindowMouseScrollEvent(Events::MouseScrollEvent &E) {
         VIPER_LOG("MouseScrollEvent Event triggered! {0}, {1}", E.x, E.y);
+
+        Globals::Editor::ZoomLevel = std::max(Globals::Editor::ZoomLevel, 0.5f);
         if( Globals::Editor::IsSceneHovered)
             Globals::Editor::ZoomLevel -= static_cast< float >( E.y );
         return true;

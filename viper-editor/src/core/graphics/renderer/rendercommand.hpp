@@ -17,6 +17,7 @@ namespace Viper {
         static void BindFBO();
         static void UnbindFBO();
 
-        static uint32_t FrameID( );
+        static uint32_t GetColorAttachment( );
+        static uint32_t GetDepthAttachment( );
     };
 };

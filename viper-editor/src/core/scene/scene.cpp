@@ -29,6 +29,11 @@ namespace Viper {
     Scene::~Scene() {
     };
 
+    template< typename... Components >
+    Entity Scene::GetView( ) {
+        return m_register.view< Components... >( );
+    };
+
     Entity Scene::CreateEntity( const std::string& tag_name ) {
         Entity ent = { m_register.create(), this };
         ent.add< TagComponent >( tag_name );

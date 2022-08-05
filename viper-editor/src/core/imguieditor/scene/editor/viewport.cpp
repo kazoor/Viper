@@ -51,9 +51,9 @@ namespace Viper {
             Globals::Editor::IsSceneFocused = ImGui::IsWindowFocused();
 
             ImGui::Image(
-                    reinterpret_cast< ImTextureID >( RenderCommand::FrameID( ) ),
+                    reinterpret_cast< ImTextureID >( RenderCommand::GetColorAttachment( ) ),
                     ImVec2(SceneSize.x, SceneSize.y),
-                    ImVec2( 0, 1 ), ImVec2( 1, 0));
+                    ImVec2( 1, 0 ), ImVec2( 0, 1));
 
             if (ImGui::IsItemClicked())
                 m_Context->ResetViewport();

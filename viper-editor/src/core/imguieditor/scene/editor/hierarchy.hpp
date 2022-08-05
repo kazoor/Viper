@@ -13,5 +13,6 @@ namespace Viper {
         void OnImGuiRenderItems( Timestep::Timestep ts );
     private:
         Scene* m_Context;
+        Scene* m_Editor;
     };
 };

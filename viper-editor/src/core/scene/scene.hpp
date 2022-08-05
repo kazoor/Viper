@@ -10,6 +10,13 @@
 
 namespace Viper {
     class Entity;
+
+    enum class SceneStates : int {
+        State_None,
+        State_Playing,
+        State_Simulating
+    };
+
     class Scene {
     public:
         Scene();
@@ -21,15 +28,18 @@ namespace Viper {
         
         void OnUpdate( Timestep::Timestep ts );
 
-        void OnPhysics( );
+        void OnPhysics();
 
-        void ResetViewport( );
+        void ResetViewport();
 
         void OnPhysicsStart();
 
         void OnPhysicsUpdate();
 
         void OnPhysicsEnd();
+
+        template< typename... Components >
+        Entity GetView();
     private:
         friend class Entity;
         friend class SceneHierarchy;
@@ -38,6 +48,9 @@ namespace Viper {
         entt::registry m_register;
         entt::entity m_selected_entity = entt::null;
 
+        Scene* m_CopyScene;
         b2World* m_box_world;
+
+        SceneStates m_SceneState = SceneStates::State_None;
     };
 };

@@ -10,6 +10,7 @@
 #include <scene/scene.hpp>
 #include <graphics/renderer/renderer2d.hpp>
 #include <util/globals/global.hpp>
+#include <graphics/renderer/rendercommand.hpp>
 
 namespace Viper {
     static char buff[80] = { '\0' };
@@ -28,12 +29,21 @@ namespace Viper {
 
             ImGui::DragFloat("Rad", &Globals::Editor::Radians );
 
+            ImGui::Text("Color Attachment.");
+            ImGui::Image( reinterpret_cast< ImTextureID >( RenderCommand::GetColorAttachment()), ImVec2(100.0f, 100.0f));
+            ImGui::Text("Depth Attachment.");
+            ImGui::Image( reinterpret_cast< ImTextureID >( RenderCommand::GetDepthAttachment()), ImVec2(100.0f, 100.0f));
+
             if( m_Context->m_box_world != nullptr ) {
-                if( ImGui::Button("Stop simulation"))
+                if( ImGui::Button("Stop simulation")) {
                     m_Context->OnPhysicsEnd();
+                    m_Context->m_SceneState = SceneStates::State_None;
+                }
             } else {
-                if( ImGui::Button("Start simulation"))
+                if( ImGui::Button("Start simulation")) {
                     m_Context->OnPhysicsStart();
+                    m_Context->m_SceneState = SceneStates::State_Simulating;
+                }
             };
 
             if(ImGui::Button("Open file dialogue")) {

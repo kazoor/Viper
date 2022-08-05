@@ -24,7 +24,6 @@ struct FileManager_t {
 };
 
 constexpr const char* s_Directory = "resources";
-
 namespace Viper {
     void SceneFilexplorer::OnImGuiRender( Timestep::Timestep ts ) {
         if( ImGui::Begin("File Explorer")) {
