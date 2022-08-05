@@ -56,24 +56,18 @@ namespace Viper {
     void SceneLayer::OnUpdate(Timestep::Timestep ts) {
         Graphics::WindowParams_t &WindowData = *(Graphics::WindowParams_t *)glfwGetWindowUserPointer(WindowContext);
         
-        //Renderer::RenderCommand::SetClearColor( { 0.05f, 0.05f, 0.05f, 1.0f } );
-        //Renderer::RenderCommand::Clear();
-
         RenderCommand::SetColor({ 0.05f, 0.05f, 0.05f, 1.0f });
         RenderCommand::Clear();
         
-
-        //Renderer::Renderer2D::BindFramebuffer();
         RenderCommand::BindFBO();
-        //Renderer::RenderCommand::Clear();
         RenderCommand::Clear();
 
         AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
         m_Camera->SetProjection(-AspectRatio * Globals::Editor::ZoomLevel, AspectRatio * Globals::Editor::ZoomLevel, Globals::Editor::ZoomLevel, -Globals::Editor::ZoomLevel, 1.0f, -1.0f);
+        //m_Camera->SetPerspective(glm::radians( Globals::Editor::Radians ), AspectRatio, 0.01f, 1000.0f);
         
         Renderer2D::Begin( *m_Camera );
-        
-        Viper::Renderer2D::DrawTexture(glm::vec2(-200.0f, -200.0f), glm::vec2(1800.0f, 1800.0f), m_Texture, 100.0f, glm::vec4(1.0f));
+        Viper::Renderer2D::DrawTexture(glm::vec2(-200.0f, -200.0f), glm::vec2(1800.0f, 1800.0f), m_Texture, 150.0f, glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));
 
         m_ActiveScene->OnUpdate(ts);
 
