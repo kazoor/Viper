@@ -8,6 +8,8 @@
 #include <scene/sceneentity.hpp>
 #include <scene/scene.hpp>
 #include <components/transform.hpp>
+#include <components/rigidbody2d.hpp>
+#include <components/boxcollision2d.hpp>
 
 #include <glm/gtc/type_ptr.hpp>
 #include <nlohmann/json.hpp>
@@ -58,6 +60,8 @@ namespace Viper {
     void SerializeEntity( Entity entity, std::uint32_t entity_id, nlohmann::json& data ) {
         TransformComponent tr;
         SpriteRendererComponent sr;
+        Rigidbody2DComponent rb2d;
+        BoxCollider2DComponent bc2d;
 
         if(entity.has<TransformComponent>()) {
             tr = entity.get<TransformComponent>();
@@ -83,7 +87,7 @@ namespace Viper {
                         }}
                  }},
             }});
-        }
+        } // End transform
 
         if(entity.has<SpriteRendererComponent>()) {
             sr = entity.get<SpriteRendererComponent>();
@@ -108,7 +112,45 @@ namespace Viper {
                     }}
                 }
             });
-        }
+        } // End spriterenderer
+
+        if(entity.has<Rigidbody2DComponent>()) {
+            rb2d = entity.get<Rigidbody2DComponent>();
+            data.push_back({
+                entity_id,
+                {
+                    {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
+                    {"Rigidbody2D", {
+                        {"Type", static_cast<int>(rb2d.Type)},
+                        {"FixedRotation", rb2d.FixedRotation}
+                    }}
+                }
+            });
+        } // End rigidbody2d 
+
+        if(entity.has<BoxCollider2DComponent>()) {
+            bc2d = entity.get<BoxCollider2DComponent>();
+            data.push_back({
+                entity_id,
+                {
+                    {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
+                    {"BoxCollider2D",{
+                        {"Offset", {
+                            {"X", bc2d.offset.x},
+                            {"Y", bc2d.offset.y}
+                        } },
+                        {"Size", {
+                            {"X", bc2d.size.x},
+                            {"Y", bc2d.size.y}
+                        }},
+                        {"Density", bc2d.density},
+                        {"Friction", bc2d.friction},
+                        {"Restitution", bc2d.restitution},
+                        {"RestitutionThreshold", bc2d.restitutionthreshold}
+                    }}
+                }
+            });
+        } 
     }
 
     void SceneInspector::OnImGuiPopulateComponents( Entity entity ) {
@@ -259,7 +301,8 @@ namespace Viper {
 
                 };
                 if(ImGui::MenuItem("Save", "CTRL+S")) {
-                    nlohmann::json data = nlohmann::json::array();
+                    //nlohmann::json data = nlohmann::json::array();
+                    nlohmann::json data;
 
                     m_Context->m_register.each([&](auto entity_id ){
                         Entity ent = { entity_id, m_Context };
@@ -276,13 +319,18 @@ namespace Viper {
                     m_Context->m_register.clear();
 
                     //nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
-//
-                    //for(int i = 0; i != data.size(); ++i ) {
-                    //    auto objects = data[i][1];
-//
-                    //    if(!objects["Transform"]["Position"].is_null())
-                    //        std::cout << Objects["Transform"]["Position"] << std::endl;
-                    //}
+
+                    /*for(int i = 0; i != data.size(); ++i ) {
+                        // Make sure we dont hadd the same game object more than once
+                        int id = data[i][0].get<int>();
+                        auto component = data[i][1];
+
+                        std::vector<std::string> gomNames;
+                        static int lastId = -1;
+                        if(id != lastId) {
+                            lastId = id;
+                        }
+                    }*/
                 };
                 ImGui::EndMenu();
             };
