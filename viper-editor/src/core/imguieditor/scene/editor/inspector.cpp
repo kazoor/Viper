@@ -7,7 +7,6 @@
 #include <scene/entitycomponents.hpp>
 #include <scene/sceneentity.hpp>
 #include <scene/scene.hpp>
-#include <components/transform.hpp>
 
 #include <glm/gtc/type_ptr.hpp>
 #include <nlohmann/json.hpp>
@@ -50,6 +49,7 @@ static void imgui_gizmo_transform(const std::string& string, glm::vec3& values, 
 };
 
 constexpr const char* RigidbodyTypes[] = { "Static", "Dynamic", "Kinematic" };
+constexpr const char* CameraTypes[] = { "Perspective", "Orthographic" };
 
 namespace Viper {
     SceneInspector::SceneInspector( Scene* SceneContext ) : m_Context( SceneContext ) { };
@@ -123,6 +123,7 @@ namespace Viper {
         if( ImGui::MenuItem("BoxCollider2D") && !entity.has< BoxCollider2DComponent >( ) ) {
             entity.add< BoxCollider2DComponent >( );
         };
+
     };
 
     void SceneInspector::OnImGuiRender( Timestep::Timestep ts ) {
@@ -147,8 +148,9 @@ namespace Viper {
                 if( m_Context->m_SceneState == SceneStates::State_Simulating )
                     ImGui::BeginDisabled();
 
+                // Camera Component [START].
                 if( ent.has< TransformComponent >( ) ) {
-                    auto &[pos, scale, rot] = ent.get< TransformComponent >( );
+                    auto &[pos, scale, rot, trans] = ent.get< TransformComponent >( );
 
                     if(ImGui::TreeNodeEx( " " ICON_FA_CUBES "  Transform", t)) {
                         imgui_gizmo_transform("Position", pos);
@@ -158,7 +160,50 @@ namespace Viper {
                         ImGui::TreePop();
                     };
                 };
+                // Camera Component [END].
 
+                // Camera Component [START].
+                if( ent.has< CameraComponent >( ) ) {
+                    auto &[c, mc, as] = ent.get< CameraComponent >( );
+
+                    if(ImGui::TreeNodeEx( " " ICON_FA_CAMERA "  Camera", t)) {
+                        ImGui::Checkbox("Main Camera", &mc);        
+                        ImGui::Checkbox("Fixed Aspect Ratio", &as);
+                        const char* current_body_type = CameraTypes[(int)c.GetProjectionType()];
+                        if(ImGui::BeginCombo("Body type", current_body_type)) {
+                            for( int i = 0; i < 2; i++ ) {
+                                bool is_selected = current_body_type == CameraTypes[i];
+                                if( ImGui::Selectable(CameraTypes[i], is_selected)) {
+                                    current_body_type = CameraTypes[i];
+                                    //rb2d.Type = (Rigidbody2DComponent::BodyType)i;
+                                    c.SetProjectionType((SceneCamera::ProjectionType)i);
+                                };
+
+                                if( is_selected )
+                                    ImGui::SetItemDefaultFocus();
+                            }
+                            ImGui::EndCombo();
+                        }; 
+
+                        if( c.GetProjectionType() == SceneCamera::ProjectionType::Orthographic ) {
+                                auto _size = c.GetOrthographicSize();
+                                if( ImGui::DragFloat("Ortho Size", &_size ) )
+                                    c.SetOrthographicSize(_size);
+
+                                auto _near = c.GetOrthographicNear();
+                                if( ImGui::DragFloat("Ortho Near", &_near ) )
+                                    c.SetOrthographicNear(_near);
+
+                                auto _far = c.GetOrthographicFar();
+                                if( ImGui::DragFloat("Ortho Far", &_far ) )
+                                    c.SetOrthographicFar(_far);
+                            };
+                        ImGui::TreePop();
+                    };
+                };
+                // Camera Component [END].
+
+                // Rigidbody2D Component [START].
                 if( ent.has< Rigidbody2DComponent >( ) ) {
                     auto& rb2d = ent.get< Rigidbody2DComponent >( );
                     if(ImGui::TreeNodeEx( " " ICON_FA_CUBES "  Rigidbody2D", t)) {
@@ -191,7 +236,9 @@ namespace Viper {
                         ImGui::TreePop();
                     };
                 };
+                // Rigidbody2D Component [END].
 
+                // BoxCollider2D Component [START].
                 if( ent.has< BoxCollider2DComponent >( ) ) {
                     auto& box2d = ent.get< BoxCollider2DComponent >( );
                     if(ImGui::TreeNodeEx( " " ICON_FA_CUBES "  BoxCollider2D", t)) {
@@ -204,7 +251,9 @@ namespace Viper {
                         ImGui::TreePop();
                     };
                 };
+                // BoxCollider2D Component [STOP].
 
+                // SpriteRenderer Component [START].
                 if( ent.has< SpriteRendererComponent >( ) ) {
                     auto& sprite = ent.get< SpriteRendererComponent >( );
 
@@ -237,6 +286,7 @@ namespace Viper {
                         ImGui::TreePop();
                     };
                 };
+                // SpriteRenderer Component [END].
 
                 if( m_Context->m_SceneState == SceneStates::State_Simulating )
                     ImGui::EndDisabled();

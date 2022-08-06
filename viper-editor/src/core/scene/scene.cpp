@@ -51,7 +51,9 @@ namespace Viper {
     void Scene::OnUpdate(Timestep::Timestep ts) {
         const int velocity_iterations = 6;
         const int position_iterations = 2;
-        
+
+        Camera* m_MainCamera = nullptr;
+        glm::mat4* m_MainTransform = nullptr;
         if( m_box_world ) {
             m_box_world->Step(ts, velocity_iterations, position_iterations);
 
@@ -70,16 +72,39 @@ namespace Viper {
                 transform.rotation.z = body->GetAngle();
             };
         };
-        // Sprite & Transform
         {
-            auto view = m_register.view< TransformComponent, SpriteRendererComponent >( );
-            for( auto entity : view ) {
-                auto [tr, spr] = view.get< TransformComponent, SpriteRendererComponent >( entity );
+            auto view = m_register.view< CameraComponent, TransformComponent >( );
+            for( auto camera_entity : view ) {
+                auto [cam, trans] = view.get< CameraComponent, TransformComponent >( camera_entity );
+                if( cam.MainCamera ) {
+                    m_MainCamera = &cam.camera;
+                    m_MainTransform = &trans.transform;
+                    break;
+                };
+            }; 
+        };
+        // Sprite & Transform
+        //if( m_MainCamera ) {
+        //    Renderer2D::Begin(m_MainCamera->GetProjection(), *m_MainTransform);
+        //    auto group = m_register.group< TransformComponent >( entt::get< SpriteRendererComponent > );
+        //    for( auto entity : group ) {
+        //        auto [tr, spr] = group.get< TransformComponent, SpriteRendererComponent >( entity );
+        //        if( spr.sprite.get( ) ) {
+        //            Renderer2D::DrawRotatedTexture( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, spr.sprite, spr.tiling, tr.rotation.z, glm::vec4(spr.color.x, spr.color.y, spr.color.z, spr.color.w) );
+        //        } else Renderer2D::DrawQuadRotated( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, tr.rotation.z, spr.color);
+        //    };
+        //    Renderer2D::End();
+        //} else {
+        //    Renderer2D::Begin(m_MainCamera->GetProjection(), *m_MainTransform);
+            auto group = m_register.group< TransformComponent >( entt::get< SpriteRendererComponent > );
+            for( auto entity : group ) {
+                auto [tr, spr] = group.get< TransformComponent, SpriteRendererComponent >( entity );
                 if( spr.sprite.get( ) ) {
                     Renderer2D::DrawRotatedTexture( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, spr.sprite, spr.tiling, tr.rotation.z, glm::vec4(spr.color.x, spr.color.y, spr.color.z, spr.color.w) );
                 } else Renderer2D::DrawQuadRotated( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, tr.rotation.z, spr.color);
             };
-        }
+        //    Renderer2D::End();
+        //}
     };
 
     void Scene::OnPhysics() {
@@ -125,8 +150,6 @@ namespace Viper {
                 fixture.restitution = bc2d.restitution;
                 fixture.restitutionThreshold = bc2d.restitutionthreshold;
                 body_body->CreateFixture(&fixture);
-
-                
             };
         };
     };
@@ -136,7 +159,31 @@ namespace Viper {
         m_box_world = nullptr;
     };
 
+    Entity Scene::GetCameraEntity() {
+        auto view = m_register.view< CameraComponent >( );
+        for( auto entity : view ) {
+            auto& camera = view.get< CameraComponent >( entity );
+            if( camera.MainCamera )
+                return Entity{ entity, this };
+        };
+        return {};
+    };
+
     void Scene::OnPhysicsUpdate() {
 
+    };
+
+    void Scene::OnViewportResize( uint32_t width, uint32_t height ) {
+        m_ViewportWidth = width;
+        m_ViewportHeight = height;
+        printf("event called for viewport.\n");
+        auto view = m_register.view< CameraComponent >( );
+        for( auto camera : view ) {
+            auto& cam = view.get< CameraComponent >( camera );
+
+            if(!cam.FixedAspectRatio) {
+                cam.camera.SetViewportSize(width, height);
+            };
+        };
     };
 };

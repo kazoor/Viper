@@ -34,4 +34,7 @@ namespace Viper {
 
     uint32_t RenderCommand::GetColorAttachment( ) { return s_Command.Framebuffer->GetColorAttachment();};
     uint32_t RenderCommand::GetDepthAttachment( ) { return s_Command.Framebuffer->GetDepthAttachment();};
+
+    uint32_t RenderCommand::GetFramebufferWidth() { return s_Command.Framebuffer->GetWidth(); };
+    uint32_t RenderCommand::GetFramebufferHeight() { return s_Command.Framebuffer->GetHeight(); };
 };

@@ -6,6 +6,7 @@
 
 #include <graphics/renderer/api/color.hpp>
 #include <graphics/renderer/rendercommand.hpp>
+#include <graphics/renderer/camera/orthographic_camera_controller.hpp>
 #include <graphics/renderer/renderer2d.hpp>
 #include <graphics/renderer/light2d.hpp>
 #include <graphics/renderer/sprite2d.hpp>
@@ -32,6 +33,8 @@ public:
 
         m_Width = 1280.0f;
         m_Height = 720.0f;
+
+        m_Camera = new Viper::OrthoGraphicCameraController(1280.0f/720.0f);
     };
 
     ~SandboxLayer() {
@@ -41,6 +44,7 @@ public:
     void Destroy() {
         Viper::Renderer2D::Shutdown();
         delete m_Lights;
+        delete m_Camera;
     };
 
     void OnUpdate( Timestep ts ) {
@@ -48,24 +52,25 @@ public:
         Viper::RenderCommand::Clear();
 
         printf("fps :: %.2f\n", 1.0f / ts.seconds());
+        m_Camera->OnUpdate(ts);
 
         float aspect = m_Width / m_Height;
-        auto camera = Viper::Renderer::OrthoGraphicCamera(-aspect * 5.0f, aspect * 5.0f, 5.0f, -5.0f, 1.0f, -1.0f);
 
-        Viper::Renderer2D::Begin(camera);
+        Viper::Renderer2D::Begin(m_Camera->GetCamera());
         Viper::Renderer2D::DrawTexture(glm::vec2(-2.0f, -2.0f), glm::vec2(40.0f, 40.0f), m_Texture, 20.0f, glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));
         Viper::Renderer2D::DrawTexture(glm::vec2(-5.5f, -3.5f), glm::vec2(2.0f, 2.0f), m_Texture2, 1.0f, glm::vec4(1.0f));
             
         Viper::Renderer2D::End();
 
-        m_Lights->Begin( camera );
+        m_Lights->Begin( m_Camera->GetCamera() );
             m_Lights->Light(glm::vec2(0.0f, 0.0f), glm::vec4(0.2f, 1.0f, 0.2f, 1.0f));
             m_Lights->Light(glm::vec2(1.0f, 1.0f), glm::vec4(0.2f, 1.0f, 0.2f, 1.0f), 45.0f);
-            m_Lights->Light(glm::vec2(-1.0f, -1.0f), glm::vec4(0.2f, 1.0f, 0.2f, 1.0f), 78.0f);
+            m_Lights->Light(glm::vec2(-1.0f, -1.0f), glm::vec4(0.2f, 1.0f, 0.2f, 1.0f), 78.0f, glm::vec2(20.0f, 20.0f));
         m_Lights->End();
     };
 
     void OnEvent(Viper::Events::Event& event) {
+        m_Camera->OnEvent(event);
     };
 private:
     GLFWwindow* m_PtrToWindow;
@@ -74,6 +79,7 @@ private:
 
     Viper::Ref< Viper::Sprite2D > m_Texture, m_Texture2;
     Viper::Light2D* m_Lights;
+    Viper::OrthoGraphicCameraController* m_Camera;
 };
 
 class CTest : public Viper::Application {

@@ -23,7 +23,7 @@ namespace Viper {
     Ref< Sprite2D > m_Texture;
     SceneLayer::SceneLayer(void* context) : Layer("Scene"), WindowContext((GLFWwindow*)context) {
         AspectRatio = 2.0f;
-        m_Camera = new OrthoGraphicCameraController(1280.0f/720.0f, true);
+        m_Camera = new OrthoGraphicCameraController(1280.0f/720.0f);
 
         Renderer2D::Init();
         RenderCommand::Init();

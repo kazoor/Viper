@@ -281,7 +281,6 @@ namespace Viper {
 		    	m_TextureSlots[i]->Bind(i);
 
             m_ShaderDebug__Square->Use();
-            m_ShaderDebug__Square->SetUniformMat4("u_ViewProjection", render_camera.GetViewProjectionMatrix( ) * glm::translate( glm::mat4( 1.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) ) );
             
             const uint32_t index_count = m_IndexCount ? m_IndexCount : m_MaxIndices;
             glBindVertexArray(m_Vao);
@@ -295,7 +294,6 @@ namespace Viper {
             glBufferSubData(GL_ARRAY_BUFFER, 0, size_ptr, m_LinePtr );
            
             m_ShaderDebug__Line->Use();
-            m_ShaderDebug__Line->SetUniformMat4("u_ViewProjection", render_camera.GetViewProjectionMatrix( ) * glm::translate( glm::mat4( 1.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) ) );
 
             const uint32_t line_count = m_LineCount ? m_LineCount : m_MaxLines;
             glBindVertexArray(m_LineVao);
@@ -325,6 +323,22 @@ namespace Viper {
     void Renderer2D::Begin( const Renderer::OrthoGraphicCamera& camera ) {
         render_camera = camera;
         std::memset(&stats, 0, sizeof( Stats ) );
+        glm::mat4 view_projection = render_camera.GetViewProjectionMatrix() * glm::inverse(glm::translate( glm::mat4( 1.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) ));
+        m_ShaderDebug__Square->SetUniformMat4("u_ViewProjection", view_projection);
+        m_ShaderDebug__Line->SetUniformMat4("u_ViewProjection", view_projection );
+
+        BeginBatch();
+    };
+
+    void Renderer2D::Begin( const Camera& camera, const glm::mat4& transform ) {
+        //render_camera = camera;
+
+        std::memset(&stats, 0, sizeof( Stats ) );
+
+        glm::mat4 view_projection = camera.GetProjection() * glm::inverse( transform );
+
+        m_ShaderDebug__Square->SetUniformMat4("u_ViewProjection", view_projection );
+        m_ShaderDebug__Line->SetUniformMat4("u_ViewProjection", view_projection );
 
         BeginBatch();
     };

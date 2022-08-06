@@ -64,6 +64,8 @@ namespace Viper::Renderer {
     };
 
     void FrameBuffer::Resize( int width, int height ) {
+        m_Width = width;
+        m_Height = height;
         Setup( width, height );
     };
 

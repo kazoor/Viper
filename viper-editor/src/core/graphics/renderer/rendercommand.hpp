@@ -19,5 +19,8 @@ namespace Viper {
 
         static uint32_t GetColorAttachment( );
         static uint32_t GetDepthAttachment( );
+
+        static uint32_t GetFramebufferWidth();
+        static uint32_t GetFramebufferHeight();
     };
 };

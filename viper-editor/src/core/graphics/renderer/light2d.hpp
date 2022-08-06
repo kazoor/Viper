@@ -13,7 +13,7 @@ namespace Viper {
         Light2D();
         ~Light2D();
         void Begin( const Renderer::OrthoGraphicCamera& camera );
-        void Light( const glm::vec2& position, glm::vec4 color, float angle = 0.0f);
+        void Light( const glm::vec2& position, glm::vec4 color, float angle = 0.0f, const glm::vec2& size = glm::vec2(1.0f));
         void End();
     private:
         uint32_t m_LightVAO;

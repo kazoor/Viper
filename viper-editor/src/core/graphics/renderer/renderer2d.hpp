@@ -5,6 +5,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp> // ortho
 #include <graphics/renderer/camera/orthographic_camera.hpp>
+#include <graphics/renderer/camera/camera.hpp>
 #include <graphics/renderer/sprite2d.hpp>
 #include <viper/viper.hpp>
 
@@ -32,6 +33,7 @@ namespace Viper {
         static void DrawRotatedTexture( const glm::vec2& pos, const glm::vec2& size, const Ref< Sprite2D >& sprite, float tiling = 1.0f, float angle = 0.0f, glm::vec4 color = glm::vec4(1.0f));
 
         static void Begin( const Renderer::OrthoGraphicCamera& camera );
+        static void Begin( const Camera& camera, const glm::mat4& transform );
         static void End();
 
         static Stats& GetStats();

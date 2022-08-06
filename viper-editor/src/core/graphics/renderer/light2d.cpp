@@ -59,10 +59,10 @@ namespace Viper {
         m_LightBufferPtr = m_LightPtr;
         m_LightCount = 0;
     };
-    void Light2D::Light( const glm::vec2& position, glm::vec4 color, float angle) {
+    void Light2D::Light( const glm::vec2& position, glm::vec4 color, float angle, const glm::vec2& size) {
         glm::mat4 transform = glm::translate( glm::mat4( 1.0f ), glm::vec3( position.x, position.y, 0.0f ) ) 
         * glm::rotate( glm::mat4( 1.0f ), glm::radians( angle ), glm::vec3(0.0f, 0.0f, 1.0f))
-        * glm::scale( glm::mat4( 1.0f ), glm::vec3( 1.0f, 1.0f, 1.0f ) );
+        * glm::scale( glm::mat4( 1.0f ), glm::vec3( size.x, size.y, 1.0f ) );
         for( int i = 0; i < 3; i++ ) {
             m_LightBufferPtr->position = transform * transforms[ i ];
             m_LightBufferPtr->color = color;

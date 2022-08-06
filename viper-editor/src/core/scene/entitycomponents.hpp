@@ -2,7 +2,9 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <graphics/renderer/sprite2d.hpp>
+#include <graphics/renderer/camera/scene_camera.hpp>
 #include <util/ref/reference.hpp>
 #include <string.h>
 
@@ -14,14 +16,23 @@
 
 namespace Viper {
     struct TransformComponent {
+        glm::vec3 position;
+        glm::vec3 scale;
+        glm::vec3 rotation;
+        glm::mat4 transform = glm::mat4(1.0f);
+
         TransformComponent() = default;
         TransformComponent( const TransformComponent& o ) = default;
         TransformComponent( const glm::vec3& pos ) : position( pos ), scale(glm::vec3(0.0f)), rotation(glm::vec3(0.0f)) { };
         TransformComponent( const glm::vec3& pos, const glm::vec3& size ) : position( pos ), scale(size), rotation(glm::vec3(0.0f)) { };
-        TransformComponent( const glm::vec3& pos, const glm::vec3& size, const glm::vec3& rot ) : position( pos ), scale(size), rotation(rot) { };
-        glm::vec3 position;
-        glm::vec3 scale;
-        glm::vec3 rotation;
+        TransformComponent( const glm::vec3& pos, const glm::vec3& size, const glm::vec3& rot ) : position(pos), scale(size), rotation(rot) { };
+        
+        glm::mat4 GetTransform() const {
+            auto quat = glm::toMat4(glm::quat(rotation));
+            return glm::translate(glm::mat4(1.0f), position)
+            * quat
+            * glm::scale(glm::mat4(1.0f), scale);
+        };
     };
 
     struct TagComponent {
@@ -72,7 +83,12 @@ namespace Viper {
     };
 
     struct CameraComponent {
-        
+        SceneCamera camera;
+        bool MainCamera = true;
+        bool FixedAspectRatio = false;
+
+        CameraComponent() = default;
+        CameraComponent( const CameraComponent&) = default;
     };
 
     VIPER_INCOMPLETE_COMP(NativeScriptComponent)
