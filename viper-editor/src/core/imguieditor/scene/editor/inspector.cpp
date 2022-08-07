@@ -3,10 +3,15 @@
 #include <iostream>
 #include <imguieditor/fontawesome5.hpp>
 #include <ImGui/imgui.h>
-
+#include <unordered_map>
+#include <string>
 #include <scene/entitycomponents.hpp>
 #include <scene/sceneentity.hpp>
 #include <scene/scene.hpp>
+
+#include <components/transform.hpp>
+#include <components/rigidbody2d.hpp>
+#include <components/boxcollision2d.hpp>
 
 #include <glm/gtc/type_ptr.hpp>
 #include <nlohmann/json.hpp>
@@ -59,6 +64,8 @@ namespace Viper {
     void SerializeEntity( Entity entity, std::uint32_t entity_id, nlohmann::json& data ) {
         TransformComponent tr;
         SpriteRendererComponent sr;
+        Rigidbody2DComponent rb2d;
+        BoxCollider2DComponent bc2d;
 
         if(entity.has<TransformComponent>()) {
             tr = entity.get<TransformComponent>();
@@ -84,7 +91,7 @@ namespace Viper {
                         }}
                  }},
             }});
-        }
+        } // End transform
 
         if(entity.has<SpriteRendererComponent>()) {
             sr = entity.get<SpriteRendererComponent>();
@@ -109,7 +116,45 @@ namespace Viper {
                     }}
                 }
             });
-        }
+        } // End spriterenderer
+
+        if(entity.has<Rigidbody2DComponent>()) {
+            rb2d = entity.get<Rigidbody2DComponent>();
+            data.push_back({
+                entity_id,
+                {
+                    {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
+                    {"Rigidbody2D", {
+                        {"Type", static_cast<int>(rb2d.Type)},
+                        {"FixedRotation", rb2d.FixedRotation}
+                    }}
+                }
+            });
+        } // End rigidbody2d 
+
+        if(entity.has<BoxCollider2DComponent>()) {
+            bc2d = entity.get<BoxCollider2DComponent>();
+            data.push_back({
+                entity_id,
+                {
+                    {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
+                    {"BoxCollider2D",{
+                        {"Offset", {
+                            {"X", bc2d.offset.x},
+                            {"Y", bc2d.offset.y}
+                        } },
+                        {"Size", {
+                            {"X", bc2d.size.x},
+                            {"Y", bc2d.size.y}
+                        }},
+                        {"Density", bc2d.density},
+                        {"Friction", bc2d.friction},
+                        {"Restitution", bc2d.restitution},
+                        {"RestitutionThreshold", bc2d.restitutionthreshold}
+                    }}
+                }
+            });
+        } 
     }
 
     void SceneInspector::OnImGuiPopulateComponents( Entity entity ) {
@@ -325,10 +370,11 @@ namespace Viper {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
             if(ImGui::BeginMenu("File")) {
                 if(ImGui::MenuItem("New", "CTRL+N")) {
-
+                    m_Context->m_register.clear();
                 };
                 if(ImGui::MenuItem("Save", "CTRL+S")) {
-                    nlohmann::json data = nlohmann::json::array();
+                    //nlohmann::json data = nlohmann::json::array();
+                    nlohmann::json data;
 
                     m_Context->m_register.each([&](auto entity_id ){
                         Entity ent = { entity_id, m_Context };
@@ -344,14 +390,71 @@ namespace Viper {
                     // Before we load in a scene we want to clear the scene from all objects first.
                     m_Context->m_register.clear();
 
-                    //nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
-//
-                    //for(int i = 0; i != data.size(); ++i ) {
-                    //    auto objects = data[i][1];
-//
-                    //    if(!objects["Transform"]["Position"].is_null())
-                    //        std::cout << Objects["Transform"]["Position"] << std::endl;
-                    //}
+                    nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
+
+                    for(int i = 0; i != data.size(); ++i ) {
+                        // Make sure we dont hadd the same game object more than once
+                        std::uint32_t id = data[i][0].get<std::uint32_t>();
+                        auto component = data[i][1];
+                        Viper::Entity ent;
+
+                        std::unordered_map<std::uint32_t, std::string> objMap;
+                        static int lastId = -1;
+                        if(id != lastId) {
+                            // Map up all the tags to their matching object id & create the entity.
+                            objMap[id] = component["Tag"];
+
+                            ent = m_Context->CreateEntity(component["Tag"]);
+
+                            // Make sure to load the correct transform data.
+                            TransformComponent tr(
+                                {
+                                    component["Transform"]["Position"]["X"].get<float>(),
+                                    component["Transform"]["Position"]["Y"].get<float>(),
+                                    component["Transform"]["Position"]["Z"].get<float>()
+                                },
+                                {
+                                    component["Transform"]["Scale"]["X"].get<float>(),
+                                    component["Transform"]["Scale"]["Y"].get<float>(),
+                                    component["Transform"]["Scale"]["Z"].get<float>()
+                                },
+                                {
+                                    component["Transform"]["Rotation"]["X"].get<float>(),
+                                    component["Transform"]["Rotation"]["Y"].get<float>(),
+                                    component["Transform"]["Rotation"]["Z"].get<float>()
+                                }
+                            );
+                            ent.get<TransformComponent>() = tr;
+
+                            lastId = id;
+                        }
+
+                        for(const auto &objects : objMap) {
+                            const auto [mappedId, tag] = objects;
+                            for(int j = 0; j != data.size(); j++) {
+                                if(mappedId == data[j][0].get<int>()) {
+                                   // Check for all the components each game object should have and add them.
+                                   auto component = data[j][1];
+
+                                   if(!component["SpriteRenderer"].is_null()) {
+                                        SpriteRendererComponent sr(
+                                            glm::vec4(
+                                                component["SpriteRenderer"]["Color"]["R"].get<float>(),
+                                                component["SpriteRenderer"]["Color"]["G"].get<float>(),
+                                                component["SpriteRenderer"]["Color"]["B"].get<float>(),
+                                                component["SpriteRenderer"]["Color"]["A"].get<float>()
+                                            ),
+                                            Viper::Sprite2D::Create(component["SpriteRenderer"]["Sprite"]["Path"].get<std::string>()));
+
+                                        sr.tiling = component["SpriteRenderer"]["Sprite"]["Tiling"].get<float>();
+
+                                        ent.add<SpriteRendererComponent>();
+                                        ent.get<SpriteRendererComponent>() = sr;
+                                   }
+                                }
+                            }
+                        }
+                    }
                 };
                 ImGui::EndMenu();
             };

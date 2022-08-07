@@ -1,5 +1,6 @@
 #pragma once
 #include <string.h>
+#include <cinttypes>
 #include <util/ref/reference.hpp>
 #include <viper/viper.hpp>
 
@@ -29,6 +30,12 @@ namespace Viper {
         int GetHeight() const;
         std::string GetPath() const;
         uint32_t GetSpriteID() const;
+
+        const int SetWidth(const int W);
+        const int SetHeight(const int H);
+        const std::string SetPath(const std::string &Path);
+        const uint32_t SetSpriteID(const std::uint32_t &ID);
+
     private:
         int Width;
         int Height;
