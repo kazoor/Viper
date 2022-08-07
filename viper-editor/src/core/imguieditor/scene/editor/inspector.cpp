@@ -64,8 +64,9 @@ namespace Viper {
     void SerializeEntity( Entity entity, std::uint32_t entity_id, nlohmann::json& data ) {
         TransformComponent tr;
         SpriteRendererComponent sr;
-        Rigidbody2DComponent rb2d;
-        BoxCollider2DComponent bc2d;
+        Rigidbody2DComponent rigidbody;
+        BoxCollider2DComponent boxcollider;
+        CameraComponent cam;
 
         if(entity.has<TransformComponent>()) {
             tr = entity.get<TransformComponent>();
@@ -136,42 +137,60 @@ namespace Viper {
         } // End spriterenderer
 
         if(entity.has<Rigidbody2DComponent>()) {
-            rb2d = entity.get<Rigidbody2DComponent>();
+            rigidbody = entity.get<Rigidbody2DComponent>();
             data.push_back({
                 entity_id,
                 {
                     {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
                     {"Rigidbody2D", {
-                        {"Type", static_cast<int>(rb2d.Type)},
-                        {"FixedRotation", rb2d.FixedRotation}
+                        {"Type", static_cast<int>(rigidbody.Type)},
+                        {"FixedRotation", rigidbody.FixedRotation},
+                        {"Gravity", rigidbody.Gravity}
                     }}
                 }
             });
         } // End rigidbody2d 
 
         if(entity.has<BoxCollider2DComponent>()) {
-            bc2d = entity.get<BoxCollider2DComponent>();
+            boxcollider = entity.get<BoxCollider2DComponent>();
             data.push_back({
                 entity_id,
                 {
                     {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
                     {"BoxCollider2D",{
                         {"Offset", {
-                            {"X", bc2d.offset.x},
-                            {"Y", bc2d.offset.y}
+                            {"X", boxcollider.offset.x},
+                            {"Y", boxcollider.offset.y}
                         } },
                         {"Size", {
-                            {"X", bc2d.size.x},
-                            {"Y", bc2d.size.y}
+                            {"X", boxcollider.size.x},
+                            {"Y", boxcollider.size.y}
                         }},
-                        {"Density", bc2d.density},
-                        {"Friction", bc2d.friction},
-                        {"Restitution", bc2d.restitution},
-                        {"RestitutionThreshold", bc2d.restitutionthreshold}
+                        {"Density", boxcollider.density},
+                        {"Friction", boxcollider.friction},
+                        {"Restitution", boxcollider.restitution},
+                        {"RestitutionThreshold", boxcollider.restitutionthreshold}
                     }}
                 }
             });
-        } 
+        }
+
+        if(entity.has<CameraComponent>()) {
+            cam = entity.get<CameraComponent>();
+            
+            data.push_back({
+                entity_id, 
+                {
+                    {"Tag", entity.get<TagComponent>().tag.c_str()},
+                    {"Camera", {
+                        {"MainCamera", cam.MainCamera},
+                        {"FixedAspectRatio", cam.FixedAspectRatio},
+                        {"Type", static_cast<int>(cam.camera.GetCameraType())},
+                        {"VerticalFOV", cam.camera.GetVerticalFov()}
+                    }}
+                }
+            });
+        }
     }
 
     void SceneInspector::OnImGuiPopulateComponents( Entity entity ) {
@@ -402,6 +421,11 @@ namespace Viper {
 
                     nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
 
+                    if(data.is_null()) {
+                        VIPER_LOG("Failed to load file.");
+                        return;
+                    }
+
                     for(int i = 0; i != data.size(); ++i ) {
                         // Make sure we dont hadd the same game object more than once
                         std::uint32_t id = data[i][0].get<std::uint32_t>();
@@ -458,6 +482,37 @@ namespace Viper {
 
                                         ent.get<SpriteRendererComponent>() = sr;
                                    }
+
+                                   if(!component["Rigidbody2D"].is_null()) {
+                                        ent.add<Rigidbody2DComponent>();
+                                        auto& rigidbody = ent.get<Rigidbody2DComponent>();
+
+                                        rigidbody.Type = static_cast<Viper::Rigidbody2DComponent::BodyType>(component["Rigidbody2D"]["Type"].get<int>());
+                                        rigidbody.FixedRotation = component["Rigidbody2D"]["FixedRotation"].get<bool>();
+                                        rigidbody.Gravity = component["Rigidbody2D"]["Gravity"].get<float>();
+                                   }
+
+                                    if(!component["BoxCollider2D"].is_null()) {
+                                        ent.add<BoxCollider2DComponent>();
+                                        auto& boxcollider = ent.get<BoxCollider2DComponent>();
+
+                                        boxcollider.offset = glm::vec2(component["BoxCollider2D"]["Offset"]["X"].get<float>(), component["BoxCollider2D"]["Offset"]["Y"].get<float>());
+                                        boxcollider.size = glm::vec2(component["BoxCollider2D"]["Size"]["X"].get<float>(), component["BoxCollider2D"]["Size"]["Y"].get<float>());
+                                        boxcollider.density = component["BoxCollider2D"]["Density"].get<float>();
+                                        boxcollider.friction = component["BoxCollider2D"]["Friction"].get<float>();
+                                        boxcollider.restitution = component["BoxCollider2D"]["Restitution"].get<float>();
+                                        boxcollider.restitutionthreshold = component["BoxCollider2D"]["RestitutionThreshold"].get<float>();
+                                    }
+
+                                    if(!component["Camera"].is_null()) {
+                                        ent.add<CameraComponent>();
+                                        auto& cam = ent.get<CameraComponent>();
+
+                                        cam.MainCamera = component["Camera"]["MainCamera"].get<bool>();
+                                        cam.FixedAspectRatio = component["Camera"]["FixedAspectRatio"].get<bool>();
+                                        cam.camera.SetProjectionType(static_cast<Viper::SceneCamera::CameraTypes>(component["Camera"]["Type"].get<int>()));
+                                        cam.camera.SetVerticalFov(component["Camera"]["VerticalFOV"].get<float>());
+                                    }
                                 }
                             }
                         }

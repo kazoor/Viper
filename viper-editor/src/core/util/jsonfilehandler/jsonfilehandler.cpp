@@ -7,9 +7,12 @@ namespace Viper::Util {
     nlohmann::json JSONFileHandler::Read(const std::string &FilePath) {
         std::ifstream InStream(FilePath);
 
+        if(InStream.fail()) 
+            return nullptr;
+
         // Use nlohmann's built in function to parse
         auto ret = nlohmann::json::parse(InStream);
-
+        
         InStream.close();
         return ret;
     }
@@ -20,5 +23,5 @@ namespace Viper::Util {
         OutStream << JSONObj;
 
         OutStream.close();
-    } 
+    }
 }
