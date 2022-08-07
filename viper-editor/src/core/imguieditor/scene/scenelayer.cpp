@@ -34,11 +34,11 @@ namespace Viper {
         Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Success!", "Window has been loaded!", Globals::ConsoleSuccess );
         
         m_ActiveScene = CreateRef< Scene >( );
-        Entity ent = m_ActiveScene->CreateEntity("MainCameraComponent");
-        ent.add< CameraComponent >( );
-
-        Entity test_entity = m_ActiveScene->CreateEntity("test_ent");
-        test_entity.add< SpriteRendererComponent >( );
+        //Entity ent = m_ActiveScene->CreateEntity("MainCameraComponent");
+        //ent.add< CameraComponent >( );
+//
+        //Entity test_entity = m_ActiveScene->CreateEntity("test_ent");
+        //test_entity.add< SpriteRendererComponent >( );
 
         m_Viewport = SceneViewport( m_ActiveScene.get(), context );
         m_Hierarchy = SceneHierarchy( m_ActiveScene.get() );
