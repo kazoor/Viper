@@ -13,6 +13,7 @@ namespace Viper {
         void OnImGuiRender(Timestep::Timestep ts);
         void OnImGuiScene(Timestep::Timestep ts);
         void OnImGuiPlay(Timestep::Timestep ts);
+        void OnImGuiShader(Timestep::Timestep ts);
     private:
         Scene* m_Context;
         void* m_WindowContext;

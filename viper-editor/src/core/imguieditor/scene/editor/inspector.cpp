@@ -95,27 +95,44 @@ namespace Viper {
 
         if(entity.has<SpriteRendererComponent>()) {
             sr = entity.get<SpriteRendererComponent>();
-            data.push_back({
-                entity_id,
-                {
-                    {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
-                    {"SpriteRenderer", {
-                        {"Color", {
-                            {"R", sr.color.r},
-                            {"G", sr.color.g},
-                            {"B", sr.color.b},
-                            {"A", sr.color.a}
-                        }},
-                        {"Sprite", {
-                            {"Width", sr.sprite.get()->GetWidth()},
-                            {"Height", sr.sprite.get()->GetHeight()},
-                            {"Path", sr.sprite.get()->GetPath()},
-                            {"SpriteID", sr.sprite.get()->GetSpriteID()},
-                            {"Tiling", sr.tiling}
+            if( sr.sprite.get() != nullptr ) {
+                    data.push_back({
+                    entity_id,
+                    {
+                        {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
+                        {"SpriteRenderer", {
+                            {"Color", {
+                                {"R", sr.color.r},
+                                {"G", sr.color.g},
+                                {"B", sr.color.b},
+                                {"A", sr.color.a}
+                            }},
+                            {"Sprite", {
+                                {"Width", sr.sprite.get()->GetWidth()},
+                                {"Height", sr.sprite.get()->GetHeight()},
+                                {"Path", sr.sprite.get()->GetPath()},
+                                {"SpriteID", sr.sprite.get()->GetSpriteID()},
+                                {"Tiling", sr.tiling}
+                            }}
                         }}
-                    }}
-                }
-            });
+                    }
+                });
+            } else {
+                data.push_back({
+                    entity_id,
+                    {
+                        {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
+                        {"SpriteRenderer", {
+                            {"Color", {
+                                {"R", sr.color.r},
+                                {"G", sr.color.g},
+                                {"B", sr.color.b},
+                                {"A", sr.color.a}
+                            }}
+                        }}
+                    }
+                });
+            }
         } // End spriterenderer
 
         if(entity.has<Rigidbody2DComponent>()) {
@@ -431,18 +448,21 @@ namespace Viper {
                                    auto component = data[j][1];
 
                                    if(!component["SpriteRenderer"].is_null()) {
-                                        SpriteRendererComponent sr(
-                                            glm::vec4(
+                                        ent.add<SpriteRendererComponent>();
+                                        auto& sr = ent.get<SpriteRendererComponent>();
+
+                                        sr.color = glm::vec4(
                                                 component["SpriteRenderer"]["Color"]["R"].get<float>(),
                                                 component["SpriteRenderer"]["Color"]["G"].get<float>(),
                                                 component["SpriteRenderer"]["Color"]["B"].get<float>(),
                                                 component["SpriteRenderer"]["Color"]["A"].get<float>()
-                                            ),
-                                            Viper::Sprite2D::Create(component["SpriteRenderer"]["Sprite"]["Path"].get<std::string>()));
+                                            );
+                                        
+                                        if(component["SpriteRenderer"].contains("Sprite")) {
+                                            sr.tiling = component["SpriteRenderer"]["Sprite"]["Tiling"].get<float>();
+                                            sr.sprite = Sprite2D::Create(component["SpriteRenderer"]["Sprite"]["Path"].get<std::string>());
+                                        }
 
-                                        sr.tiling = component["SpriteRenderer"]["Sprite"]["Tiling"].get<float>();
-
-                                        ent.add<SpriteRendererComponent>();
                                         ent.get<SpriteRendererComponent>() = sr;
                                    }
                                 }

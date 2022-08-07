@@ -16,10 +16,14 @@
 #include <scene/sceneentity.hpp>
 
 #include <viper/base.hpp>
+#include <ImGui/ImColTextEditor.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <fstream>
 
 namespace Viper {
+
     SceneViewport::SceneViewport( Scene* SceneContext, void* WindowContext ) : m_Context( SceneContext ), m_WindowContext( WindowContext ) { 
+	    
     };
 
     // FBO Texture, should be rendered here.
@@ -41,6 +45,7 @@ namespace Viper {
 
         OnImGuiScene( ts );
         OnImGuiPlay( ts );
+        OnImGuiShader( ts );
     };
 
     void SceneViewport::OnImGuiScene( Timestep::Timestep ts ) {
@@ -74,18 +79,20 @@ namespace Viper {
                 ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
                 auto cameraEntity = m_Context->GetCameraEntity();
-                const auto& camera = cameraEntity.get< CameraComponent >().camera;
-                const glm::mat4& cameraProjection = camera.GetProjection();
-                glm::mat4 cameraView = glm::inverse(cameraEntity.get< TransformComponent >().GetTransform());
+                if( cameraEntity && cameraEntity != selected_entity ) {
+                    const auto& camera = cameraEntity.get< CameraComponent >().camera;
+                    const glm::mat4& cameraProjection = camera.GetProjection();
+                    glm::mat4 cameraView = glm::inverse(cameraEntity.get< TransformComponent >().GetTransform());
 
-                auto& tc = selected_entity.get< TransformComponent >();
-                glm::mat4 transform = tc.GetTransform();
+                    auto& tc = selected_entity.get< TransformComponent >();
+                    glm::mat4 transform = tc.GetTransform();
 
-                ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                        ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transform));
+                    ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+                            ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transform));
 
-                if(ImGuizmo::IsUsing())
-                    tc.Translation = glm::vec3(transform[3]);
+                    if(ImGuizmo::IsUsing())
+                        tc.Translation = glm::vec3(transform[3]);
+                }
             };
 
             //if (ImGui::IsItemClicked())
@@ -113,5 +120,9 @@ namespace Viper {
 
             ImGui::End();
         };
+    };
+
+    void SceneViewport::OnImGuiShader(Timestep::Timestep ts) {
+        
     };
 };

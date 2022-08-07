@@ -46,10 +46,6 @@ namespace Viper {
                 }
             };
 
-            auto m_CameraEnt = m_Context->GetCameraEntity();
-            auto& m_CameraTransform = m_CameraEnt.get< TransformComponent >( );
-
-            ImGui::DragFloat3("Camera transform", glm::value_ptr(m_CameraTransform.Translation ) );
 
             if(ImGui::Button("Open file dialogue")) {
                 OPENFILENAME ofn;

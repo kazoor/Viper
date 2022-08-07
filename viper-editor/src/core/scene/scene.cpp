@@ -23,6 +23,28 @@ namespace Viper {
         return b2_staticBody;
     };
 
+    class RaycastCallback : public b2RayCastCallback {
+    public:
+        RaycastCallback() {
+            m_fixture = nullptr;
+        };
+
+        float ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float fraction) {
+            m_fixture = fixture;
+            m_point = point;
+            m_normal = normal;
+            m_fraction = fraction;
+            printf("ray hit: %.2f\n", m_fraction);
+            return fraction;
+        };
+
+    private:
+        b2Fixture* m_fixture;
+        b2Vec2 m_point;
+        b2Vec2 m_normal;
+        float m_fraction;
+    };
+
     Scene::Scene() {
     };
 
@@ -52,6 +74,8 @@ namespace Viper {
         if( m_box_world ) {
             m_box_world->Step(ts, velocity_iterations, position_iterations);
 
+            m_box_world->DebugDraw();
+
             auto view = m_register.view< Rigidbody2DComponent >( );
             for( auto entity : view ) {
                 printf("box_world valid\n");
@@ -80,7 +104,7 @@ namespace Viper {
                 };
             }; 
         };
-        if( m_MainCamera ) {
+        if( m_MainCamera != nullptr ) {
             Renderer2D::Begin( m_MainCamera->GetProjection(), m_MainTransform );
 
             auto group = m_register.group< TransformComponent >( entt::get< SpriteRendererComponent > );
@@ -166,7 +190,7 @@ namespace Viper {
             if( camera.MainCamera )
                 return Entity{ entity, this };
         };
-        return {};
+        return Entity{ entt::null, this };
     };
 
     void Scene::OnPhysicsUpdate() {
