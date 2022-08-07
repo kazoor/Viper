@@ -143,7 +143,8 @@ namespace Viper {
                     {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
                     {"Rigidbody2D", {
                         {"Type", static_cast<int>(rb2d.Type)},
-                        {"FixedRotation", rb2d.FixedRotation}
+                        {"FixedRotation", rb2d.FixedRotation},
+                        {"Gravity", rb2d.Gravity}
                     }}
                 }
             });
@@ -409,6 +410,11 @@ namespace Viper {
 
                     nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
 
+                    if(data.is_null()) {
+                        VIPER_LOG("Failed to load file.");
+                        return;
+                    }
+                    
                     for(int i = 0; i != data.size(); ++i ) {
                         // Make sure we dont hadd the same game object more than once
                         std::uint32_t id = data[i][0].get<std::uint32_t>();
@@ -465,6 +471,28 @@ namespace Viper {
 
                                         ent.get<SpriteRendererComponent>() = sr;
                                    }
+
+                                   if(!component["Rigidbody2D"].is_null()) {
+                                        ent.add<Rigidbody2DComponent>();
+                                        auto& rigidbody = ent.get<Rigidbody2DComponent>();
+
+                                        rigidbody.Type = static_cast<Viper::Rigidbody2DComponent::BodyType>(component["Rigidbody2D"]["Type"].get<int>());
+                                        rigidbody.FixedRotation = component["Rigidbody2D"]["FixedRotation"].get<bool>();
+                                        rigidbody.Gravity = component["Rigidbody2D"]["Gravity"].get<float>();
+                                   }
+
+                                    if(!component["BoxCollider2D"].is_null()) {
+                                        ent.add<BoxCollider2DComponent>();
+                                        auto& boxcollider = ent.get<BoxCollider2DComponent>();
+
+                                        std::cout << component << std::endl;
+                                        boxcollider.offset = glm::vec2(component["BoxCollider2D"]["Offset"]["X"].get<float>(), component["BoxCollider2D"]["Offset"]["Y"].get<float>());
+                                        boxcollider.size = glm::vec2(component["BoxCollider2D"]["Size"]["X"].get<float>(), component["BoxCollider2D"]["Size"]["Y"].get<float>());
+                                        boxcollider.density = component["BoxCollider2D"]["Density"].get<float>();
+                                        boxcollider.friction = component["BoxCollider2D"]["Friction"].get<float>();
+                                        boxcollider.restitution = component["BoxCollider2D"]["Restitution"].get<float>();
+                                        boxcollider.restitutionthreshold = component["BoxCollider2D"]["RestitutionThreshold"].get<float>();
+                                    }
                                 }
                             }
                         }

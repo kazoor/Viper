@@ -16,7 +16,6 @@
 #include <scene/sceneentity.hpp>
 
 #include <viper/base.hpp>
-#include <ImGui/ImColTextEditor.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <fstream>
 
