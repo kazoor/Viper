@@ -2,9 +2,9 @@
 #include <cstdint>
 #include "scene.hpp"
 #include <entt/entt.hpp>
-
+#include <viper/viper.hpp>
 namespace Viper {
-    class Entity {
+    class VIPER_API Entity {
     public:
         Entity();
         Entity( entt::entity ent, Scene* scene );

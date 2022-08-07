@@ -26,10 +26,16 @@ namespace Viper::Renderer {
         void BindTexture( uint32_t texture );
 
         static Ref< FrameBuffer > Create( );
+
+        uint32_t GetWidth() const { return m_Width; };
+        uint32_t GetHeight() const { return m_Height; };
     private:
         uint32_t FBO;
         uint32_t m_ColorAttachment;
         uint32_t m_DepthBufferAttachment;
+
+        uint32_t m_Width = 1280;
+        uint32_t m_Height = 720;
     };
 };
 

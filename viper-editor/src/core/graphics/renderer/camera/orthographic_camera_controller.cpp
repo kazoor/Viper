@@ -59,4 +59,9 @@ namespace Viper {
         m_camera.SetProjection(-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level);
         return true;
     };
+
+    void OrthoGraphicCameraController::SetPosition( const glm::vec3& position ) {
+        m_camera_position = position;
+        m_camera.SetPosition( m_camera_position );
+    };
 };

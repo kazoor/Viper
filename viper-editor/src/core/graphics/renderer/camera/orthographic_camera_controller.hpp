@@ -11,6 +11,7 @@ namespace Viper {
         void OnUpdate(Timestep::Timestep ts);
         void OnEvent(Events::Event& event);
         const Renderer::OrthoGraphicCamera& GetCamera() const { return m_camera; };
+        void SetPosition( const glm::vec3& position );
     private:
         bool OnMouseScrolled(Events::MouseScrollEvent& event);
         bool OnWindowResize(Events::WindowResizeEvent& event);

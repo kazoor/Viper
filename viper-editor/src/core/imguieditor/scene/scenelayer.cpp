@@ -10,11 +10,13 @@
 #include <components/gameobject.hpp>
 #include <components/spriterenderer.hpp>
 
+#include <scene/entitycomponents.hpp>
 #include <scene/sceneentity.hpp>
 
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_glfw.h>
 #include <ImGui/imgui_impl_opengl3.h>
+#include <ImGui/ImGuizmo.h>
 
 #include <graphics/renderer/rendercommand.hpp>
 #include <graphics/renderer/renderer2d.hpp>
@@ -22,8 +24,7 @@
 namespace Viper {
     Ref< Sprite2D > m_Texture;
     SceneLayer::SceneLayer(void* context) : Layer("Scene"), WindowContext((GLFWwindow*)context) {
-        AspectRatio = 2.0f;
-        m_Camera = new OrthoGraphicCameraController(1280.0f/720.0f, true);
+        //m_Camera = new OrthoGraphicCameraController(1280.0f/720.0f);
 
         Renderer2D::Init();
         RenderCommand::Init();
@@ -33,6 +34,11 @@ namespace Viper {
         Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Success!", "Window has been loaded!", Globals::ConsoleSuccess );
         
         m_ActiveScene = CreateRef< Scene >( );
+        Entity ent = m_ActiveScene->CreateEntity("MainCameraComponent");
+        ent.add< CameraComponent >( );
+
+        Entity test_entity = m_ActiveScene->CreateEntity("test_ent");
+        test_entity.add< SpriteRendererComponent >( );
 
         m_Viewport = SceneViewport( m_ActiveScene.get(), context );
         m_Hierarchy = SceneHierarchy( m_ActiveScene.get() );
@@ -47,7 +53,7 @@ namespace Viper {
     };
 
     void SceneLayer::Destroy() {
-        delete m_Camera;
+        //delete m_Camera;
         Renderer2D::Shutdown();
 
         OnImGuiExit();
@@ -55,31 +61,21 @@ namespace Viper {
 
     void SceneLayer::OnUpdate(Timestep::Timestep ts) {
         Graphics::WindowParams_t &WindowData = *(Graphics::WindowParams_t *)glfwGetWindowUserPointer(WindowContext);
-        m_Camera->OnUpdate( ts );
+        //m_Camera->OnUpdate( ts );
         
+        RenderCommand::BindFBO();        
         RenderCommand::SetColor({ 0.05f, 0.05f, 0.05f, 1.0f });
         RenderCommand::Clear();
-        
-        RenderCommand::BindFBO();
-        RenderCommand::Clear();
 
-        AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
-        //m_Camera->SetPerspective(glm::radians( Globals::Editor::Radians ), AspectRatio, 0.01f, 1000.0f);
-        
-        Renderer2D::Begin( m_Camera->GetCamera() );
-        Viper::Renderer2D::DrawTexture(glm::vec2(-200.0f, -200.0f), glm::vec2(1800.0f, 1800.0f), m_Texture, 150.0f, glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));
-
+        //AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
         m_ActiveScene->OnUpdate(ts);
 
-        Viper::Renderer2D::End();
         RenderCommand::UnbindFBO();
 
         OnImGuiRender(ts);
     }
 
-    void SceneLayer::OnEvent(Events::Event& event) {
-        m_Camera->OnEvent(event);
-    };
+    void SceneLayer::OnEvent(Events::Event& event) { };
 
     void SceneLayer::OnImGuiInit() {
         ImGui::CreateContext();
@@ -158,6 +154,7 @@ namespace Viper {
         ImGui_ImplGlfw_NewFrame();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
     };
 
     void SceneLayer::OnImGuiEnd() {

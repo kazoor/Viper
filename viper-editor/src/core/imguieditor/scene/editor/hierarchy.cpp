@@ -11,7 +11,7 @@
 #include <graphics/renderer/renderer2d.hpp>
 #include <util/globals/global.hpp>
 #include <graphics/renderer/rendercommand.hpp>
-
+#include <glm/gtc/type_ptr.hpp>
 namespace Viper {
     static char buff[80] = { '\0' };
     SceneHierarchy::SceneHierarchy( Scene* SceneContext ) : m_Context( SceneContext ) { };
@@ -45,6 +45,11 @@ namespace Viper {
                     m_Context->m_SceneState = SceneStates::State_Simulating;
                 }
             };
+
+            auto m_CameraEnt = m_Context->GetCameraEntity();
+            auto& m_CameraTransform = m_CameraEnt.get< TransformComponent >( );
+
+            ImGui::DragFloat3("Camera transform", glm::value_ptr(m_CameraTransform.Translation ) );
 
             if(ImGui::Button("Open file dialogue")) {
                 OPENFILENAME ofn;

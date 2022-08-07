@@ -16,6 +16,7 @@
 #include <imguieditor/scene/editor/inspector.hpp>
 #include <imguieditor/scene/editor/viewport.hpp>
 #include <imguieditor/scene/editor/filexplorer.hpp>
+#include <scene/sceneentity.hpp>
 
 namespace Viper {
     class VIPER_API SceneLayer : public Layers::Layer {
@@ -44,6 +45,7 @@ namespace Viper {
         float m_LastFrame = 0.0f;
         float AspectRatio;
 
+        Entity m_CameraEntity;
 
         SceneFilexplorer m_Filexplorer;
         SceneHierarchy m_Hierarchy;

@@ -10,17 +10,18 @@ add_compile_definitions(VIPER_API VIPER_EXPORT)
 
 add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/viper/application.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/viper/application_buffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/window/window.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/shaders/shader/shader.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/rendercommand.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/light2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer3d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/framebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/sprite2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera_controller.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/scene_camera.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
         #${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/imguieditor.cpp
@@ -59,6 +60,8 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_widgets.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_tables.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/ImGuizmo.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/ImSequencer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/ImGradient.cpp
         )
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/include/box2d/")

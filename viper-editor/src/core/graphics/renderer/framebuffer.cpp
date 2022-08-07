@@ -33,22 +33,21 @@ namespace Viper::Renderer {
             glDeleteTextures(1, &m_ColorAttachment);
             glDeleteTextures(1, &m_DepthBufferAttachment);
         };
+        
         glCreateFramebuffers(1, &FBO);
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorAttachment);
         glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        //glBindTexture(GL_TEXTURE_2D, 0);
-        
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorAttachment, 0);
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_DepthBufferAttachment);
         glBindTexture(GL_TEXTURE_2D, m_DepthBufferAttachment);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, width, height );
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, width, height);
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthBufferAttachment, 0);
 
@@ -57,6 +56,7 @@ namespace Viper::Renderer {
 
     void FrameBuffer::Bind() {
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+        glViewport(0, 0, m_Width, m_Height);
     };
 
     void FrameBuffer::Unbind() {
@@ -64,6 +64,8 @@ namespace Viper::Renderer {
     };
 
     void FrameBuffer::Resize( int width, int height ) {
+        m_Width = width;
+        m_Height = height;
         Setup( width, height );
     };
 
