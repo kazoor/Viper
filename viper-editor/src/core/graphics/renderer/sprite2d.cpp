@@ -1,4 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
+#include <cinttypes>
 #include <stb/stb_image.h>
 #include <glad/glad.h>
 #include <util/globals/global.hpp>
@@ -133,5 +134,21 @@ namespace Viper {
 
     uint32_t Sprite2D::GetSpriteID() const {
         return SpriteID;
+    }
+
+    const int Sprite2D::SetWidth(const int W) {
+        Width = W;
+    }
+
+    const int Sprite2D::SetHeight(const int H) {
+        Height = H;
+    }
+
+    const std::string Sprite2D::SetPath(const std::string &Pth) {
+        Path = Pth;
+    }
+
+    const uint32_t Sprite2D::SetSpriteID(const std::uint32_t &ID) {
+        SpriteID = ID;
     }
 };

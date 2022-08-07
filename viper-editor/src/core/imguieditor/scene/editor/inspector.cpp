@@ -3,7 +3,8 @@
 #include <iostream>
 #include <imguieditor/fontawesome5.hpp>
 #include <ImGui/imgui.h>
-
+#include <unordered_map>
+#include <string>
 #include <scene/entitycomponents.hpp>
 #include <scene/sceneentity.hpp>
 #include <scene/scene.hpp>
@@ -298,7 +299,7 @@ namespace Viper {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
             if(ImGui::BeginMenu("File")) {
                 if(ImGui::MenuItem("New", "CTRL+N")) {
-
+                    m_Context->m_register.clear();
                 };
                 if(ImGui::MenuItem("Save", "CTRL+S")) {
                     //nlohmann::json data = nlohmann::json::array();
@@ -318,19 +319,71 @@ namespace Viper {
                     // Before we load in a scene we want to clear the scene from all objects first.
                     m_Context->m_register.clear();
 
-                    //nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
+                    nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
 
-                    /*for(int i = 0; i != data.size(); ++i ) {
+                    for(int i = 0; i != data.size(); ++i ) {
                         // Make sure we dont hadd the same game object more than once
-                        int id = data[i][0].get<int>();
+                        std::uint32_t id = data[i][0].get<std::uint32_t>();
                         auto component = data[i][1];
+                        Viper::Entity ent;
 
-                        std::vector<std::string> gomNames;
+                        std::unordered_map<std::uint32_t, std::string> objMap;
                         static int lastId = -1;
                         if(id != lastId) {
+                            // Map up all the tags to their matching object id & create the entity.
+                            objMap[id] = component["Tag"];
+
+                            ent = m_Context->CreateEntity(component["Tag"]);
+
+                            // Make sure to load the correct transform data.
+                            TransformComponent tr(
+                                {
+                                    component["Transform"]["Position"]["X"].get<float>(),
+                                    component["Transform"]["Position"]["Y"].get<float>(),
+                                    component["Transform"]["Position"]["Z"].get<float>()
+                                },
+                                {
+                                    component["Transform"]["Scale"]["X"].get<float>(),
+                                    component["Transform"]["Scale"]["Y"].get<float>(),
+                                    component["Transform"]["Scale"]["Z"].get<float>()
+                                },
+                                {
+                                    component["Transform"]["Rotation"]["X"].get<float>(),
+                                    component["Transform"]["Rotation"]["Y"].get<float>(),
+                                    component["Transform"]["Rotation"]["Z"].get<float>()
+                                }
+                            );
+                            ent.get<TransformComponent>() = tr;
+
                             lastId = id;
                         }
-                    }*/
+
+                        for(const auto &objects : objMap) {
+                            const auto [mappedId, tag] = objects;
+                            for(int j = 0; j != data.size(); j++) {
+                                if(mappedId == data[j][0].get<int>()) {
+                                   // Check for all the components each game object should have and add them.
+                                   auto component = data[j][1];
+
+                                   if(!component["SpriteRenderer"].is_null()) {
+                                        SpriteRendererComponent sr(
+                                            glm::vec4(
+                                                component["SpriteRenderer"]["Color"]["R"].get<float>(),
+                                                component["SpriteRenderer"]["Color"]["G"].get<float>(),
+                                                component["SpriteRenderer"]["Color"]["B"].get<float>(),
+                                                component["SpriteRenderer"]["Color"]["A"].get<float>()
+                                            ),
+                                            Viper::Sprite2D::Create(component["SpriteRenderer"]["Sprite"]["Path"].get<std::string>()));
+
+                                        sr.tiling = component["SpriteRenderer"]["Sprite"]["Tiling"].get<float>();
+
+                                        ent.add<SpriteRendererComponent>();
+                                        ent.get<SpriteRendererComponent>() = sr;
+                                   }
+                                }
+                            }
+                        }
+                    }
                 };
                 ImGui::EndMenu();
             };
