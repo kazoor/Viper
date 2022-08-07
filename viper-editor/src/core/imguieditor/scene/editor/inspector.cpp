@@ -232,35 +232,28 @@ namespace Viper {
                     if(ImGui::TreeNodeEx( " " ICON_FA_CAMERA "  Camera", t)) {
                         ImGui::Checkbox("Main Camera", &mc);        
                         ImGui::Checkbox("Fixed Aspect Ratio", &as);
-                        //const char* current_body_type = CameraTypes[(int)c.GetProjectionType()];
-                        //if(ImGui::BeginCombo("Body type", current_body_type)) {
-                        //    for( int i = 0; i < 2; i++ ) {
-                        //        bool is_selected = current_body_type == CameraTypes[i];
-                        //        if( ImGui::Selectable(CameraTypes[i], is_selected)) {
-                        //            current_body_type = CameraTypes[i];
-                        //            //rb2d.Type = (Rigidbody2DComponent::BodyType)i;
-                        //            c.SetProjectionType((SceneCamera::ProjectionType)i);
-                        //        };
+                        const char* current_body_type = CameraTypes[(int)c.GetCameraType()];
+                        if(ImGui::BeginCombo("Body type", current_body_type)) {
+                            for( int i = 0; i < 2; i++ ) {
+                                bool is_selected = current_body_type == CameraTypes[i];
+                                if( ImGui::Selectable(CameraTypes[i], is_selected)) {
+                                    current_body_type = CameraTypes[i];
+                                    //rb2d.Type = (Rigidbody2DComponent::BodyType)i;
+                                    c.SetProjectionType((SceneCamera::CameraTypes)i);
+                                };
 //
-                        //        if( is_selected )
-                        //            ImGui::SetItemDefaultFocus();
-                        //    }
-                        //    ImGui::EndCombo();
-                        //}; 
+                                if( is_selected )
+                                    ImGui::SetItemDefaultFocus();
+                            }
+                            ImGui::EndCombo();
+                        }; 
+                        if( c.GetCameraType() == SceneCamera::CameraTypes::Perspective ) {
+                            float m_fov = c.GetVerticalFov();
+                            ImGui::DragFloat("Field of view", &m_fov);
+                            if( m_fov )
+                                c.SetVerticalFov(m_fov);
 
-                        //if( c.GetProjectionType() == SceneCamera::ProjectionType::Orthographic ) {
-                        //        auto _size = c.GetOrthographicSize();
-                        //        if( ImGui::DragFloat("Ortho Size", &_size ) )
-                        //            c.SetOrthographicSize(_size);
-//
-                        //        auto _near = c.GetOrthographicNear();
-                        //        if( ImGui::DragFloat("Ortho Near", &_near ) )
-                        //            c.SetOrthographicNear(_near);
-//
-                        //        auto _far = c.GetOrthographicFar();
-                        //        if( ImGui::DragFloat("Ortho Far", &_far ) )
-                        //            c.SetOrthographicFar(_far);
-                        //    };
+                        };
                         ImGui::TreePop();
                     };
                 };

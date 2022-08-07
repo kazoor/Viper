@@ -8,7 +8,17 @@ namespace Viper {
     };
 
     void SceneCamera::SetOrthographic(float size, float nearClip, float farClip) {
+        type = CameraTypes::Orthographic;
         m_OrthographicSize = size;
+        m_OrthographicNear = nearClip;
+        m_OrthographicFar = farClip;
+
+        RecalculateMatrix();
+    };
+
+    void SceneCamera::SetPerspective(float verticalFov, float nearClip, float farClip) {
+        type = CameraTypes::Perspective;
+        m_VerticalFOV = verticalFov;
         m_OrthographicNear = nearClip;
         m_OrthographicFar = farClip;
 
@@ -23,11 +33,15 @@ namespace Viper {
     };
 
     void SceneCamera::RecalculateMatrix() {
-        float orthoLeft = -m_OrthographicSize * m_AspectRatio * 0.5f;
-        float orthoRight = m_OrthographicSize * m_AspectRatio * 0.5f;
-        float orthoBottom = -m_OrthographicSize * 0.5f;
-        float orthoTop = m_OrthographicSize * 0.5f;
+        if( type == CameraTypes::Orthographic ) {
+            float orthoLeft = -m_OrthographicSize * m_AspectRatio * 0.5f;
+            float orthoRight = m_OrthographicSize * m_AspectRatio * 0.5f;
+            float orthoBottom = -m_OrthographicSize * 0.5f;
+            float orthoTop = m_OrthographicSize * 0.5f;
 
-        m_Projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_OrthographicNear, m_OrthographicFar);
+            m_Projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_OrthographicNear, m_OrthographicFar);
+        } else if( type == CameraTypes::Perspective ) {
+            m_Projection = glm::perspective(m_VerticalFOV, m_AspectRatio, m_OrthographicNear, m_OrthographicFar);
+        };
     };
 };
