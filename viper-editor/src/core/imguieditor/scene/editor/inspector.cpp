@@ -50,6 +50,7 @@ static void imgui_gizmo_transform(const std::string& string, glm::vec3& values, 
 
 constexpr const char* RigidbodyTypes[] = { "Static", "Dynamic", "Kinematic" };
 constexpr const char* CameraTypes[] = { "Perspective", "Orthographic" };
+constexpr const char* SpriteTypes[] = { "Quad", "Triangle" };
 
 namespace Viper {
     SceneInspector::SceneInspector( Scene* SceneContext ) : m_Context( SceneContext ) { };
@@ -67,19 +68,19 @@ namespace Viper {
                     {"Tag", entity.get< TagComponent >( ).tag.c_str( )},
                     {"Transform", {
                         {"Position", {
-                            {"X", tr.position.x},
-                            {"Y", tr.position.y},
-                            {"Z", tr.position.z}
+                            {"X", tr.Translation.x},
+                            {"Y", tr.Translation.y},
+                            {"Z", tr.Translation.z}
                         }},
                         {"Scale", {
-                            {"X", tr.scale.x},
-                            {"Y", tr.scale.y},
-                            {"Z", tr.scale.z}
+                            {"X", tr.Scale.x},
+                            {"Y", tr.Scale.y},
+                            {"Z", tr.Scale.z}
                         }},
                         {"Rotation", {
-                            {"X", tr.rotation.x},
-                            {"Y", tr.rotation.y},
-                            {"Z", tr.rotation.z}
+                            {"X", tr.Rotation.x},
+                            {"Y", tr.Rotation.y},
+                            {"Z", tr.Rotation.z}
                         }}
                  }},
             }});
@@ -112,18 +113,17 @@ namespace Viper {
     }
 
     void SceneInspector::OnImGuiPopulateComponents( Entity entity ) {
-        if( ImGui::MenuItem("SpriteRenderer") && !entity.has< SpriteRendererComponent >( ) ) {
-            entity.add< SpriteRendererComponent >( glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f ) );
-        };
+        OnImGuiPopulateContext< SpriteRendererComponent >( entity, "SpriteRenderer" );
+        OnImGuiPopulateContext< Rigidbody2DComponent >( entity, "Rigidbody2D" );
+        OnImGuiPopulateContext< BoxCollider2DComponent >( entity, "BoxCollider2D" );
+        OnImGuiPopulateContext< CameraComponent >( entity, "Camera" );
+    };
 
-        if( ImGui::MenuItem("Rigidbody2D") && !entity.has< Rigidbody2DComponent >( ) ) {
-            entity.add< Rigidbody2DComponent >( );
-        };
-
-        if( ImGui::MenuItem("BoxCollider2D") && !entity.has< BoxCollider2DComponent >( ) ) {
-            entity.add< BoxCollider2DComponent >( );
-        };
-
+    template< typename T >
+    void SceneInspector::OnImGuiPopulateContext( Entity ent, const std::string& name ) {
+        if(!ent.has< T >( ) )
+            if( ImGui::MenuItem( name.c_str( ) ) )
+                ent.add< T >( );
     };
 
     void SceneInspector::OnImGuiRender( Timestep::Timestep ts ) {
@@ -145,12 +145,12 @@ namespace Viper {
                     };
                 };
 
-                if( m_Context->m_SceneState == SceneStates::State_Simulating )
-                    ImGui::BeginDisabled();
+                //if( m_Context->m_SceneState == SceneStates::State_Simulating )
+                //    ImGui::BeginDisabled();
 
                 // Camera Component [START].
                 if( ent.has< TransformComponent >( ) ) {
-                    auto &[pos, scale, rot, trans] = ent.get< TransformComponent >( );
+                    auto &[pos, rot, scale] = ent.get< TransformComponent >( );
 
                     if(ImGui::TreeNodeEx( " " ICON_FA_CUBES "  Transform", t)) {
                         imgui_gizmo_transform("Position", pos);
@@ -169,35 +169,35 @@ namespace Viper {
                     if(ImGui::TreeNodeEx( " " ICON_FA_CAMERA "  Camera", t)) {
                         ImGui::Checkbox("Main Camera", &mc);        
                         ImGui::Checkbox("Fixed Aspect Ratio", &as);
-                        const char* current_body_type = CameraTypes[(int)c.GetProjectionType()];
-                        if(ImGui::BeginCombo("Body type", current_body_type)) {
-                            for( int i = 0; i < 2; i++ ) {
-                                bool is_selected = current_body_type == CameraTypes[i];
-                                if( ImGui::Selectable(CameraTypes[i], is_selected)) {
-                                    current_body_type = CameraTypes[i];
-                                    //rb2d.Type = (Rigidbody2DComponent::BodyType)i;
-                                    c.SetProjectionType((SceneCamera::ProjectionType)i);
-                                };
+                        //const char* current_body_type = CameraTypes[(int)c.GetProjectionType()];
+                        //if(ImGui::BeginCombo("Body type", current_body_type)) {
+                        //    for( int i = 0; i < 2; i++ ) {
+                        //        bool is_selected = current_body_type == CameraTypes[i];
+                        //        if( ImGui::Selectable(CameraTypes[i], is_selected)) {
+                        //            current_body_type = CameraTypes[i];
+                        //            //rb2d.Type = (Rigidbody2DComponent::BodyType)i;
+                        //            c.SetProjectionType((SceneCamera::ProjectionType)i);
+                        //        };
+//
+                        //        if( is_selected )
+                        //            ImGui::SetItemDefaultFocus();
+                        //    }
+                        //    ImGui::EndCombo();
+                        //}; 
 
-                                if( is_selected )
-                                    ImGui::SetItemDefaultFocus();
-                            }
-                            ImGui::EndCombo();
-                        }; 
-
-                        if( c.GetProjectionType() == SceneCamera::ProjectionType::Orthographic ) {
-                                auto _size = c.GetOrthographicSize();
-                                if( ImGui::DragFloat("Ortho Size", &_size ) )
-                                    c.SetOrthographicSize(_size);
-
-                                auto _near = c.GetOrthographicNear();
-                                if( ImGui::DragFloat("Ortho Near", &_near ) )
-                                    c.SetOrthographicNear(_near);
-
-                                auto _far = c.GetOrthographicFar();
-                                if( ImGui::DragFloat("Ortho Far", &_far ) )
-                                    c.SetOrthographicFar(_far);
-                            };
+                        //if( c.GetProjectionType() == SceneCamera::ProjectionType::Orthographic ) {
+                        //        auto _size = c.GetOrthographicSize();
+                        //        if( ImGui::DragFloat("Ortho Size", &_size ) )
+                        //            c.SetOrthographicSize(_size);
+//
+                        //        auto _near = c.GetOrthographicNear();
+                        //        if( ImGui::DragFloat("Ortho Near", &_near ) )
+                        //            c.SetOrthographicNear(_near);
+//
+                        //        auto _far = c.GetOrthographicFar();
+                        //        if( ImGui::DragFloat("Ortho Far", &_far ) )
+                        //            c.SetOrthographicFar(_far);
+                        //    };
                         ImGui::TreePop();
                     };
                 };
@@ -233,6 +233,11 @@ namespace Viper {
 
                             body->ApplyForce({ pos.x, pos.y },{0.0f, 0.0f}, true);
                         }
+
+                        if(ImGui::Button("Apply force")) {
+                            b2Body* body = (b2Body*)rb2d.Rigidbody;
+                            body->ApplyForce(b2Vec2(100.0f, 100.0f), b2Vec2(0.0f, 0.0f), true); 
+                        };
                         ImGui::TreePop();
                     };
                 };
@@ -259,7 +264,21 @@ namespace Viper {
 
                     if(ImGui::TreeNodeEx(" " ICON_FA_PAINT_BRUSH "  SpriteRenderer", t)) {
                         ImGui::ColorEdit4("Sprite Color", glm::value_ptr(sprite.color));
-                         
+
+                        const char* current_sprite_type = SpriteTypes[(int)sprite.type];
+                        if(ImGui::BeginCombo("Sprite Type", current_sprite_type)) {
+                            for( int i = 0; i < 2; i++ ) {
+                                bool is_selected = current_sprite_type == SpriteTypes[i];
+                                if( ImGui::Selectable(SpriteTypes[i], is_selected)) {
+                                    current_sprite_type = SpriteTypes[i];
+                                    sprite.type = (SpriteRendererComponent::SpriteType)i;
+                                };
+
+                                if( is_selected )
+                                    ImGui::SetItemDefaultFocus();
+                            }
+                            ImGui::EndCombo();
+                        };
                         if(sprite.sprite.get() == nullptr) {
                             if(ImGui::Button("Bake Texture")) {
                                 sprite.sprite = Sprite2D::Create( "resources/textures/checkerboard.png" );
@@ -288,8 +307,8 @@ namespace Viper {
                 };
                 // SpriteRenderer Component [END].
 
-                if( m_Context->m_SceneState == SceneStates::State_Simulating )
-                    ImGui::EndDisabled();
+                //if( m_Context->m_SceneState == SceneStates::State_Simulating )
+                //    ImGui::EndDisabled();
 
                 if(ImGui::BeginPopupContextWindow("##AddComponent", 1, false)) {
                     OnImGuiPopulateComponents(ent);

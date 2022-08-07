@@ -1,29 +1,33 @@
 #include "scene_camera.hpp"
+#include <stdio.h>
 #include <glm/gtc/matrix_transform.hpp> // ortho
+
 namespace Viper {
     SceneCamera::SceneCamera() {
-        Recalculate();
+        RecalculateMatrix();
     };
 
-    void SceneCamera::SetOrthographic( float size, float near, float far ) {
-        m_OrthoSize = size;
-        m_OrthoNear = near;
-        m_OrthoFar = far;
+    void SceneCamera::SetOrthographic(float size, float nearClip, float farClip) {
+        m_OrthographicSize = size;
+        m_OrthographicNear = nearClip;
+        m_OrthographicFar = farClip;
 
-        Recalculate();
+        RecalculateMatrix();
     };
 
-    void SceneCamera::SetViewportSize( uint32_t width, uint32_t height ) {
-        m_AspectRatio = ( float )width / ( float )height;
-        Recalculate();
+    void SceneCamera::SetViewportSize(uint32_t width, uint32_t height) {
+        m_AspectRatio = (float)width / (float)height;
+        RecalculateMatrix();
+
+        //printf("[SceneCamera] Viewport update: %dx%d, aspect: %.2f\n", width, height, (float)width / (float)height);
     };
 
-    void SceneCamera::Recalculate() {
-        float ortho_left = -m_OrthoSize * m_AspectRatio * 0.5f;
-        float ortho_right = m_OrthoSize * m_AspectRatio * 0.5f;
-        float ortho_bottom = -m_OrthoSize * 0.5f;
-        float ortho_top = m_OrthoSize * 0.5f;
+    void SceneCamera::RecalculateMatrix() {
+        float orthoLeft = -m_OrthographicSize * m_AspectRatio * 0.5f;
+        float orthoRight = m_OrthographicSize * m_AspectRatio * 0.5f;
+        float orthoBottom = -m_OrthographicSize * 0.5f;
+        float orthoTop = m_OrthographicSize * 0.5f;
 
-        m_Projection = glm::ortho( ortho_left, ortho_right, ortho_bottom, ortho_top, m_OrthoNear, m_OrthoFar );
+        m_Projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_OrthographicNear, m_OrthographicFar);
     };
 };

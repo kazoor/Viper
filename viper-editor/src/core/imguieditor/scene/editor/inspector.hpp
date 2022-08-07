@@ -12,6 +12,9 @@ namespace Viper {
 
         void OnImGuiRender( Timestep::Timestep ts);
         void OnImGuiPopulateComponents( Entity entity );
+
+        template< typename T >
+        void OnImGuiPopulateContext( Entity ent, const std::string& name );
     private:
         Scene* m_Context;
     };

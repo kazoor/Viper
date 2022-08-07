@@ -37,10 +37,7 @@ namespace Viper {
     Entity Scene::CreateEntity( const std::string& tag_name ) {
         Entity ent = { m_register.create(), this };
         ent.add< TagComponent >( tag_name );
-        ent.add< TransformComponent >( 
-                glm::vec3( 1.0f, 1.0f, 0.0f ),
-                glm::vec3( 1.0f, 1.0f, 0.0f ),
-                glm::vec3( 0.0f, 0.0f, 0.0f ) );
+        ent.add< TransformComponent >( );
         return ent;
     };
 
@@ -52,8 +49,6 @@ namespace Viper {
         const int velocity_iterations = 6;
         const int position_iterations = 2;
 
-        Camera* m_MainCamera = nullptr;
-        glm::mat4* m_MainTransform = nullptr;
         if( m_box_world ) {
             m_box_world->Step(ts, velocity_iterations, position_iterations);
 
@@ -67,48 +62,51 @@ namespace Viper {
                 b2Body* body = ( b2Body* )rb2d.Rigidbody;
                 const auto& pos = body->GetPosition();
 
-                transform.position.x = pos.x;
-                transform.position.y = pos.y;
-                transform.rotation.z = body->GetAngle();
+                transform.Translation.x = pos.x;
+                transform.Translation.y = pos.y;
+                transform.Translation.z = body->GetAngle();
             };
         };
+        Camera* m_MainCamera = nullptr;
+        glm::mat4 m_MainTransform;
         {
             auto view = m_register.view< CameraComponent, TransformComponent >( );
             for( auto camera_entity : view ) {
                 auto [cam, trans] = view.get< CameraComponent, TransformComponent >( camera_entity );
                 if( cam.MainCamera ) {
                     m_MainCamera = &cam.camera;
-                    m_MainTransform = &trans.transform;
+                    m_MainTransform = trans.GetTransform();
                     break;
                 };
             }; 
         };
-        // Sprite & Transform
-        //if( m_MainCamera ) {
-        //    Renderer2D::Begin(m_MainCamera->GetProjection(), *m_MainTransform);
-        //    auto group = m_register.group< TransformComponent >( entt::get< SpriteRendererComponent > );
-        //    for( auto entity : group ) {
-        //        auto [tr, spr] = group.get< TransformComponent, SpriteRendererComponent >( entity );
-        //        if( spr.sprite.get( ) ) {
-        //            Renderer2D::DrawRotatedTexture( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, spr.sprite, spr.tiling, tr.rotation.z, glm::vec4(spr.color.x, spr.color.y, spr.color.z, spr.color.w) );
-        //        } else Renderer2D::DrawQuadRotated( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, tr.rotation.z, spr.color);
-        //    };
-        //    Renderer2D::End();
-        //} else {
-        //    Renderer2D::Begin(m_MainCamera->GetProjection(), *m_MainTransform);
+        if( m_MainCamera ) {
+            Renderer2D::Begin( m_MainCamera->GetProjection(), m_MainTransform );
+
             auto group = m_register.group< TransformComponent >( entt::get< SpriteRendererComponent > );
             for( auto entity : group ) {
                 auto [tr, spr] = group.get< TransformComponent, SpriteRendererComponent >( entity );
-                if( spr.sprite.get( ) ) {
-                    Renderer2D::DrawRotatedTexture( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, spr.sprite, spr.tiling, tr.rotation.z, glm::vec4(spr.color.x, spr.color.y, spr.color.z, spr.color.w) );
-                } else Renderer2D::DrawQuadRotated( { tr.position.x, tr.position.y }, { tr.scale.x, tr.scale.y }, tr.rotation.z, spr.color);
+
+                Renderer2D::DrawSprite(tr.GetTransform(), spr);
             };
-        //    Renderer2D::End();
-        //}
+            Renderer2D::End();
+        }
+    };
+
+    void Scene::OnOverlay( Timestep::Timestep ts ) {
+        auto group = m_register.group< TransformComponent >( entt::get< BoxCollider2DComponent > );
+        for( auto entity : group ) {
+            auto [tr, spr] = group.get< TransformComponent, BoxCollider2DComponent >( entity );
+            Renderer2D::DrawOutlinedQuad( { tr.Translation.x, tr.Translation.y }, { tr.Scale.x, tr.Scale.y }, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        };
     };
 
     void Scene::OnPhysics() {
         
+    };
+
+    Entity Scene::GetSelectedEntity() {
+        return Entity{ m_selected_entity, this };
     };
 
     void Scene::ResetViewport( ) {
@@ -126,9 +124,10 @@ namespace Viper {
 
             b2BodyDef body;
             body.type = Rigidbody2DTypeToBox2D( rb2d.Type );//(b2BodyType)rb2d.Type;
-            body.position.Set(transform.position.x, transform.position.y);
+            body.position.Set(transform.Translation.x, transform.Translation.y);
             body.fixedRotation = rb2d.FixedRotation;
-            body.angle = transform.rotation.z;
+            body.angle = transform.Rotation.z;
+            body.gravityScale = rb2d.Gravity;
 
             auto body_body = m_box_world->CreateBody(&body);
             body_body->SetFixedRotation(rb2d.FixedRotation);
@@ -139,8 +138,8 @@ namespace Viper {
 
                 b2PolygonShape polygonShanpe;
                 polygonShanpe.SetAsBox(
-                        bc2d.size.x * transform.scale.x, 
-                        bc2d.size.y * transform.scale.y
+                        bc2d.size.x * transform.Scale.x, 
+                        bc2d.size.y * transform.Scale.y
                     );
 
                 b2FixtureDef fixture;
@@ -150,6 +149,7 @@ namespace Viper {
                 fixture.restitution = bc2d.restitution;
                 fixture.restitutionThreshold = bc2d.restitutionthreshold;
                 body_body->CreateFixture(&fixture);
+                
             };
         };
     };
@@ -176,13 +176,12 @@ namespace Viper {
     void Scene::OnViewportResize( uint32_t width, uint32_t height ) {
         m_ViewportWidth = width;
         m_ViewportHeight = height;
-        printf("event called for viewport.\n");
+        
         auto view = m_register.view< CameraComponent >( );
-        for( auto camera : view ) {
-            auto& cam = view.get< CameraComponent >( camera );
-
-            if(!cam.FixedAspectRatio) {
-                cam.camera.SetViewportSize(width, height);
+        for( auto entity : view ) {
+            auto& cameraComponent = view.get< CameraComponent >( entity );
+            if(!cameraComponent.FixedAspectRatio) {
+                cameraComponent.camera.SetViewportSize( width, height );  
             };
         };
     };

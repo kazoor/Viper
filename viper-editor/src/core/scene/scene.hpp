@@ -8,6 +8,7 @@
 
 #include <entt/entt.hpp>
 #include <box2d/include/box2d/box2d.h>
+#include <viper/viper.hpp>
 
 namespace Viper {
     class Entity;
@@ -18,7 +19,7 @@ namespace Viper {
         State_Simulating
     };
 
-    class Scene {
+    class VIPER_API Scene {
     public:
         Scene();
 
@@ -29,6 +30,8 @@ namespace Viper {
         void DestroyEntity( entt::entity ent );
         
         void OnUpdate( Timestep::Timestep ts );
+
+        void OnOverlay( Timestep::Timestep ts );
 
         void OnPhysics();
 
@@ -51,6 +54,8 @@ namespace Viper {
         friend class SceneHierarchy;
         friend class SceneInspector;
         friend class SceneViewport;
+
+        Entity GetSelectedEntity();
     private:
         entt::registry m_register;
         entt::entity m_selected_entity = entt::null;

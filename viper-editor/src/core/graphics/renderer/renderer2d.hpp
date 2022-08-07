@@ -7,6 +7,7 @@
 #include <graphics/renderer/camera/orthographic_camera.hpp>
 #include <graphics/renderer/camera/camera.hpp>
 #include <graphics/renderer/sprite2d.hpp>
+#include <scene/entitycomponents.hpp>
 #include <viper/viper.hpp>
 
 namespace Viper {
@@ -32,9 +33,14 @@ namespace Viper {
         static void DrawTexture( const glm::vec2& pos, const glm::vec2& size, const Ref< Sprite2D >& sprite, float tiling = 1.0f, glm::vec4 color = glm::vec4(1.0f));
         static void DrawRotatedTexture( const glm::vec2& pos, const glm::vec2& size, const Ref< Sprite2D >& sprite, float tiling = 1.0f, float angle = 0.0f, glm::vec4 color = glm::vec4(1.0f));
 
+        static void DrawTriangle( const glm::mat4& transform, glm::vec4 color = glm::vec4(1.0f));
+        static void DrawTriangle( const glm::vec2& position, const glm::vec2& size, const float angle = 0.0f, glm::vec4 color = glm::vec4(1.0f));
+
         static void Begin( const Renderer::OrthoGraphicCamera& camera );
-        static void Begin( const Camera& camera, const glm::mat4& transform );
+        static void Begin( const glm::mat4& projection, const glm::mat4& transform );
         static void End();
+
+        static void DrawSprite( const glm::mat4& transform, SpriteRendererComponent& component);
 
         static Stats& GetStats();
     private:

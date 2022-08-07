@@ -173,8 +173,26 @@ namespace Viper::Graphics {
         LayerStack = new Layers::LayerStack();
         glfwSwapInterval(1); // Vsync on for now.
 
+        glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
+
         glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glEnable(GL_DEPTH_TEST);
+        glEnable(GL_LINE_SMOOTH);
+
+        const GLubyte* vendor = glGetString(GL_VENDOR); // Returns the vendor
+        const GLubyte* renderer = glGetString(GL_RENDERER); // Returns a hint to the model
+        const GLubyte* version = glGetString(GL_VERSION); // Returns a hint to the model
+        const GLubyte* shading = glGetString(GL_SHADING_LANGUAGE_VERSION); // Returns the amount of extensions.
+
+        spdlog::info("OpenGL Vendor: {0}", vendor );
+        spdlog::info("OpenGL Renderer: {0}", renderer );
+        spdlog::info("OpenGL Version: {0}", version );
+        spdlog::info("OpenGL Shading: {0}", shading );
     };
 
     GLFWwindow* Window::CreateWindowEx(WindowParams_t Params) {
@@ -205,8 +223,8 @@ namespace Viper::Graphics {
             dispatcher.Dispatch< Events::WindowResizeEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowResizeEvent ) );
             dispatcher.Dispatch< Events::WindowCloseEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowCloseEvent ) );
             
-            dispatcher.Dispatch<Events::MouseCursorPositionEvent>(
-                    VIPER_GET_EVENT_FUNC(Window::OnWindowMouseCursorPositionEvent));
+            //dispatcher.Dispatch<Events::MouseCursorPositionEvent>(
+            //        VIPER_GET_EVENT_FUNC(Window::OnWindowMouseCursorPositionEvent));
             //dispatcher.Dispatch<Events::MouseScrollEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowMouseScrollEvent));
 
             dispatcher.Dispatch<Events::KeyboardKeyPressedEvent>(VIPER_GET_EVENT_FUNC(Window::OnKeyboardKeyPressedEvent));

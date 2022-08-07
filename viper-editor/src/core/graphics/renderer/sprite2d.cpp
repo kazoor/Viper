@@ -12,6 +12,7 @@ namespace Viper {
     };
 
     Sprite2D::Sprite2D( const std::string& path ) : Path(path) {
+        stbi_set_flip_vertically_on_load(1);
         int m_texture_width, m_texture_height, m_texture_channels;
         unsigned char* m_TextureData = stbi_load(path.c_str( ), &m_texture_width, &m_texture_height, &m_texture_channels, 0);
         if( m_TextureData )

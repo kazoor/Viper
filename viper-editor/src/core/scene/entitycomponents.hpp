@@ -6,7 +6,9 @@
 #include <graphics/renderer/sprite2d.hpp>
 #include <graphics/renderer/camera/scene_camera.hpp>
 #include <util/ref/reference.hpp>
+#include <viper/viper.hpp>
 #include <string.h>
+#include <box2d/include/box2d/b2_body.h>
 
 #define VIPER_INCOMPLETE_COMP( CompDef ) struct CompDef { \
     CompDef() { printf("error, comp not complete for " #CompDef ); } \
@@ -15,46 +17,52 @@
 };
 
 namespace Viper {
-    struct TransformComponent {
-        glm::vec3 position;
-        glm::vec3 scale;
-        glm::vec3 rotation;
-        glm::mat4 transform = glm::mat4(1.0f);
+    struct VIPER_API TransformComponent {
+        glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
 
-        TransformComponent() = default;
-        TransformComponent( const TransformComponent& o ) = default;
-        TransformComponent( const glm::vec3& pos ) : position( pos ), scale(glm::vec3(0.0f)), rotation(glm::vec3(0.0f)) { };
-        TransformComponent( const glm::vec3& pos, const glm::vec3& size ) : position( pos ), scale(size), rotation(glm::vec3(0.0f)) { };
-        TransformComponent( const glm::vec3& pos, const glm::vec3& size, const glm::vec3& rot ) : position(pos), scale(size), rotation(rot) { };
-        
-        glm::mat4 GetTransform() const {
-            auto quat = glm::toMat4(glm::quat(rotation));
-            return glm::translate(glm::mat4(1.0f), position)
-            * quat
-            * glm::scale(glm::mat4(1.0f), scale);
-        };
+		TransformComponent() = default;
+		TransformComponent(const TransformComponent&) = default;
+		TransformComponent(const glm::vec3& translation)
+			: Translation(translation) {}
+
+		glm::mat4 GetTransform() const
+		{
+			glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+
+			return glm::translate(glm::mat4(1.0f), Translation)
+				* rotation
+				* glm::scale(glm::mat4(1.0f), Scale);
+		}
     };
 
-    struct TagComponent {
+    struct VIPER_API TagComponent {
+        std::string tag = "{un_named_object}";
+
         TagComponent() = default;
         TagComponent( const TagComponent& o ) = default;
         TagComponent( const std::string& tagname ) : tag( tagname ) { };
-
-        std::string tag;
     };
 
-    struct SpriteRendererComponent {
+    struct VIPER_API SpriteRendererComponent {
+        enum class SpriteType : int {
+            sprite_quad,
+            sprite_triangle
+        };
+
+        glm::vec4 color = glm::vec4( 1.0f );
+        float tiling = 1.0f;
+        Ref< Sprite2D > sprite;
+        SpriteType type = SpriteType::sprite_quad;
+
         SpriteRendererComponent() = default;
         SpriteRendererComponent( const SpriteRendererComponent& o ) = default;
         SpriteRendererComponent( const glm::vec4& col ) : color( col ), sprite( ) { };
         SpriteRendererComponent( const glm::vec4& col, const Ref< Sprite2D >& texture ) : color( col ), sprite( texture ) { };
-
-        glm::vec4 color;
-        float tiling = 1.0f;
-        Ref< Sprite2D > sprite;
     };
 
-    struct Rigidbody2DComponent {
+    struct VIPER_API Rigidbody2DComponent {
         enum class BodyType : int {
             body_static = 0,
             body_dynamic,
@@ -64,12 +72,21 @@ namespace Viper {
         BodyType Type = BodyType::body_static;
         bool FixedRotation = false;
         void* Rigidbody = nullptr;
+        float Gravity = 1.0f;
+
+        void AddForce( const glm::vec2& force, const glm::vec2& point ) const {
+            ((b2Body*)Rigidbody)->ApplyForce( { force.x, force.y }, { point.x, point.y }, true );
+        };
+
+        void AddForceCenter(const glm::vec2& force_center) {
+            ((b2Body*)Rigidbody)->ApplyForceToCenter({force_center.x,force_center.y}, true);
+        }
 
         Rigidbody2DComponent() = default;
         Rigidbody2DComponent( const Rigidbody2DComponent& ) = default;
     };
 
-    struct BoxCollider2DComponent {
+    struct VIPER_API BoxCollider2DComponent {
         glm::vec2 offset = { 0.0f, 0.0f };
         glm::vec2 size = { 0.5f, 0.5f };
         float density = 1.0f;
@@ -82,13 +99,13 @@ namespace Viper {
         BoxCollider2DComponent( const BoxCollider2DComponent&) = default;
     };
 
-    struct CameraComponent {
+    struct VIPER_API CameraComponent {
         SceneCamera camera;
         bool MainCamera = true;
         bool FixedAspectRatio = false;
 
         CameraComponent() = default;
-        CameraComponent( const CameraComponent&) = default;
+        CameraComponent( const CameraComponent& ) = default;
     };
 
     VIPER_INCOMPLETE_COMP(NativeScriptComponent)

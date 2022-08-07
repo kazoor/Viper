@@ -8,6 +8,7 @@
 #include <util/globals/global.hpp>
 
 #include <ImGui/imgui_internal.h>
+#include <ImGui/ImGuizmo.h>
 
 #include <graphics/renderer/rendercommand.hpp>
 
@@ -30,8 +31,9 @@ namespace Viper {
             ImGui::SetWindowPos(ImVec2(0.0f, 20.0f));
             ImGui::SetWindowSize(
                     ImVec2(static_cast< float >( windowdata.Width ), static_cast< float >( windowdata.Height ) - 20.0f ));
-            static auto m_dock_space = ImGui::GetID( "m_view_id" );
-            ImGui::DockSpace(m_dock_space, ImVec2(0, 0));
+
+            ImGuiID DockspaceID = ImGui::GetID("Dockspace");
+            ImGui::DockSpace(DockspaceID, ImVec2(0,0),ImGuiDockNodeFlags_None);
 
             ImGui::End();
         }
@@ -44,7 +46,7 @@ namespace Viper {
     void SceneViewport::OnImGuiScene( Timestep::Timestep ts ) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::Begin(ICON_FA_GAMEPAD "  Scene")) {
-            ViewportSize = ImGui::GetWindowSize();
+            ViewportSize = ImGui::GetContentRegionAvail();
             ImVec2 ScenePos = ImGui::GetWindowPos();
             Globals::Editor::SceneW = ViewportSize.x;
             Globals::Editor::SceneH = ViewportSize.y;
@@ -61,8 +63,33 @@ namespace Viper {
                     ImVec2(ViewportSize.x, ViewportSize.y),
                     ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
 
-            if (ImGui::IsItemClicked())
-                m_Context->ResetViewport();
+
+            auto selected_entity = m_Context->GetSelectedEntity();
+            if( selected_entity ) {
+                ImGuizmo::SetOrthographic(false);
+                ImGuizmo::SetDrawlist();
+
+                float windowWidth = ( float )ImGui::GetWindowWidth();
+                float windowHeight = ( float )ImGui::GetWindowHeight();
+                ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+                auto cameraEntity = m_Context->GetCameraEntity();
+                const auto& camera = cameraEntity.get< CameraComponent >().camera;
+                const glm::mat4& cameraProjection = camera.GetProjection();
+                glm::mat4 cameraView = glm::inverse(cameraEntity.get< TransformComponent >().GetTransform());
+
+                auto& tc = selected_entity.get< TransformComponent >();
+                glm::mat4 transform = tc.GetTransform();
+
+                ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+                        ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transform));
+
+                if(ImGuizmo::IsUsing())
+                    tc.Translation = glm::vec3(transform[3]);
+            };
+
+            //if (ImGui::IsItemClicked())
+            //    m_Context->ResetViewport();
 
             ImGui::End();
         };
