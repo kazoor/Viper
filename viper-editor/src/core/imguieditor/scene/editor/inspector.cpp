@@ -407,24 +407,18 @@ namespace Viper {
                             ent = m_Context->CreateEntity(component["Tag"]);
 
                             // Make sure to load the correct transform data.
-                            TransformComponent tr(
-                                {
-                                    component["Transform"]["Position"]["X"].get<float>(),
+                            auto& tr = ent.get<TransformComponent>();
+                            tr.Translation = glm::vec3(component["Transform"]["Position"]["X"].get<float>(),
                                     component["Transform"]["Position"]["Y"].get<float>(),
-                                    component["Transform"]["Position"]["Z"].get<float>()
-                                },
-                                {
-                                    component["Transform"]["Scale"]["X"].get<float>(),
+                                    component["Transform"]["Position"]["Z"].get<float>());
+
+                            tr.Scale = glm::vec3(component["Transform"]["Scale"]["X"].get<float>(),
                                     component["Transform"]["Scale"]["Y"].get<float>(),
-                                    component["Transform"]["Scale"]["Z"].get<float>()
-                                },
-                                {
-                                    component["Transform"]["Rotation"]["X"].get<float>(),
+                                    component["Transform"]["Scale"]["Z"].get<float>());
+
+                            tr.Rotation = glm::vec3(component["Transform"]["Rotation"]["X"].get<float>(),
                                     component["Transform"]["Rotation"]["Y"].get<float>(),
-                                    component["Transform"]["Rotation"]["Z"].get<float>()
-                                }
-                            );
-                            ent.get<TransformComponent>() = tr;
+                                    component["Transform"]["Rotation"]["Z"].get<float>());
 
                             lastId = id;
                         }
