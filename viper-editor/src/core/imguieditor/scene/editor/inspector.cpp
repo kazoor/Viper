@@ -1,5 +1,6 @@
 #include "inspector.hpp"
 
+#include <windows.h>
 #include <iostream>
 #include <imguieditor/fontawesome5.hpp>
 #include <ImGui/imgui.h>
@@ -402,7 +403,6 @@ namespace Viper {
                     m_Context->m_register.clear();
                 };
                 if(ImGui::MenuItem("Save", "CTRL+S")) {
-                    //nlohmann::json data = nlohmann::json::array();
                     nlohmann::json data;
 
                     m_Context->m_register.each([&](auto entity_id ){
@@ -411,16 +411,45 @@ namespace Viper {
                                 return;
                             SerializeEntity(ent, static_cast<uint32_t>(entity_id), data);
                         });
-                        
-                    Viper::Util::JSONFileHandler().Write("test.json", data);
+                    
+                    OPENFILENAME ofn;
+                    char fileName[256] = "";
+                    ZeroMemory(&ofn, sizeof(ofn));
+
+                    ofn.lStructSize = sizeof(OPENFILENAME);
+                    ofn.hwndOwner = NULL;
+                    ofn.lpstrFilter = "JSON File (*.json)\0*.json\0";
+                    ofn.lpstrFile = fileName;
+                    ofn.nMaxFile = MAX_PATH;
+                    ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY;
+                    ofn.lpstrDefExt = "";
+
+                    if ( GetSaveFileName(&ofn) ) {
+                       Viper::Util::JSONFileHandler().Write(fileName, data);
+                    }
                 };
                 if(ImGui::MenuItem("Open", "CTRL+O")) {
 
                     // Before we load in a scene we want to clear the scene from all objects first.
                     m_Context->m_register.clear();
 
-                    nlohmann::json data = Viper::Util::JSONFileHandler().Read("test.json");
+                    nlohmann::json data;
+                    OPENFILENAME ofn;
+                    char fileName[256] = "";
+                    ZeroMemory(&ofn, sizeof(ofn));
 
+                    ofn.lStructSize = sizeof(OPENFILENAME);
+                    ofn.hwndOwner = NULL;
+                    ofn.lpstrFilter = "JSON File (*.json)\0*.json\0";
+                    ofn.lpstrFile = fileName;
+                    ofn.nMaxFile = MAX_PATH;
+                    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+                    ofn.lpstrDefExt = "";
+
+                    if ( GetOpenFileName(&ofn) ) {
+                       data = Viper::Util::JSONFileHandler().Read(fileName);
+                    }
+                    
                     if(data.is_null()) {
                         VIPER_LOG("Failed to load file.");
                         return;
