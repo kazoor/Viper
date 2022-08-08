@@ -29,7 +29,7 @@ namespace Viper {
         m_AspectRatio = (float)width / (float)height;
         RecalculateMatrix();
 
-        //printf("[SceneCamera] Viewport update: %dx%d, aspect: %.2f\n", width, height, (float)width / (float)height);
+        printf("[SceneCamera] Viewport update: %dx%d, aspect: %.2f\n", width, height, (float)width / (float)height);
     };
 
     void SceneCamera::RecalculateMatrix() {
