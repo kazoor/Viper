@@ -2,9 +2,9 @@
 #include <util/timer/timestep.hpp>
 #include <string.h>
 
-#include <imguieditor/scene/editor/hierarchy.hpp>
-#include <imguieditor/scene/editor/inspector.hpp>
-#include <imguieditor/scene/editor/viewport.hpp>
+#include <scene/hierarchy.hpp>
+#include <scene/inspector.hpp>
+#include <scene/viewport.hpp>
 
 #include <entt/entt.hpp>
 #include <box2d/include/box2d/box2d.h>
@@ -49,6 +49,8 @@ namespace Viper {
         Entity GetView();
 
         Entity GetCameraEntity();
+
+        void CreateCameraEntity();
     private:
         friend class Entity;
         friend class SceneHierarchy;

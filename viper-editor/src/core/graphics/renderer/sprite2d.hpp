@@ -36,6 +36,8 @@ namespace Viper {
         const void SetPath(const std::string &Path);
         const void SetSpriteID(const std::uint32_t &ID);
 
+        void Release();
+
     private:
         int Width;
         int Height;

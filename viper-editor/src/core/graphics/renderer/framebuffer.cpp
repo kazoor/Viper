@@ -4,10 +4,11 @@
 #include <glad/glad.h>
 #include "framebuffer.hpp"
 
-namespace Viper::Renderer {
-    FrameBuffer::FrameBuffer( ) {
+namespace Viper {
+    FrameBuffer::FrameBuffer( const FramebufferSpec_t& sp ) {
         //glGenFramebuffers(1, &FBO);
-        Setup(1280, 720);
+        specs = sp;
+        Setup(sp.width, sp.height);
     };
 
     FrameBuffer::~FrameBuffer() {
@@ -56,7 +57,7 @@ namespace Viper::Renderer {
 
     void FrameBuffer::Bind() {
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-        glViewport(0, 0, m_Width, m_Height);
+        glViewport(0, 0, specs.width, specs.height);
     };
 
     void FrameBuffer::Unbind() {
@@ -64,8 +65,8 @@ namespace Viper::Renderer {
     };
 
     void FrameBuffer::Resize( int width, int height ) {
-        m_Width = width;
-        m_Height = height;
+        specs.width = width;
+        specs.height = height;
         Setup( width, height );
     };
 
@@ -73,7 +74,7 @@ namespace Viper::Renderer {
         glBindTexture(GL_TEXTURE_2D, texture );
     };
 
-    Ref<FrameBuffer> FrameBuffer::Create() {
-        return CreateRef<FrameBuffer>();
+    Ref<FrameBuffer> FrameBuffer::Create(const FramebufferSpec_t& sp) {
+        return CreateRef<FrameBuffer>( sp );
     };
 };

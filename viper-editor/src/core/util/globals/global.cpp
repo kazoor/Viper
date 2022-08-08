@@ -30,18 +30,6 @@ namespace Viper::Globals {
 
     // == // == // == // == // == // == //
 
-    VIPER_DECLARE_CONTEXT_NULL(Components::GameObjectManager*, Gom)
-
-    void GlobalsContext::CreateContext() {
-        Gom = new Components::GameObjectManager();
-    };
-
-    void GlobalsContext::DestroyContext() {
-        delete Gom;
-    };
-
-    // == // == // == // == // == // == //
-
     std::vector< Console_t > ConsoleContext::m_errors{};
 
     void ConsoleContext::AddLog( const std::string& title, const std::string& log ) {

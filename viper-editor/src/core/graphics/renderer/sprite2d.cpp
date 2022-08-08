@@ -74,6 +74,7 @@ namespace Viper {
 
     void Sprite2D::Delete() {
         glDeleteTextures(1, &SpriteID);
+        printf("Deallocted texture.\n");
     };
 
     Ref< Sprite2D > Sprite2D::Create( const std::string& sprite_path ) {
@@ -102,6 +103,10 @@ namespace Viper {
 
     void Sprite2D::Bind( uint32_t slot ) {
         glBindTextureUnit( slot, SpriteID );
+    };
+
+    void Sprite2D::Release() {
+        Delete();
     };
 
     void Sprite2D::Change( const std::string& location ) {

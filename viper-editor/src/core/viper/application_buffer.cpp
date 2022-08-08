@@ -74,7 +74,7 @@ namespace Viper {
         delete m_TextureShader;
     };
 
-    void ApplicationBuffer::Render(const Ref< Renderer::FrameBuffer >& framebuffer ) {
+    void ApplicationBuffer::Render(const Ref< FrameBuffer >& framebuffer ) {
         m_TextureShader->Use();
         glBindVertexArray(m_Vao);
         for(int i = 0; i < 10; i++)

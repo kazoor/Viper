@@ -53,7 +53,7 @@ namespace Viper {
 
         glm::vec4 color = glm::vec4( 1.0f );
         float tiling = 1.0f;
-        Ref< Sprite2D > sprite;
+        Ref< Sprite2D > sprite = nullptr;
         SpriteType type = SpriteType::sprite_quad;
 
         SpriteRendererComponent() = default;

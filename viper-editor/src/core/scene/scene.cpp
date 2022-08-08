@@ -2,6 +2,7 @@
 #include <glm/vec3.hpp>
 
 #include <graphics/renderer/renderer2d.hpp>
+#include <graphics/renderer/renderer3d.hpp>
 
 #include "scene.hpp"
 #include "sceneentity.hpp"
@@ -78,7 +79,6 @@ namespace Viper {
 
             auto view = m_register.view< Rigidbody2DComponent >( );
             for( auto entity : view ) {
-                printf("box_world valid\n");
                 Entity ent = { entity, this };
                 auto& transform = ent.get< TransformComponent >( );
                 auto& rb2d = ent.get< Rigidbody2DComponent >( );
@@ -88,7 +88,7 @@ namespace Viper {
 
                 transform.Translation.x = pos.x;
                 transform.Translation.y = pos.y;
-                transform.Translation.z = body->GetAngle();
+                transform.Rotation.z = body->GetAngle();
             };
         };
         Camera* m_MainCamera = nullptr;
@@ -105,15 +105,15 @@ namespace Viper {
             }; 
         };
         if( m_MainCamera != nullptr ) {
-            Renderer2D::Begin( m_MainCamera->GetProjection(), m_MainTransform );
+            Renderer3D::Begin( m_MainCamera->GetProjection(), m_MainTransform );
 
             auto group = m_register.group< TransformComponent >( entt::get< SpriteRendererComponent > );
             for( auto entity : group ) {
                 auto [tr, spr] = group.get< TransformComponent, SpriteRendererComponent >( entity );
 
-                Renderer2D::DrawSprite(tr.GetTransform(), spr);
+                Renderer3D::Quad(tr.GetTransform(), spr.color );//DrawSprite(tr.GetTransform(), spr);
             };
-            Renderer2D::End();
+            Renderer3D::End();
         }
     };
 
@@ -191,6 +191,11 @@ namespace Viper {
                 return Entity{ entity, this };
         };
         return Entity{ entt::null, this };
+    };
+
+    void Scene::CreateCameraEntity() {
+        Entity ent = CreateEntity("MainSceneCamera");
+        ent.add< CameraComponent >( );
     };
 
     void Scene::OnPhysicsUpdate() {

@@ -1,6 +1,5 @@
 #include <viper/application.hpp>
-#include <imguieditor/imguieditor.hpp>
-#include <imguieditor/scene/scenelayer.hpp>
+#include <scene/scenelayer.hpp>
 #include <scene/entitycomponents.hpp>
 #include <scene/scene.hpp>
 #include <layers/layer/layer.hpp>

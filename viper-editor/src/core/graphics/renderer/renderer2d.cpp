@@ -500,6 +500,9 @@ namespace Viper {
     };
 
     void Renderer2D::DrawSprite( const glm::mat4& transform, SpriteRendererComponent& component) {
-        DrawQuad(transform, component.color);            
+        if(component.sprite.get())
+            DrawTexture(transform, component.sprite, component.tiling, component.color);
+        else
+            DrawQuad(transform, component.color);            
     };
 };

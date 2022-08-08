@@ -8,19 +8,7 @@
 namespace Viper {
     class VIPER_API RenderCommand {
     public:
-        static void Init();
-        
         static void Clear();
         static void SetColor(const glm::vec4 color);
-        static void Resize(const int width, const int height);
-
-        static void BindFBO();
-        static void UnbindFBO();
-
-        static uint32_t GetColorAttachment( );
-        static uint32_t GetDepthAttachment( );
-
-        static uint32_t GetFramebufferWidth();
-        static uint32_t GetFramebufferHeight();
     };
 };
