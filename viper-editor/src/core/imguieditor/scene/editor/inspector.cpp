@@ -426,6 +426,7 @@ namespace Viper {
 
                     if ( GetSaveFileName(&ofn) ) {
                        Viper::Util::JSONFileHandler().Write(fileName, data);
+                       data.clear();
                     }
                 };
                 if(ImGui::MenuItem("Open", "CTRL+O")) {
@@ -546,6 +547,7 @@ namespace Viper {
                             }
                         }
                     }
+                data.clear();
                 };
                 ImGui::EndMenu();
             };
