@@ -41,7 +41,7 @@ namespace Viper {
 
             m_Projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_OrthographicNear, m_OrthographicFar);
         } else if( type == CameraTypes::Perspective ) {
-            m_Projection = glm::perspective(m_VerticalFOV, m_AspectRatio, m_OrthographicNear, m_OrthographicFar);
+            m_Projection = glm::perspective(glm::radians(m_VerticalFOV), m_AspectRatio, m_OrthographicNear, m_OrthographicFar);
         };
     };
 };

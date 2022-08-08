@@ -1,44 +1,49 @@
 #include "scenelayer.hpp"
+
 // utils:
 #include <util/globals/global.hpp>
 #include <util/timer/timestep.hpp>
-#include <util/physics/physics2d.hpp>
 
-// components:
-#include <components/camera.hpp>
-#include <components/input.hpp>
-#include <components/gameobject.hpp>
-#include <components/spriterenderer.hpp>
+// base:
+#include <viper/base.hpp>
 
-#include <scene/entitycomponents.hpp>
-#include <scene/sceneentity.hpp>
+// scene:
+#include "fontawesome5.hpp"
+#include "entitycomponents.hpp"
+#include "sceneentity.hpp"
 
+// ImGui:
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_glfw.h>
 #include <ImGui/imgui_impl_opengl3.h>
 #include <ImGui/ImGuizmo.h>
 
+// renderer:
 #include <graphics/renderer/rendercommand.hpp>
 #include <graphics/renderer/renderer2d.hpp>
+#include <graphics/renderer/renderer3d.hpp>
 
 namespace Viper {
     Ref< Sprite2D > m_Texture;
     SceneLayer::SceneLayer(void* context) : Layer("Scene"), WindowContext((GLFWwindow*)context) {
         //m_Camera = new OrthoGraphicCameraController(1280.0f/720.0f);
 
-        Renderer2D::Init();
-        RenderCommand::Init();
+        //Renderer2D::Init();
+        Renderer3D::Init();
+
         m_Texture = Sprite2D::Create( "resources/textures/checkerboard.png" );
 
 
         Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Success!", "Window has been loaded!", Globals::ConsoleSuccess );
         
         m_ActiveScene = CreateRef< Scene >( );
-        //Entity ent = m_ActiveScene->CreateEntity("MainCameraComponent");
-        //ent.add< CameraComponent >( );
-//
-        //Entity test_entity = m_ActiveScene->CreateEntity("test_ent");
-        //test_entity.add< SpriteRendererComponent >( );
+        FrameBuffer::FramebufferSpec_t specification;
+        specification.width = 1280;
+        specification.height = 720;
+        specification.samplers = 1;
+        m_FrameBuffer = FrameBuffer::Create( specification );
+
+        m_ActiveScene->CreateCameraEntity();
 
         m_Viewport = SceneViewport( m_ActiveScene.get(), context );
         m_Hierarchy = SceneHierarchy( m_ActiveScene.get() );
@@ -54,23 +59,30 @@ namespace Viper {
 
     void SceneLayer::Destroy() {
         //delete m_Camera;
-        Renderer2D::Shutdown();
+        //Renderer2D::Shutdown();
+        Renderer3D::Shutdown();
 
         OnImGuiExit();
     };
 
     void SceneLayer::OnUpdate(Timestep::Timestep ts) {
         Graphics::WindowParams_t &WindowData = *(Graphics::WindowParams_t *)glfwGetWindowUserPointer(WindowContext);
-        //m_Camera->OnUpdate( ts );
         
-        RenderCommand::BindFBO();        
+        auto window_size = m_Viewport.GetViewportSize();
+        if( auto spec = m_FrameBuffer->GetSpecification();
+            window_size.x > 0.0f && window_size.y > 0.0f && spec.width != window_size.x || spec.height != window_size.y ) {
+                m_FrameBuffer->Resize((uint32_t)window_size.x, (uint32_t)window_size.y);
+                m_ActiveScene->OnViewportResize((uint32_t)window_size.x, (uint32_t)window_size.y);
+            };
+            
+        m_FrameBuffer->Bind();
+             
         RenderCommand::SetColor({ 0.05f, 0.05f, 0.05f, 1.0f });
         RenderCommand::Clear();
 
-        //AspectRatio = ( float )WindowData.Width / ( float )WindowData.Height;
         m_ActiveScene->OnUpdate(ts);
 
-        RenderCommand::UnbindFBO();
+        m_FrameBuffer->Unbind();
 
         OnImGuiRender(ts);
     }
@@ -165,9 +177,9 @@ namespace Viper {
 
     void SceneLayer::OnImGuiRender(Timestep::Timestep ts) {
         OnImGuiBegin();
-            m_Viewport.OnImGuiRender(ts);
+            m_Viewport.OnImGuiRender(ts, m_FrameBuffer);
             m_Filexplorer.OnImGuiRender(ts);
-            m_Hierarchy.OnImGuiRender(ts);
+            m_Hierarchy.OnImGuiRender(ts, m_FrameBuffer);
             m_Inspector.OnImGuiRender(ts);
         OnImGuiEnd();
     };

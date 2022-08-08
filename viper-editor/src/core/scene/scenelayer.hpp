@@ -10,13 +10,15 @@
 #include <graphics/window/window.hpp>
 #include <graphics/renderer/camera/orthographic_camera_controller.hpp>
 
-#include <scene/scene.hpp>
+#include "scene.hpp"
 
-#include <imguieditor/scene/editor/hierarchy.hpp>
-#include <imguieditor/scene/editor/inspector.hpp>
-#include <imguieditor/scene/editor/viewport.hpp>
-#include <imguieditor/scene/editor/filexplorer.hpp>
-#include <scene/sceneentity.hpp>
+#include "hierarchy.hpp"
+#include "inspector.hpp"
+#include "viewport.hpp"
+#include "filexplorer.hpp"
+#include <graphics/renderer/framebuffer.hpp>
+
+#include "sceneentity.hpp"
 
 namespace Viper {
     class VIPER_API SceneLayer : public Layers::Layer {
@@ -41,12 +43,12 @@ namespace Viper {
         GLFWwindow* WindowContext;
         OrthoGraphicCameraController* m_Camera;
         Ref< Scene > m_ActiveScene;
+        Ref< FrameBuffer > m_FrameBuffer;
 
         float m_LastFrame = 0.0f;
         float AspectRatio;
 
         Entity m_CameraEntity;
-
         SceneFilexplorer m_Filexplorer;
         SceneHierarchy m_Hierarchy;
         SceneInspector m_Inspector;

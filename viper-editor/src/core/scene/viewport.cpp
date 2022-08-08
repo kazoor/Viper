@@ -2,8 +2,7 @@
 #include <glad/glad.h>
 #include <graphics/window/window.hpp>
 
-
-#include <imguieditor/fontawesome5.hpp>
+#include "fontawesome5.hpp"
 
 #include <util/globals/global.hpp>
 
@@ -12,8 +11,8 @@
 
 #include <graphics/renderer/rendercommand.hpp>
 
-#include <scene/entitycomponents.hpp>
-#include <scene/sceneentity.hpp>
+#include "entitycomponents.hpp"
+#include "sceneentity.hpp"
 
 #include <viper/base.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -26,7 +25,7 @@ namespace Viper {
     };
 
     // FBO Texture, should be rendered here.
-    void SceneViewport::OnImGuiRender( Timestep::Timestep ts ) {
+    void SceneViewport::OnImGuiRender( Timestep::Timestep ts, const Ref< FrameBuffer >& framebuffer ) {
         Graphics::WindowParams_t& windowdata = *( Graphics::WindowParams_t* )glfwGetWindowUserPointer( ( GLFWwindow* )m_WindowContext );
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::Begin(VIPER_TITLE, NULL,
@@ -42,31 +41,27 @@ namespace Viper {
         }
         ImGui::PopStyleVar();
 
-        OnImGuiScene( ts );
+        OnImGuiScene( ts, framebuffer );
         OnImGuiPlay( ts );
         OnImGuiShader( ts );
     };
 
-    void SceneViewport::OnImGuiScene( Timestep::Timestep ts ) {
+    void SceneViewport::OnImGuiScene( Timestep::Timestep ts, const Ref< FrameBuffer >& framebuffer ) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::Begin(ICON_FA_GAMEPAD "  Scene")) {
-            ViewportSize = ImGui::GetContentRegionAvail();
+            auto wnd_size = ImGui::GetContentRegionAvail();
+            ViewportSize = { wnd_size.x, wnd_size.y };
+            
             ImVec2 ScenePos = ImGui::GetWindowPos();
             Globals::Editor::SceneW = ViewportSize.x;
             Globals::Editor::SceneH = ViewportSize.y;
 
-            if(RenderCommand::GetFramebufferWidth( ) != ( int )ViewportSize.x || RenderCommand::GetFramebufferHeight( ) != ( int )ViewportSize.y) {
-                RenderCommand::Resize(( int )ViewportSize.x, ( int )ViewportSize.y);
-                m_Context->OnViewportResize(( int )ViewportSize.x, ( int )ViewportSize.y);
-            };
-
             Globals::Editor::IsSceneHovered = ImGui::IsWindowHovered();
             Globals::Editor::IsSceneFocused = ImGui::IsWindowFocused();
 
-             ImGui::Image( reinterpret_cast< ImTextureID >( RenderCommand::GetColorAttachment( ) ),
+             ImGui::Image( reinterpret_cast< ImTextureID >( framebuffer->GetColorAttachment( ) ),
                     ImVec2(ViewportSize.x, ViewportSize.y),
                     ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
-
 
             auto selected_entity = m_Context->GetSelectedEntity();
             if( selected_entity ) {

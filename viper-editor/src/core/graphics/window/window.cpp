@@ -7,9 +7,9 @@
 #include "window.hpp"
 #include <util/input/inputhandler/inputhandler.hpp>
 #include <util/input/mouse/mouseevents.hpp>
-#include <imguieditor/imguieditor.hpp>
 #include <graphics/renderer/rendercommand.hpp>
-#include <imguieditor/scene/scenelayer.hpp>
+#include <scene/scenelayer.hpp>
+#include <viper/base.hpp>
 #include <thread>
 #include <algorithm>
 
@@ -253,7 +253,7 @@ namespace Viper::Graphics {
         glViewport(0, 0, E.Width, E.Height);
         WindowParams.Width = E.Width;
         WindowParams.Height = E.Height;
-        RenderCommand::Resize(E.Width, E.Height);
+        //RenderCommand::Resize(E.Width, E.Height);
         return true;
     }
 
@@ -261,7 +261,7 @@ namespace Viper::Graphics {
         spdlog::info("WindowResize Event triggered! New size is {0}x{1}", E.Width, E.Height);
         WindowParams.Width = E.Width;
         WindowParams.Height = E.Height;
-        RenderCommand::Resize(E.Width, E.Height);
+        //RenderCommand::Resize(E.Width, E.Height);
         return true;
     }
 
@@ -292,17 +292,17 @@ namespace Viper::Graphics {
 
     bool Window::OnWindowMouseCursorPositionEvent(Events::MouseCursorPositionEvent &E) {
         VIPER_LOG("MouseCursorPositionEvent Event triggered! {0}, {1}", E.x, E.y);
-        Globals::Editor::MousePosX = E.x;
-        Globals::Editor::MousePosY = E.y;
+        //Globals::Editor::MousePosX = E.x;
+        //Globals::Editor::MousePosY = E.y;
         return true;
     };
     
     bool Window::OnWindowMouseScrollEvent(Events::MouseScrollEvent &E) {
         VIPER_LOG("MouseScrollEvent Event triggered! {0}, {1}", E.x, E.y);
 
-        Globals::Editor::ZoomLevel = std::max(Globals::Editor::ZoomLevel, 0.5f);
-        if( Globals::Editor::IsSceneHovered)
-            Globals::Editor::ZoomLevel -= static_cast< float >( E.y );
+        //Globals::Editor::ZoomLevel = std::max(Globals::Editor::ZoomLevel, 0.5f);
+        //if( Globals::Editor::IsSceneHovered)
+        //    Globals::Editor::ZoomLevel -= static_cast< float >( E.y );
         return true;
     };
 

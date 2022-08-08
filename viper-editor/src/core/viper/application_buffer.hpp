@@ -9,7 +9,7 @@ namespace Viper {
         ApplicationBuffer();
         ~ApplicationBuffer();
 
-        void Render( const Ref< Renderer::FrameBuffer >& framebuffer );
+        void Render( const Ref< FrameBuffer >& framebuffer );
 
         static Ref< ApplicationBuffer > Create();
     private:

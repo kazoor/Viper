@@ -1,34 +1,34 @@
 #include "filexplorer.hpp"
 #include <ImGui/imgui.h>
-#include <imguieditor/fontawesome5.hpp>
+#include "fontawesome5.hpp"
+#include <viper/base.hpp>
 
 #include <ghc/filesystem.hpp>
 
 #include <util/globals/global.hpp>
 #include <util/timer/timer.hpp>
+#include <unordered_map>
 
-#include <vector>
+constexpr const uint32_t fnv1_basis = 0x811C9DC5;
+constexpr const uint32_t fnv1_prime = 0x1000193;
 
-static const size_t hash_png = std::hash< std::string >( )(".png");
-static const size_t hash_jpg = std::hash< std::string >( )(".jpg");
-static const size_t hash_vert = std::hash< std::string >( )(".vert");
-static const size_t hash_frag = std::hash< std::string >( )(".frag");
-static const size_t hash_ini = std::hash< std::string >( )(".ini");
-static const size_t hash_font_ttf = std::hash< std::string >( )( ".ttf" );
-static const size_t hash_font_otf = std::hash< std::string >( )( ".otf" );
+constexpr uint32_t hash32( const char* string, const uint32_t basis = fnv1_basis ) {
+	return ( string[ 0 ] == '\0' ) ? basis : hash32( &string[ 1 ], ( basis ^ string[ 0 ] ) * fnv1_prime );
+};
 
-struct FileManager_t {
-    std::string filename;
-    std::string fileext;
-    std::string relative_path;
+uint32_t hash32_runtime( const char* string ) { uint32_t m_hash = fnv1_basis;
+	for ( std::size_t i = 0; i < strlen( string ); i++ ) {
+		m_hash ^= string[ i ];
+		m_hash *= fnv1_prime;
+	};
+	return m_hash;
 };
 
 constexpr const char* s_Directory = "resources";
+
 namespace Viper {
     void SceneFilexplorer::OnImGuiRender( Timestep::Timestep ts ) {
         if( ImGui::Begin("File Explorer")) {
-            Timer::Timer ts;
-
             static ghc::filesystem::path m_CurrentDir = s_Directory;
             std::vector< FileManager_t > m_FilesWithinFolder;
             ImGui::Columns(2, "##FileExplorer");
@@ -60,30 +60,7 @@ namespace Viper {
                     m_CurrentDir = m_CurrentDir.parent_path();
                 }
             };
-            int imgui_next_id = 0;
-            for( auto f : m_FilesWithinFolder ) {
-                const size_t m_file_hash = std::hash< std::string >( )( f.fileext );
-                std::string sz_StringSerialized;
-
-                if( m_file_hash == hash_frag || m_file_hash == hash_vert )
-                    sz_StringSerialized = VIPER_FORMAT_STRING(ICON_FA_WHEELCHAIR " %s :: %s", f.filename.c_str(), f.fileext.c_str());//ImGui::Text(ICON_FA_WHEELCHAIR " %s :: %s", f.filename.c_str(), f.fileext.c_str());
-                else if( m_file_hash == hash_png || m_file_hash == hash_jpg )
-                    sz_StringSerialized = VIPER_FORMAT_STRING( ICON_FA_FILE_IMAGE " %s :: %s", f.filename.c_str(), f.fileext.c_str() );//ImGui::Text(ICON_FA_FILE_IMAGE " %s :: %s", f.filename.c_str(), f.fileext.c_str());
-                else if( m_file_hash == hash_font_ttf || m_file_hash == hash_font_otf )
-                    sz_StringSerialized = VIPER_FORMAT_STRING( ICON_FA_FONT " %s :: %s", f.filename.c_str(), f.fileext.c_str() );//ImGui::Text(ICON_FA_FONT " %s :: %s", f.filename.c_str(), f.fileext.c_str());
-                else
-                    sz_StringSerialized = VIPER_FORMAT_STRING( ICON_FA_FILE " %s :: %s", f.filename.c_str(), f.fileext.c_str() );//ImGui::Text(ICON_FA_FILE " %s :: %s", f.filename.c_str(), f.fileext.c_str());
-                
-                ImGui::Text("%s -> rel: %s", sz_StringSerialized.c_str(), f.relative_path.c_str() );
-                ImGui::PushID(imgui_next_id++);
-                ImGui::Button("DragSource");
-                if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                    const char* relative_path_location = f.relative_path.c_str( );
-                    ImGui::SetDragDropPayload("FILE_EXPLORER_DRAG_DROP", relative_path_location, ( strlen(relative_path_location) + 1 ) * sizeof( char* ) );
-                    ImGui::EndDragDropSource();
-                };
-                ImGui::PopID();
-            };
+            OnListFiles(m_FilesWithinFolder);
             ImGui::Columns(1);
             
             ImGui::End();
@@ -105,5 +82,42 @@ namespace Viper {
             ImGui::End();
         };
         ImGui::PopStyleVar();
+    };
+
+    void SceneFilexplorer::OnListFiles( const std::vector< FileManager_t >& files_in_directory ) {
+        for( const auto file : files_in_directory ) {
+            const auto m_file_hash = hash32_runtime( file.fileext.c_str( ) );
+            switch(m_file_hash) {
+                case hash32(".ini"): break;
+
+                case hash32(".png"):
+                case hash32(".jpg"): ImGui::Text("%s", VIPER_FORMAT_STRING( ICON_FA_FILE_IMAGE " %s :: image", file.filename.c_str(), file.fileext.c_str() ).c_str()); break;
+
+                case hash32(".glsl"):
+                case hash32(".sprv"):
+                case hash32(".frag"):
+                case hash32(".vert"): ImGui::Text("%s", VIPER_FORMAT_STRING(ICON_FA_WHEELCHAIR " %s :: shader", file.filename.c_str(), file.fileext.c_str()).c_str()); break;
+
+                case hash32(".ttf"):
+                case hash32(".otf"): ImGui::Text("%s", VIPER_FORMAT_STRING( ICON_FA_FONT " %s :: font", file.filename.c_str(), file.fileext.c_str() ).c_str()); break;
+
+                case hash32(".json"): ImGui::Text("%s", VIPER_FORMAT_STRING( ICON_FA_CUBE " %s :: scene", file.filename.c_str(), file.fileext.c_str() ).c_str()); break;
+
+                default:
+                    ImGui::Text("%s", VIPER_FORMAT_STRING( ICON_FA_FILE " %s :: %s", file.filename.c_str(), file.fileext.c_str() ).c_str());
+                    break;
+            };
+        };
+
+        /*
+        ImGui::Text("%s -> rel: %s", sz_StringSerialized.c_str(), f.relative_path.c_str() );
+        ImGui::PushID(imgui_next_id++);
+        ImGui::Button("DragSource");
+        if(ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+            const char* relative_path_location = f.relative_path.c_str( );
+            ImGui::SetDragDropPayload("FILE_EXPLORER_DRAG_DROP", relative_path_location, ( strlen(relative_path_location) + 1 ) * sizeof( char* ) );
+            ImGui::EndDragDropSource();
+        };
+        ImGui::PopID();*/
     };
 };

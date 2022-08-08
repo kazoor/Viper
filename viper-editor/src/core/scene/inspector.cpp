@@ -2,21 +2,23 @@
 
 #include <windows.h>
 #include <iostream>
-#include <imguieditor/fontawesome5.hpp>
 #include <ImGui/imgui.h>
 #include <unordered_map>
 #include <string>
 #include <scene/entitycomponents.hpp>
+
+#include <scene/fontawesome5.hpp>
 #include <scene/sceneentity.hpp>
 #include <scene/scene.hpp>
 
-#include <components/transform.hpp>
-#include <components/rigidbody2d.hpp>
-#include <components/boxcollision2d.hpp>
+//#include <components/transform.hpp>
+//#include <components/rigidbody2d.hpp>
+//#include <components/boxcollision2d.hpp>
 
 #include <glm/gtc/type_ptr.hpp>
 #include <nlohmann/json.hpp>
 #include <util/jsonfilehandler/jsonfilehandler.hpp>
+#include <viper/base.hpp>
 
 static void imgui_gizmo_transform(const std::string& string, glm::vec3& values, float reset_value = 0.0f) {
     ImGui::Columns(2, std::string("##").append(string).c_str( ), false);
@@ -110,10 +112,10 @@ namespace Viper {
                                 {"A", sr.color.a}
                             }},
                             {"Sprite", {
-                                {"Width", sr.sprite.get()->GetWidth()},
-                                {"Height", sr.sprite.get()->GetHeight()},
-                                {"Path", sr.sprite.get()->GetPath()},
-                                {"SpriteID", sr.sprite.get()->GetSpriteID()},
+                                {"Width", sr.sprite->GetWidth()},
+                                {"Height", sr.sprite->GetHeight()},
+                                {"Path", sr.sprite->GetPath()},
+                                {"SpriteID", sr.sprite->GetSpriteID()},
                                 {"Tiling", sr.tiling}
                             }}
                         }}
@@ -413,8 +415,8 @@ namespace Viper {
                         });
                     
                     OPENFILENAME ofn;
-                    char fileName[256] = "";
-                    ZeroMemory(&ofn, sizeof(ofn));
+                    char fileName[256] = { 0 };
+                    ZeroMemory(&ofn, sizeof(OPENFILENAME));
 
                     ofn.lStructSize = sizeof(OPENFILENAME);
                     ofn.hwndOwner = NULL;
@@ -422,7 +424,7 @@ namespace Viper {
                     ofn.lpstrFile = fileName;
                     ofn.nMaxFile = MAX_PATH;
                     ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY;
-                    ofn.lpstrDefExt = "";
+                    
 
                     if ( GetSaveFileName(&ofn) ) {
                        Viper::Util::JSONFileHandler().Write(fileName, data);
@@ -436,15 +438,15 @@ namespace Viper {
 
                     nlohmann::json data;
                     OPENFILENAME ofn;
-                    char fileName[256] = "";
-                    ZeroMemory(&ofn, sizeof(ofn));
+                    char fileName[256] = { 0 };
+                    ZeroMemory(&ofn, sizeof(OPENFILENAME));
 
                     ofn.lStructSize = sizeof(OPENFILENAME);
                     ofn.hwndOwner = NULL;
                     ofn.lpstrFilter = "JSON File (*.json)\0*.json\0";
                     ofn.lpstrFile = fileName;
                     ofn.nMaxFile = MAX_PATH;
-                    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+                    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;//OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
                     ofn.lpstrDefExt = "";
 
                     if ( GetOpenFileName(&ofn) ) {
@@ -495,9 +497,9 @@ namespace Viper {
                                    auto component = data[j][1];
 
                                    if(!component["SpriteRenderer"].is_null()) {
-                                        ent.add<SpriteRendererComponent>();
-                                        auto& sr = ent.get<SpriteRendererComponent>();
+                                        //auto& sr = ent.get<SpriteRendererComponent>();
 
+                                        SpriteRendererComponent sr;
                                         sr.color = glm::vec4(
                                                 component["SpriteRenderer"]["Color"]["R"].get<float>(),
                                                 component["SpriteRenderer"]["Color"]["G"].get<float>(),
@@ -507,10 +509,10 @@ namespace Viper {
                                         
                                         if(component["SpriteRenderer"].contains("Sprite")) {
                                             sr.tiling = component["SpriteRenderer"]["Sprite"]["Tiling"].get<float>();
-                                            sr.sprite = Sprite2D::Create(component["SpriteRenderer"]["Sprite"]["Path"].get<std::string>());
+                                            sr.sprite = Sprite2D::Create(component["SpriteRenderer"]["Sprite"]["Path"].get<nlohmann::json::string_t*>()->c_str());
                                         }
 
-                                        ent.get<SpriteRendererComponent>() = sr;
+                                        ent.add<SpriteRendererComponent>(sr);
                                    }
 
                                    if(!component["Rigidbody2D"].is_null()) {
