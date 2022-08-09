@@ -108,5 +108,12 @@ namespace Viper {
         CameraComponent( const CameraComponent& ) = default;
     };
 
+    struct VIPER_API LightComponent {
+        bool IsEnabled = true;
+
+        LightComponent() = default;
+        LightComponent(const LightComponent&) = default;
+    };
+
     VIPER_INCOMPLETE_COMP(NativeScriptComponent)
 };

@@ -2,13 +2,15 @@
 #include <util/timer/timestep.hpp>
 #include <string.h>
 
-#include <scene/hierarchy.hpp>
-#include <scene/inspector.hpp>
-#include <scene/viewport.hpp>
+#include <scene/panels/hierarchy.hpp>
+#include <scene/panels/inspector.hpp>
+#include <scene/panels/viewport.hpp>
 
 #include <entt/entt.hpp>
 #include <box2d/include/box2d/box2d.h>
 #include <viper/viper.hpp>
+
+#include <glm/mat4x4.hpp>
 
 namespace Viper {
     class Entity;
@@ -32,6 +34,8 @@ namespace Viper {
         void OnUpdate( Timestep::Timestep ts );
 
         void OnOverlay( Timestep::Timestep ts );
+
+        void OnSetEditorTransform( const glm::mat4& camera_projection, const glm::mat4& camera_transform );
 
         void OnPhysics();
 
@@ -69,5 +73,11 @@ namespace Viper {
 
         uint32_t m_ViewportWidth = 0;
         uint32_t m_ViewportHeight = 0;
+
+        glm::mat4 default_transform = glm::mat4(1.0f);
+        glm::mat4 default_projection = glm::mat4(1.0f);
+        glm::vec3 light_position{0.0f, 0.0f, 1.0f};
+        glm::vec4 light_color{1.0f, 1.0f, 1.0f, 1.0f};
+        float light_intensity = 0.1f;
     };
 };

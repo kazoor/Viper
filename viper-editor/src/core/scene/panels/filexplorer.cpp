@@ -1,6 +1,7 @@
 #include "filexplorer.hpp"
+#include "../fontawesome5.hpp"
+
 #include <ImGui/imgui.h>
-#include "fontawesome5.hpp"
 #include <viper/base.hpp>
 
 #include <ghc/filesystem.hpp>

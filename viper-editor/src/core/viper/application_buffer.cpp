@@ -34,7 +34,7 @@ namespace Viper {
     };
 
     ApplicationBuffer::ApplicationBuffer() {
-        m_TextureShader = new Graphics::Shader("resources/shaders/triangle.vert", "resources/shaders/triangle.frag");
+        m_TextureShader = new Graphics::Shader("resources/shaders/Renderer2D_Triangle.vert", "resources/shaders/Renderer2D_Triangle.frag");
         
         glCreateVertexArrays(1, &m_Vao);
         glBindVertexArray( m_Vao );

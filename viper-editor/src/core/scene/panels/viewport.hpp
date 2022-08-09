@@ -2,7 +2,7 @@
 #include <util/ref/reference.hpp>
 #include <util/timer/timestep.hpp>
 #include <ImGui/imgui.h>
-#include "scene.hpp"
+#include "../scene.hpp"
 #include <graphics/renderer/framebuffer.hpp>
 #include <glm/vec2.hpp>
 

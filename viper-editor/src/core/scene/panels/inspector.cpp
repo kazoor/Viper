@@ -201,6 +201,7 @@ namespace Viper {
         OnImGuiPopulateContext< Rigidbody2DComponent >( entity, "Rigidbody2D" );
         OnImGuiPopulateContext< BoxCollider2DComponent >( entity, "BoxCollider2D" );
         OnImGuiPopulateContext< CameraComponent >( entity, "Camera" );
+        OnImGuiPopulateContext< LightComponent >( entity, "LightComponent" );
     };
 
     template< typename T >
@@ -396,7 +397,9 @@ namespace Viper {
         };
         ImGui::PopStyleVar();
 
-        ImGui::ShowDemoWindow();
+        //ImGui::Show();
+
+     //   IMGUI_DEMO_MARKER("Columns (legacy API)/Tree");
 
         if( ImGui::BeginMainMenuBar()) {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));

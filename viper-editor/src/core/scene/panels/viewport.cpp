@@ -2,7 +2,9 @@
 #include <glad/glad.h>
 #include <graphics/window/window.hpp>
 
-#include "fontawesome5.hpp"
+#include "../fontawesome5.hpp"
+#include "../entitycomponents.hpp"
+#include "../sceneentity.hpp"
 
 #include <util/globals/global.hpp>
 
@@ -10,9 +12,6 @@
 #include <ImGui/ImGuizmo.h>
 
 #include <graphics/renderer/rendercommand.hpp>
-
-#include "entitycomponents.hpp"
-#include "sceneentity.hpp"
 
 #include <viper/base.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -42,7 +41,7 @@ namespace Viper {
         ImGui::PopStyleVar();
 
         OnImGuiScene( ts, framebuffer );
-        OnImGuiPlay( ts );
+        //OnImGuiPlay( ts );
         OnImGuiShader( ts );
     };
 

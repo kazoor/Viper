@@ -4,10 +4,10 @@
 //#include <graphics/renderer/renderer.hpp>
 #include <ImGui/imgui.h>
 
-#include "fontawesome5.hpp"
-#include "entitycomponents.hpp"
-#include "sceneentity.hpp"
-#include "scene.hpp"
+#include "../fontawesome5.hpp"
+#include "../entitycomponents.hpp"
+#include "../sceneentity.hpp"
+#include "../scene.hpp"
 
 #include <graphics/renderer/renderer2d.hpp>
 #include <graphics/renderer/renderer3d.hpp>
@@ -29,18 +29,41 @@ namespace Viper {
             //ImGui::Text("max verts: %d", stats.max_vertices_allowed);
             //ImGui::Text("max indices: %d", stats.max_indices_allowed);
             //ImGui::Text("max quads: %d", stats.max_quads_allowed);
+static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+             if (ImGui::BeginTable("table1", 3, flags))
+        {
+            ImGui::TableSetupColumn("AAA", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("BBB", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("CCC", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableHeadersRow();
+            for (int row = 0; row < 5; row++)
+            {
+                ImGui::TableNextRow();
+                for (int column = 0; column < 3; column++)
+                {
+                    ImGui::TableSetColumnIndex(column);
+                    ImGui::Text("%s %d,%d", (column == 2) ? ICON_FA_CUBE " Stretch" : "Fixed", column, row);
+                }
+            }
+            ImGui::EndTable();
+        }
 
             auto stats3d = Renderer3D::GetStats();
             ImGui::Text("Cubes: %d", stats3d.m_CubeCount);
             ImGui::Text("IndexCount: %d", stats3d.m_IndexCount);
+            ImGui::Text("DrawCalls: %d", stats3d.m_DrawCalls);
 
             ImGui::DragFloat("Rad", &Globals::Editor::Radians );
 
             ImGui::Text("Color Attachment.");
             ImGui::Image( reinterpret_cast< ImTextureID >( framebuffer->GetColorAttachment( ) ), ImVec2(100.0f, 100.0f));
+            
             ImGui::Text("Depth Attachment.");
             ImGui::Image( reinterpret_cast< ImTextureID >( framebuffer->GetDepthAttachment( ) ), ImVec2(100.0f, 100.0f));
 
+            ImGui::DragFloat3("LightPos", glm::value_ptr(m_Context->light_position), 0.05f);
+            ImGui::ColorPicker4("LightCol", glm::value_ptr( m_Context->light_color ) );
+            ImGui::SliderFloat("Intensity", &m_Context->light_intensity, 0.01f, 20.0f);
             if( m_Context->m_box_world != nullptr ) {
                 if( ImGui::Button("Stop simulation")) {
                     m_Context->OnPhysicsEnd();
@@ -53,25 +76,6 @@ namespace Viper {
                 }
             };
 
-
-            if(ImGui::Button("Open file dialogue")) {
-                OPENFILENAME ofn;
-                char fileName[256] = "";
-                ZeroMemory(&ofn, sizeof(ofn));
-
-                ofn.lStructSize = sizeof(OPENFILENAME);
-                ofn.hwndOwner = NULL;
-                ofn.lpstrFilter = "Viper scene (*.viper)\0*.viper\0";
-                ofn.lpstrFile = fileName;
-                ofn.nMaxFile = MAX_PATH;
-                ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-                ofn.lpstrDefExt = "";
-
-                if ( GetOpenFileName(&ofn) ) {
-                    printf("%s\n", fileName);
-                };
-            };
-            
             OnImGuiRenderItems( ts );
             if( ImGui::BeginPopupContextWindow(0, 1, false)) {
                 if(ImGui::MenuItem("Create Empty Entity"))
@@ -92,6 +96,7 @@ namespace Viper {
         auto view = m_Context->m_register.view< TagComponent >( );
 
         for( auto entity : view ) {
+
             auto tag_component = view.get< TagComponent >( entity );
 
             ImGuiTreeNodeFlags flag = ( ( m_Context->m_selected_entity == entity ) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;

@@ -68,6 +68,11 @@ namespace Viper {
         m_register.destroy( ent );
     };
 
+    void Scene::OnSetEditorTransform( const glm::mat4& camera_projection, const glm::mat4& camera_transform ) {
+        default_transform = camera_transform;
+        default_projection = camera_projection;
+    };
+
     void Scene::OnUpdate(Timestep::Timestep ts) {
         const int velocity_iterations = 6;
         const int position_iterations = 2;
@@ -104,17 +109,19 @@ namespace Viper {
                 };
             }; 
         };
-        if( m_MainCamera != nullptr ) {
-            Renderer3D::Begin( m_MainCamera->GetProjection(), m_MainTransform );
+        //if( m_MainCamera != nullptr ) {
+            {
+                Renderer3D::Begin( default_projection, default_transform );
+                //Renderer3D::SetLightPosition(light_position, light_color, light_intensity);
+                auto group = m_register.group< TransformComponent >( entt::get< SpriteRendererComponent > );
+                for( auto entity : group ) {
+                    auto [tr, spr] = group.get< TransformComponent, SpriteRendererComponent >( entity );
 
-            auto group = m_register.group< TransformComponent >( entt::get< SpriteRendererComponent > );
-            for( auto entity : group ) {
-                auto [tr, spr] = group.get< TransformComponent, SpriteRendererComponent >( entity );
-
-                Renderer3D::Quad(tr.GetTransform(), spr.color );//DrawSprite(tr.GetTransform(), spr);
-            };
-            Renderer3D::End();
-        }
+                    Renderer3D::Quad(tr.GetTransform(), spr.color );//DrawSprite(tr.GetTransform(), spr);
+                };
+                Renderer3D::End();
+            }
+       // }
     };
 
     void Scene::OnOverlay( Timestep::Timestep ts ) {
