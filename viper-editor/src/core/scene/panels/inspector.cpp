@@ -397,7 +397,9 @@ namespace Viper {
         };
         ImGui::PopStyleVar();
 
-        ImGui::ShowDemoWindow();
+        //ImGui::Show();
+
+     //   IMGUI_DEMO_MARKER("Columns (legacy API)/Tree");
 
         if( ImGui::BeginMainMenuBar()) {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));

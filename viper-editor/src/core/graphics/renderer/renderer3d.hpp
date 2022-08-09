@@ -19,15 +19,14 @@ namespace Viper {
         static void Shutdown();
 
         static void Begin(const glm::mat4& camera_transform, const glm::mat4& transform );
+        static void Quad( const glm::mat4& transform, const glm::vec4& color );
         static void End();
 
-        static void Quad();
-        static void Quad( const glm::mat4& transform, const glm::vec4& color );
+        static void SetLightPosition(const glm::vec3& pos, const glm::vec4& color, float intensity);
 
         static Stats3D_t& GetStats();
     private:
         static void Flush();
         static void BeginBatch();
-        static void EndBatch();
     };
 };

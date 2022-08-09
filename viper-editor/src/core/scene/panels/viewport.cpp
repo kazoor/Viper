@@ -41,7 +41,7 @@ namespace Viper {
         ImGui::PopStyleVar();
 
         OnImGuiScene( ts, framebuffer );
-        OnImGuiPlay( ts );
+        //OnImGuiPlay( ts );
         OnImGuiShader( ts );
     };
 

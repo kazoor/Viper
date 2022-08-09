@@ -58,6 +58,10 @@ namespace Viper {
             }
         }*/
 
+        // Create the 3d cube as a default entity.
+        Entity cube = m_ActiveScene->CreateEntity();
+        cube.add< SpriteRendererComponent >();
+
         m_Viewport = SceneViewport( m_ActiveScene.get(), context );
         m_Hierarchy = SceneHierarchy( m_ActiveScene.get() );
         m_Inspector = SceneInspector( m_ActiveScene.get() );
@@ -116,50 +120,46 @@ namespace Viper {
             ImGui::StyleColorsDark();
 
             io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-            io.Fonts->AddFontFromFileTTF("resources/assets/fonts/OpenSans-Bold.ttf", 16.0f);
+            io.Fonts->AddFontFromFileTTF("resources/assets/fonts/OpenSans-Bold.ttf", 14.0f);
             //io.Fonts->AddFontDefault();
 
             static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
             ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
             io.Fonts->AddFontFromFileTTF( FONT_ICON_FILE_NAME_FAS, 12.0f, &icons_config, icons_ranges );
 
-            style.Colors[ImGuiCol_Text] = ImColor( 200, 200, 200, 255 );
-            style.Colors[ImGuiCol_Button] = ImColor(35, 35, 35, 255);
-            style.Colors[ImGuiCol_ButtonHovered] = ImColor(40, 40, 40, 255);
-            style.Colors[ImGuiCol_ButtonActive] = ImColor(45, 45, 45, 255);
-
-            style.Colors[ImGuiCol_FrameBg] = ImColor(14, 16, 39, 255);
-            style.Colors[ImGuiCol_FrameBgHovered] = ImColor(17, 19, 47, 255);
-            style.Colors[ImGuiCol_FrameBgActive] = ImColor(22, 25, 52, 255);
-
-            style.Colors[ImGuiCol_Tab] = ImColor(17, 11, 44, 255);
-            style.Colors[ImGuiCol_TabHovered] = ImColor(22, 17, 68, 255);
-            style.Colors[ImGuiCol_TabActive] = ImColor(22, 17, 68, 255);
-            style.Colors[ImGuiCol_TabUnfocused] = ImColor(17, 11, 44, 255);
-            style.Colors[ImGuiCol_TabUnfocusedActive] = ImColor(41, 29, 93, 255);
-
-            style.Colors[ImGuiCol_Header] = ImColor(26, 16, 61, 255);
-            style.Colors[ImGuiCol_HeaderHovered] = ImColor(37, 28, 68, 255);
-            style.Colors[ImGuiCol_HeaderActive] = ImColor(36, 24, 83, 255);
-
-            style.Colors[ImGuiCol_SliderGrab] = ImColor(50, 50, 50, 255);
-            style.Colors[ImGuiCol_SliderGrabActive] = ImColor(50, 50, 50, 255);
-
-            style.Colors[ImGuiCol_WindowBg] = ImColor(3, 3, 13, 255 );
-            style.Colors[ImGuiCol_TitleBg] = ImColor(11, 9, 35, 255 );
-            style.Colors[ImGuiCol_TitleBgActive] = ImColor(21, 18, 55, 255 );
-            style.Colors[ImGuiCol_TitleBgCollapsed] = ImColor(21, 18, 55, 255 );
-
-            style.Colors[ImGuiCol_Button] = ImColor(35, 27, 75, 255 );
-            style.Colors[ImGuiCol_ButtonHovered] = ImColor(35, 27, 75, 255 );
-            style.Colors[ImGuiCol_ButtonActive] = ImColor(34, 24, 81, 255 );
-
-            style.Colors[ImGuiCol_SliderGrab] = ImColor( 50, 46, 117, 255 );
-            style.Colors[ImGuiCol_SliderGrabActive] = ImColor( 65, 61, 139, 255 );
-
-            style.Colors[ImGuiCol_ScrollbarGrab] = ImColor( 50, 46, 117, 255 );
-            style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImColor( 65, 61, 139, 255 );
-            style.Colors[ImGuiCol_ScrollbarGrabActive] = ImColor( 65, 61, 139, 255 );
+            style.Colors[ImGuiCol_Text] = ImVec4( 0.701f, 0.701f, 0.701f, 1.000f );
+            style.Colors[ImGuiCol_WindowBg] = ImVec4(0.066f, 0.066f, 0.066f, 1.000f);
+            style.Colors[ImGuiCol_Border] = ImVec4(0.303f, 0.303f, 0.303f, 0.500f);
+            style.Colors[ImGuiCol_FrameBg] = ImVec4(0.156f, 0.156f, 0.156f, 1.000f);
+            style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.171f, 0.171f, 0.171f, 1.000f);
+            style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.180f, 0.180f, 0.180f, 1.000f);
+            style.Colors[ImGuiCol_TitleBg] = ImVec4(0.118f, 0.118f, 0.118f, 1.000f);
+            style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.137f, 0.137f, 0.137f, 1.000f);
+            style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.185f, 0.185f, 0.185f, 1.000f);
+            style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.071f, 0.071f, 0.071f, 1.000f);
+            style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.090f, 0.090f, 0.090f, 0.530f);
+            style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.180f, 0.180f, 0.180f, 1.000f);
+            style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.242f, 0.242f, 0.242f, 1.000f);
+            style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.137f, 0.137f, 0.137f, 1.000f);
+            style.Colors[ImGuiCol_CheckMark] = ImVec4(0.370f, 0.370f, 0.370f, 1.000f);
+            style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.370f, 0.370f, 0.370f, 1.000f);
+            style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.270f, 0.270f, 0.270f, 1.000f);
+            style.Colors[ImGuiCol_Button] = ImVec4(0.133f, 0.133f, 0.133f, 1.000f);
+            style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.190f, 0.190f, 0.190f, 1.000f);
+            style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.118f, 0.118f, 0.118f, 1.000f);
+            style.Colors[ImGuiCol_Header] = ImVec4(0.118f, 0.118f, 0.118f, 1.000f);
+            style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.161f, 0.161f, 0.161f, 1.000f);
+            style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.142f, 0.142f, 0.142f, 1.000f);
+            style.Colors[ImGuiCol_Tab] = ImVec4(0.152f, 0.152f, 0.152f, 1.000f);
+            style.Colors[ImGuiCol_TabHovered] = ImVec4(0.109f, 0.109f, 0.109f, 1.000f);
+            style.Colors[ImGuiCol_TabActive] = ImVec4(0.081f, 0.081f, 0.081f, 1.000f);
+            style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.190f, 0.190f, 0.190f, 1.000f);
+            style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.152f, 0.152f, 0.152f, 1.000f);
+            style.Colors[ImGuiCol_DockingPreview] = ImVec4(0.284f, 0.284f, 0.284f, 0.700f);
+            style.Colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.109f, 0.109f, 0.109f, 1.000f);
+            style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.081f, 0.081f, 0.081f, 1.000f);
+            style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.081f, 0.081f, 0.081f, 1.000f);
+            style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.081f, 0.081f, 0.081f, 1.000f);
 
             style.WindowBorderSize = 0;
             style.FrameBorderSize = 0;

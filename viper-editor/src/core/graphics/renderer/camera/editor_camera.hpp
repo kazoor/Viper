@@ -22,6 +22,7 @@ namespace Viper {
         void RecalculateMatrix();
 
         bool OnMouseScrolled(Events::MouseScrollEvent& event);
+        glm::vec3 Lerp( glm::vec3 in, glm::vec3 dir, float ticks );
     private:
         glm::vec3 m_CameraPosition = { 0.0f, 0.0f, 2.0f }; 
 		glm::vec3 m_CameraRotation = { 0.0f, 0.0f, 0.0f };
@@ -31,5 +32,8 @@ namespace Viper {
         float m_CameraNear = -1.0f;
         float m_CameraFar = 1.0f;
         float m_AspectRatio = 0.0f;
+
+        glm::vec3 m_EasedPosition = { 0.0f, 0.0f, 0.0f };
+        glm::vec3 m_EasedRotation = { 0.0f, 0.0f, 0.0f };
     };
 };

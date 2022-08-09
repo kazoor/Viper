@@ -185,7 +185,7 @@ namespace Viper::Graphics {
         glEnable(GL_LINE_SMOOTH);
 
         glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
+        glCullFace(GL_BACK);
         glFrontFace(GL_CCW);
 
         const GLubyte* vendor = glGetString(GL_VENDOR); // Returns the vendor

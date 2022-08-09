@@ -67,6 +67,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/include/box2d/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/glm/")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/entt/single_include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/fast_obj/")
 
 # Set target folders
 message(STATUS "Setting up output directories.")

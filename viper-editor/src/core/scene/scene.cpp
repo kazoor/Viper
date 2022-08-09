@@ -112,6 +112,7 @@ namespace Viper {
         //if( m_MainCamera != nullptr ) {
             {
                 Renderer3D::Begin( default_projection, default_transform );
+                //Renderer3D::SetLightPosition(light_position, light_color, light_intensity);
                 auto group = m_register.group< TransformComponent >( entt::get< SpriteRendererComponent > );
                 for( auto entity : group ) {
                     auto [tr, spr] = group.get< TransformComponent, SpriteRendererComponent >( entity );

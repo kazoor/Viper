@@ -76,5 +76,8 @@ namespace Viper {
 
         glm::mat4 default_transform = glm::mat4(1.0f);
         glm::mat4 default_projection = glm::mat4(1.0f);
+        glm::vec3 light_position{0.0f, 0.0f, 1.0f};
+        glm::vec4 light_color{1.0f, 1.0f, 1.0f, 1.0f};
+        float light_intensity = 0.1f;
     };
 };
