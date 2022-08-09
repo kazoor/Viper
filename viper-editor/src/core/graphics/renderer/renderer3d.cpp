@@ -37,8 +37,8 @@ namespace Viper {
     };
 
     void Renderer3D::Init() {
-        m_Shader = new Graphics::Shader("resources/shaders/flat.vert", "resources/shaders/flat.frag");
-        m_ShaderLight = new Graphics::Shader("resources/shaders/light.vert", "resources/shaders/light.frag");
+        m_Shader = new Graphics::Shader("resources/shaders/Renderer3D_Quad.vert", "resources/shaders/Renderer3D_Quad.frag");
+        m_ShaderLight = new Graphics::Shader("resources/shaders/Renderer3D_Light.vert", "resources/shaders/Renderer3D_Light.frag");
         Ptr = new Vertex[ max_vertices ];
 
         glCreateVertexArrays(1, &m_Vao);

@@ -240,9 +240,9 @@ namespace Viper {
     Ref<VertexBuffer> LineVertexBuffer;
 
     void Renderer2D::Init() {
-        m_ShaderDebug__Square = new Graphics::Shader( "resources/shaders/quad.vert", "resources/shaders/quad.frag");
-        m_ShaderDebug__Line = new Graphics::Shader( "resources/shaders/line.vert", "resources/shaders/line.frag");
-        m_ShaderDebug__Triangle = new Graphics::Shader( "resources/shaders/triangle.vert", "resources/shaders/triangle.frag");
+        m_ShaderDebug__Square = new Graphics::Shader( "resources/shaders/Renderer2D_Quad.vert", "resources/shaders/Renderer2D_Quad.frag");
+        m_ShaderDebug__Line = new Graphics::Shader( "resources/shaders/Renderer2D_Line.vert", "resources/shaders/Renderer2D_Line.frag");
+        m_ShaderDebug__Triangle = new Graphics::Shader( "resources/shaders/Renderer2D_Triangle.vert", "resources/shaders/Renderer2D_Triangle.frag");
 
         m_Ptr = new Vertex[ m_MaxVertices ];
         m_LinePtr = new LineVertex[ m_MaxVertices ];
