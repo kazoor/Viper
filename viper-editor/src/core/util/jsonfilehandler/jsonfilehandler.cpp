@@ -4,11 +4,17 @@
 #include "jsonfilehandler.hpp"
 
 namespace Viper::Util {
-    nlohmann::json JSONFileHandler::Read(const std::string &FilePath) const {
+    nlohmann::json JSONFileHandler::Read(const std::string &FilePath) {
         std::ifstream InStream(FilePath);
 
-        // Use nlohmann's built in function to 
-        return nlohmann::json::parse(InStream);
+        if(InStream.fail()) 
+            return nullptr;
+
+        // Use nlohmann's built in function to parse
+        auto ret = nlohmann::json::parse(InStream);
+        
+        InStream.close();
+        return ret;
     }
 
     void JSONFileHandler::Write(const std::string &FilePath, const nlohmann::json& JSONObj) {
@@ -17,5 +23,5 @@ namespace Viper::Util {
         OutStream << JSONObj;
 
         OutStream.close();
-    } 
+    }
 }

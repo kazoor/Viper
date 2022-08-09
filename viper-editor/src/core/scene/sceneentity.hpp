@@ -2,9 +2,9 @@
 #include <cstdint>
 #include "scene.hpp"
 #include <entt/entt.hpp>
-
+#include <viper/viper.hpp>
 namespace Viper {
-    class Entity {
+    class VIPER_API Entity {
     public:
         Entity();
         Entity( entt::entity ent, Scene* scene );
@@ -34,6 +34,7 @@ namespace Viper {
         inline operator std::uint32_t() const { return static_cast< std::uint32_t >( m_handle_entity ); };
         inline operator bool() const { return m_handle_entity != entt::null; };
         inline bool operator==( const Entity& other ) const { return m_handle_entity == other.m_handle_entity && m_scene_object_ptr == other.m_scene_object_ptr; };
+        inline bool operator!=( const Entity& other ) const { return m_handle_entity != other.m_handle_entity; };
     private:
         entt::entity m_handle_entity;
         Scene* m_scene_object_ptr;

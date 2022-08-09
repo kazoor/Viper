@@ -7,10 +7,11 @@
 #include "window.hpp"
 #include <util/input/inputhandler/inputhandler.hpp>
 #include <util/input/mouse/mouseevents.hpp>
-#include <imguieditor/imguieditor.hpp>
 #include <graphics/renderer/rendercommand.hpp>
-#include <imguieditor/scene/scenelayer.hpp>
+#include <scene/scenelayer.hpp>
+#include <viper/base.hpp>
 #include <thread>
+#include <algorithm>
 
 namespace Viper::Graphics {
     static float m_LastFrame = 0.0f;
@@ -172,8 +173,30 @@ namespace Viper::Graphics {
         LayerStack = new Layers::LayerStack();
         glfwSwapInterval(1); // Vsync on for now.
 
+        glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
+
         glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glEnable(GL_DEPTH_TEST);
+        glEnable(GL_LINE_SMOOTH);
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
+
+        const GLubyte* vendor = glGetString(GL_VENDOR); // Returns the vendor
+        const GLubyte* renderer = glGetString(GL_RENDERER); // Returns a hint to the model
+        const GLubyte* version = glGetString(GL_VERSION); // Returns a hint to the model
+        const GLubyte* shading = glGetString(GL_SHADING_LANGUAGE_VERSION); // Returns the amount of extensions.
+
+        spdlog::info("OpenGL Vendor: {0}", reinterpret_cast< const char* >( vendor ) );
+        spdlog::info("OpenGL Renderer: {0}", reinterpret_cast< const char* >( renderer ) );
+        spdlog::info("OpenGL Version: {0}", reinterpret_cast< const char* >( version ) );
+        spdlog::info("OpenGL Shading: {0}", reinterpret_cast< const char* >( shading ) );
     };
 
     GLFWwindow* Window::CreateWindowEx(WindowParams_t Params) {
@@ -204,9 +227,9 @@ namespace Viper::Graphics {
             dispatcher.Dispatch< Events::WindowResizeEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowResizeEvent ) );
             dispatcher.Dispatch< Events::WindowCloseEvent >( VIPER_GET_EVENT_FUNC( Window::OnWindowCloseEvent ) );
             
-            dispatcher.Dispatch<Events::MouseCursorPositionEvent>(
-                    VIPER_GET_EVENT_FUNC(Window::OnWindowMouseCursorPositionEvent));
-            dispatcher.Dispatch<Events::MouseScrollEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowMouseScrollEvent));
+            //dispatcher.Dispatch<Events::MouseCursorPositionEvent>(
+            //        VIPER_GET_EVENT_FUNC(Window::OnWindowMouseCursorPositionEvent));
+            //dispatcher.Dispatch<Events::MouseScrollEvent>(VIPER_GET_EVENT_FUNC(Window::OnWindowMouseScrollEvent));
 
             dispatcher.Dispatch<Events::KeyboardKeyPressedEvent>(VIPER_GET_EVENT_FUNC(Window::OnKeyboardKeyPressedEvent));
 
@@ -234,7 +257,7 @@ namespace Viper::Graphics {
         glViewport(0, 0, E.Width, E.Height);
         WindowParams.Width = E.Width;
         WindowParams.Height = E.Height;
-        RenderCommand::Resize(E.Width, E.Height);
+        //RenderCommand::Resize(E.Width, E.Height);
         return true;
     }
 
@@ -242,7 +265,7 @@ namespace Viper::Graphics {
         spdlog::info("WindowResize Event triggered! New size is {0}x{1}", E.Width, E.Height);
         WindowParams.Width = E.Width;
         WindowParams.Height = E.Height;
-        RenderCommand::Resize(E.Width, E.Height);
+        //RenderCommand::Resize(E.Width, E.Height);
         return true;
     }
 
@@ -273,15 +296,17 @@ namespace Viper::Graphics {
 
     bool Window::OnWindowMouseCursorPositionEvent(Events::MouseCursorPositionEvent &E) {
         VIPER_LOG("MouseCursorPositionEvent Event triggered! {0}, {1}", E.x, E.y);
-        Globals::Editor::MousePosX = E.x;
-        Globals::Editor::MousePosY = E.y;
+        //Globals::Editor::MousePosX = E.x;
+        //Globals::Editor::MousePosY = E.y;
         return true;
     };
     
     bool Window::OnWindowMouseScrollEvent(Events::MouseScrollEvent &E) {
         VIPER_LOG("MouseScrollEvent Event triggered! {0}, {1}", E.x, E.y);
-        if (!Globals::Editor::isPlaying)
-            Globals::Editor::ZoomLevel -= static_cast< float >( E.y );
+
+        //Globals::Editor::ZoomLevel = std::max(Globals::Editor::ZoomLevel, 0.5f);
+        //if( Globals::Editor::IsSceneHovered)
+        //    Globals::Editor::ZoomLevel -= static_cast< float >( E.y );
         return true;
     };
 

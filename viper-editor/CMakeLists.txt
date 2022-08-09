@@ -10,45 +10,47 @@ add_compile_definitions(VIPER_API VIPER_EXPORT)
 
 add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/viper/application.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/viper/application_buffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/window/window.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/shaders/shader/shader.cpp
 
+        # Rendering related files
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/shaders/shader/shader.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/rendercommand.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer3d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/framebuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/sprite2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
-
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera_controller.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/scene_camera.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/editor_camera.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
-        #${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/imguieditor.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/hierarchy.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/inspector.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/viewport.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/editor/filexplorer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/imguieditor/scene/scenelayer.cpp
-
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/component.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/transform.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/spriterenderer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/scripting.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/rigidbody2d.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/boxcollision2d.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gameobject.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/camera.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/components/gom.cpp
-
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/jsonfilehandler/jsonfilehandler.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/inputhandler/inputhandler.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/mouse/mouseevents.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/globals/global.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/physics/physics2d.cpp
-
+        
+        # Scene related files
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/scene.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/sceneentity.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/scenelayer.cpp
 
+        # Scene -> Panels
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/hierarchy.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/inspector.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/viewport.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/filexplorer.cpp
+
+        # Input handlers
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/inputhandler/inputhandler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/mouse/mouseevents.cpp
+
+        # File handling
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/filehandler/filehandler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/jsonfilehandler/jsonfilehandler.cpp
+
+        # Misc related files
+        
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/globals/global.cpp
+        #${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/physics/physics2d.cpp
+
+        # Vendor files
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_demo.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_draw.cpp
@@ -57,7 +59,15 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_widgets.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/imgui_tables.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/ImGuizmo.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/ImSequencer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/external/ImGui/ImGradient.cpp
         )
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/include/box2d/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/glm/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/entt/single_include/")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/fast_obj/")
 
 # Set target folders
 message(STATUS "Setting up output directories.")
@@ -103,15 +113,15 @@ message(STATUS "Compiling & Linking json")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/json")
 target_link_libraries(Viper PUBLIC nlohmann_json)
 
+
+message(STATUS "Compiling & Linking box2d")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/box2d")
+target_link_libraries(Viper PUBLIC box2d)
+
 # Other includes
 target_include_directories(Viper SYSTEM PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/external"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core")
-
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/stb/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/glm/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/entt/single_include/")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/external/box2d/")
 
 # Copy shaders to bin
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources/

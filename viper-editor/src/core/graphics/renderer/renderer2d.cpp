@@ -18,15 +18,161 @@ struct LineVertex {
     glm::vec4 color;
 };
 
-namespace Viper {
-    // Quad related
-    uint32_t m_Vao = 0;
-    uint32_t m_Vbo = 0;
-    uint32_t m_Ibo = 0;
+struct TriangleVertex {
+    glm::vec3 position;
+    glm::vec4 color;
+};
 
-    // Line related
-    uint32_t m_LineVao = 0;
-    uint32_t m_LineVbo = 0;
+namespace Viper {
+    class IndexBuffer {
+    public:
+        IndexBuffer( uint32_t* indices, uint32_t count ) : m_Count( count ) {
+            glCreateBuffers( 1, &m_Ibo );
+
+            glBindBuffer(GL_ARRAY_BUFFER, m_Ibo);
+            glBufferData(GL_ARRAY_BUFFER, count * sizeof( uint32_t ), indices, GL_STATIC_DRAW );
+        };
+
+        ~IndexBuffer() {
+            glDeleteBuffers(1, &m_Ibo);
+        };
+
+        void Bind() const {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibo);
+        };
+
+        void Unbind() const {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        };
+
+        const uint32_t GetCount() const { return m_Count; };
+
+        static Ref< IndexBuffer > Create( uint32_t* indices, uint32_t count ) {
+            return CreateRef< IndexBuffer >( indices, count );
+        };
+    private:
+        uint32_t m_Ibo;
+        uint32_t m_Count;
+    };
+
+    class VertexBuffer {
+    public:
+        VertexBuffer( const uint32_t maxbuffer, bool isDynamic ) {
+            glCreateBuffers(1, &m_Vbo);
+            glBindBuffer(GL_ARRAY_BUFFER, m_Vbo );
+            glBufferData(GL_ARRAY_BUFFER, maxbuffer, nullptr, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW );
+        };
+
+        VertexBuffer( float* vertices, const uint32_t maxbuffer ) {
+            glCreateBuffers(1, &m_Vbo);
+            glBindBuffer(GL_ARRAY_BUFFER, m_Vbo );
+            glBufferData(GL_ARRAY_BUFFER, maxbuffer, vertices, GL_STATIC_DRAW );
+        };
+
+        ~VertexBuffer() {
+            glDeleteBuffers(1, &m_Vbo);
+        };
+
+        void Bind() const {
+            glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
+        };
+
+        void Unbind() const {
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        };
+
+        void SetData( const void* data, uint32_t size ) {
+            glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, size, data );
+        };
+
+        static Ref< VertexBuffer > Create( const uint32_t maxbuffer, bool isDynamic = true ) {
+            return CreateRef< VertexBuffer >( maxbuffer, isDynamic );
+        };
+
+        static Ref< VertexBuffer > Create( float* vertices, const uint32_t maxbuffer ) {
+            return CreateRef< VertexBuffer >( vertices, maxbuffer );
+        };
+    private:
+        uint32_t m_Vbo;
+        uint32_t m_MaxSize;
+    };
+
+    class VertexArray {
+    public:
+        VertexArray( ) {
+            glCreateVertexArrays(1, &m_Vao);
+        };
+
+        ~VertexArray() {
+            glDeleteVertexArrays(1, &m_Vao);
+        };
+
+        void Bind() const {
+            glBindVertexArray(m_Vao);
+        };
+
+        void SetQuadInfo(const Ref< VertexBuffer >& vertexbuffer ) const {
+            glBindVertexArray(m_Vao);
+		    vertexbuffer->Bind();
+
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof( Vertex, position ) );
+
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof( Vertex, color ) );
+
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof( Vertex, uvcoords ) );
+
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof( Vertex, texture_index ) );
+
+            glEnableVertexAttribArray(4);
+            glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof( Vertex, texture_tiling ) );
+        };
+
+        void SetLineInfo(const Ref< VertexBuffer >& vertexbuffer) const {
+            glBindVertexArray(m_Vao);
+            vertexbuffer->Bind();
+
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof( LineVertex ), ( const void* )offsetof( LineVertex, position ) );
+
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof( LineVertex ), ( const void* )offsetof( LineVertex, color) );
+        };
+
+        void Unbind() const {
+            glBindVertexArray(0);
+        };
+
+        static Ref< VertexArray > Create( ) {
+            return CreateRef< VertexArray >( );
+        };
+
+        void SetIndexBuffer( const Ref< IndexBuffer >& indexbuffer ) {
+            glBindVertexArray(m_Vao);
+            indexbuffer->Bind();
+
+            m_IndexBuffer = indexbuffer;
+        };
+
+        const Ref< IndexBuffer >& GetIndexBuffer() const { return m_IndexBuffer; };
+    private:
+        uint32_t m_MaxSize = 0;
+        uint32_t m_Vao;
+
+        Ref< IndexBuffer > m_IndexBuffer;
+    };
+
+    enum class VertexType : int {
+        ARRAY_BUFFER = GL_ARRAY_BUFFER,
+        ELEMENT_ARRAY_BUFFER = GL_ELEMENT_ARRAY_BUFFER,
+        ARRAY_BUFFER_BINDING = GL_ARRAY_BUFFER_BINDING,
+        ELEMENT_ARRAY_BUFFER_BINDING = GL_ELEMENT_ARRAY_BUFFER_BINDING,
+        VERTEX_ATTRIB_ARRAY_BUFFER_BINDING = GL_ELEMENT_ARRAY_BUFFER_BINDING
+    };
 
     // pointers
     Vertex* m_Ptr = nullptr;
@@ -35,8 +181,12 @@ namespace Viper {
     LineVertex* m_LinePtr = nullptr;
     LineVertex* m_LinePtrBuff = nullptr;
 
+    TriangleVertex* m_TriPtr = nullptr;
+    TriangleVertex* m_TriPtrBuff = nullptr;
+
     Graphics::Shader* m_ShaderDebug__Square = nullptr;
     Graphics::Shader* m_ShaderDebug__Line = nullptr;
+    Graphics::Shader* m_ShaderDebug__Triangle = nullptr;
     
     Renderer::OrthoGraphicCamera render_camera;
 
@@ -44,10 +194,13 @@ namespace Viper {
     constexpr const uint32_t m_MaxVertices = m_MaxQuads * 4;
     constexpr const uint32_t m_MaxIndices = m_MaxQuads * 6;
     constexpr const uint32_t m_MaxLines = m_MaxQuads * 2;
+    constexpr const uint32_t m_MaxTri = m_MaxQuads * 3;
     static const uint32_t m_MaxTextures = 32;
 
     uint32_t m_IndexCount = 0;
     uint32_t m_LineCount = 0;
+    uint32_t m_TriangleCount = 0;
+
     static uint32_t m_TextureSlotIndex = 1;
     Stats stats;
 
@@ -57,6 +210,12 @@ namespace Viper {
         glm::vec4(0.5f, -0.5f, 0.0f, 1.0f),
         glm::vec4(0.5f, 0.5f, 0.0f, 1.0f),
         glm::vec4(-0.5f, 0.5f, 0.0f, 1.0f)
+    };
+
+    constexpr glm::vec4 triangle_transforms[ 3U ] = {
+        glm::vec4( -0.5f, -0.5f, 0.0f, 1.0f ),
+        glm::vec4(  0.5f, -0.5f, 0.0f, 1.0f ),
+        glm::vec4(  0.0f,  0.5f, 0.0f, 1.0f )
     };
 
     constexpr glm::vec2 texture_transforms[ 4U ] = {
@@ -73,79 +232,49 @@ namespace Viper {
         return stats;
     };
 
+    Ref<VertexArray> QuadVertexArray;
+    Ref<VertexBuffer> QuadVertexBuffer;
+
+
+    Ref<VertexArray> LineVertexArray;
+    Ref<VertexBuffer> LineVertexBuffer;
+
     void Renderer2D::Init() {
-        m_ShaderDebug__Square = new Graphics::Shader( "resources/shaders/quad.vert", "resources/shaders/quad.frag");
-        m_ShaderDebug__Line = new Graphics::Shader( "resources/shaders/line.vert", "resources/shaders/line.frag");
+        m_ShaderDebug__Square = new Graphics::Shader( "resources/shaders/Renderer2D_Quad.vert", "resources/shaders/Renderer2D_Quad.frag");
+        m_ShaderDebug__Line = new Graphics::Shader( "resources/shaders/Renderer2D_Line.vert", "resources/shaders/Renderer2D_Line.frag");
+        m_ShaderDebug__Triangle = new Graphics::Shader( "resources/shaders/Renderer2D_Triangle.vert", "resources/shaders/Renderer2D_Triangle.frag");
 
         m_Ptr = new Vertex[ m_MaxVertices ];
         m_LinePtr = new LineVertex[ m_MaxVertices ];
+        m_TriPtr = new TriangleVertex[ m_MaxVertices ];
 
-        // // // // // // Quad Renderer // // // // // //
-        glCreateVertexArrays(1, &m_Vao);
-        glBindVertexArray(m_Vao);
-        
-        glCreateBuffers(1, &m_Vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
-        glBufferData(GL_ARRAY_BUFFER, m_MaxVertices * sizeof( Vertex ), nullptr, GL_DYNAMIC_DRAW);
+        QuadVertexArray = VertexArray::Create();
+        QuadVertexBuffer = VertexBuffer::Create( m_MaxVertices * sizeof(Vertex) );
+        QuadVertexArray->SetQuadInfo(QuadVertexBuffer);
 
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof( Vertex, position ) );
+        uint32_t* quad_indices = new uint32_t[m_MaxIndices];
+        uint32_t quad_offset = 0;
 
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof( Vertex, color ) );
+        for( uint32_t index = 0; index < m_MaxIndices; index += 6 ) {
+            quad_indices[ index + 0 ] = quad_offset + 0;
+            quad_indices[ index + 1 ] = quad_offset + 1;
+            quad_indices[ index + 2 ] = quad_offset + 2;
 
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof( Vertex, uvcoords ) );
+            quad_indices[ index + 3 ] = quad_offset + 2;
+            quad_indices[ index + 4 ] = quad_offset + 3;
+            quad_indices[ index + 5 ] = quad_offset + 0;
 
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof( Vertex, texture_index ) );
-
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof( Vertex, texture_tiling ) );
-
-        glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
-        uint32_t* m_indices = new uint32_t[ m_MaxIndices ];
-        uint32_t m_indice_offset = 0u;
-        for( size_t index = 0; index < m_MaxIndices; index += 6 ) {
-            m_indices[ index + 0 ] = m_indice_offset + 0;
-            m_indices[ index + 1 ] = m_indice_offset + 1;
-            m_indices[ index + 2 ] = m_indice_offset + 2;
-
-            m_indices[ index + 3 ] = m_indice_offset + 2;
-            m_indices[ index + 4 ] = m_indice_offset + 3;
-            m_indices[ index + 5 ] = m_indice_offset + 0;
-
-            m_indice_offset += 4;
+            quad_offset += 4;
         };
 
-        glCreateBuffers(1, &m_Ibo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_MaxIndices * sizeof( uint32_t ), m_indices, GL_STATIC_DRAW);
-        delete[] m_indices;
-        
-        glBindVertexArray(0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        Ref<IndexBuffer> quadIB = IndexBuffer::Create(quad_indices, m_MaxIndices);
+        QuadVertexArray->SetIndexBuffer(quadIB);
+		delete[] quad_indices;
 
-        // // // // // Texture Renderer // // // // // //
 
-        // // // // // Line Renderer // // // // // //
-        //glGenVertexArrays(1, &m_LineVao);
-        glCreateVertexArrays(1, &m_LineVao);
-        glBindVertexArray(m_LineVao);
-
-        glCreateBuffers(1, &m_LineVbo);
-        glBindBuffer(GL_ARRAY_BUFFER, m_LineVbo);
-        glBufferData(GL_ARRAY_BUFFER, m_MaxVertices * sizeof( LineVertex ), nullptr, GL_DYNAMIC_DRAW );
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof( LineVertex ), ( const void* )offsetof( LineVertex, position ) );
-
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof( LineVertex ), ( const void* )offsetof( LineVertex, color) );
-
-        glBindBuffer( GL_ARRAY_BUFFER, 0 );
-        glBindVertexArray( 0 );
+        LineVertexArray = VertexArray::Create();
+        LineVertexBuffer = VertexBuffer::Create( m_MaxVertices * sizeof(LineVertex) );
+        LineVertexArray->SetLineInfo(LineVertexBuffer);
 
         m_PlaceHolder = Sprite2D::Create( 1, 1 );
         uint32_t m_WhiteData = 0xffffffff;
@@ -161,19 +290,13 @@ namespace Viper {
     };
 
     void Renderer2D::Shutdown() {
-        delete m_Ptr;
-        delete m_LinePtr;
+        delete[] m_Ptr;
+        delete[] m_LinePtr;
+        delete[] m_TriPtr;
 
         delete m_ShaderDebug__Square;
         delete m_ShaderDebug__Line;
-
-        glDeleteVertexArrays(1, &m_Vao);
-        glDeleteVertexArrays(1, &m_LineVao);
-
-        glDeleteBuffers(1, &m_Vbo);
-        glDeleteBuffers(1, &m_LineVbo);
-
-        glDeleteBuffers(1, &m_Ibo);
+        delete m_ShaderDebug__Triangle;
     };
 
     void Renderer2D::DrawQuad( const glm::vec2& pos, const glm::vec2& size, glm::vec4 color) {
@@ -184,6 +307,26 @@ namespace Viper {
     void Renderer2D::DrawQuadRotated(const glm::vec2& pos, const glm::vec2& size, float angle, glm::vec4 color) {
         glm::mat4 transform = glm::translate( glm::mat4( 1.0f ), glm::vec3( pos.x, pos.y, 0.0f ) ) * glm::rotate( glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::scale( glm::mat4( 1.0f ), glm::vec3( size.x, size.y, 1.0f ) );
         DrawQuad( transform, color );
+    };
+
+    void Renderer2D::DrawTriangle( const glm::mat4& transform, glm::vec4 color) {
+        if( m_TriangleCount >= m_MaxTri ) {
+            Flush();
+            BeginBatch();
+        };
+
+        for( int i = 0; i < 3; i++ ) {
+            m_TriPtrBuff->position = transform * triangle_transforms[ i ];
+            m_TriPtrBuff->color = color;
+            m_TriPtrBuff++;
+        };
+
+        m_TriangleCount += 3;
+    };
+
+    void Renderer2D::DrawTriangle( const glm::vec2& position, const glm::vec2& size, const float angle, glm::vec4 color) {
+        glm::mat4 transform = glm::translate( glm::mat4(1.0f), glm::vec3( position.x, position.y, 0.0f) ) * glm::rotate( glm::mat4( 1.0f ), glm::radians( angle ), glm::vec3( 0.0f, 0.0f, 1.0f ) ) * glm::scale( glm::mat4( 1.0f ), glm::vec3( size.x, size.y, 1.0f ) );
+        DrawTriangle(transform, color);
     };
 
     void Renderer2D::DrawQuad( const glm::mat4& transform, glm::vec4 color ) {
@@ -266,40 +409,42 @@ namespace Viper {
     };
 
     void Renderer2D::DrawOutlinedQuad( const glm::vec2& pos, const glm::vec2& size, glm::vec4 color ) {
-        DrawLine({ pos.x, pos.y }, { pos.x + size.x, pos.y }, color ); // top
+		glm::vec3 p0 = glm::vec3(pos.x - size.x * 0.5f, pos.y - size.y * 0.5f, 0.0f);
+		glm::vec3 p1 = glm::vec3(pos.x + size.x * 0.5f, pos.y - size.y * 0.5f, 0.0f);
+		glm::vec3 p2 = glm::vec3(pos.x + size.x * 0.5f, pos.y + size.y * 0.5f, 0.0f);
+		glm::vec3 p3 = glm::vec3(pos.x - size.x * 0.5f, pos.y + size.y * 0.5f, 0.0f);
+
+		DrawLine(p0, p1, color );
+		DrawLine(p1, p2, color );
+		DrawLine(p2, p3, color );
+		DrawLine(p3, p0, color );
     };
 
 
     void Renderer2D::Flush() {
+
         // Render all the quads.
         if( m_IndexCount ) {
             const auto& size_ptr = ( uint8_t* )m_PtrBuff - ( uint8_t* )m_Ptr;
-            glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, size_ptr, m_Ptr );
+            QuadVertexBuffer->SetData(m_Ptr, size_ptr);
             
             for (uint32_t i = 0; i < m_TextureSlotIndex; i++)
 		    	m_TextureSlots[i]->Bind(i);
 
             m_ShaderDebug__Square->Use();
-            m_ShaderDebug__Square->SetUniformMat4("u_ViewProjection", render_camera.GetViewProjectionMatrix( ) * glm::translate( glm::mat4( 1.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) ) );
-            
-            const uint32_t index_count = m_IndexCount ? m_IndexCount : m_MaxIndices;
-            glBindVertexArray(m_Vao);
+            QuadVertexArray->Bind();
+            const uint32_t index_count = m_IndexCount ? m_IndexCount : QuadVertexArray->GetIndexBuffer()->GetCount();
             glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr );
         };
 
-        // Render all the lines.
+        //// Render all the lines.
         if( m_LineCount ) {
             const auto& size_ptr = ( uint8_t* )m_LinePtrBuff - ( uint8_t* )m_LinePtr;
-            glBindBuffer(GL_ARRAY_BUFFER, m_LineVbo);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, size_ptr, m_LinePtr );
+            LineVertexBuffer->SetData(m_LinePtr, size_ptr);
            
             m_ShaderDebug__Line->Use();
-            m_ShaderDebug__Line->SetUniformMat4("u_ViewProjection", render_camera.GetViewProjectionMatrix( ) * glm::translate( glm::mat4( 1.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) ) );
-
-            const uint32_t line_count = m_LineCount ? m_LineCount : m_MaxLines;
-            glBindVertexArray(m_LineVao);
-            glDrawArrays(GL_LINES, 0, line_count);
+            LineVertexArray->Bind();
+            glDrawArrays(GL_LINES, 0, m_LineCount);
         };
 
         stats.calls_this_frame++;
@@ -316,6 +461,9 @@ namespace Viper {
         m_LineCount = 0;
         m_LinePtrBuff = m_LinePtr;
 
+        m_TriangleCount = 0;
+        m_TriPtrBuff = m_TriPtr;
+
         m_TextureSlotIndex = 1;
     };
 
@@ -325,11 +473,36 @@ namespace Viper {
     void Renderer2D::Begin( const Renderer::OrthoGraphicCamera& camera ) {
         render_camera = camera;
         std::memset(&stats, 0, sizeof( Stats ) );
+        glm::mat4 view_projection = render_camera.GetViewProjectionMatrix() * glm::inverse(glm::translate( glm::mat4( 1.0f ), glm::vec3( 0.0f, 0.0f, 0.0f ) ) );
+        m_ShaderDebug__Square->SetUniformMat4("u_ViewProjection", view_projection);
+        m_ShaderDebug__Line->SetUniformMat4("u_ViewProjection", view_projection );
+        m_ShaderDebug__Triangle->SetUniformMat4("u_ViewProjection", view_projection );
 
+        BeginBatch();
+    };
+
+    void Renderer2D::Begin( const glm::mat4& projection, const glm::mat4& transform ) {
+        //render_camera = camera;
+
+        std::memset(&stats, 0, sizeof( Stats ) );
+
+        glm::mat4 view_projection = projection * glm::inverse( transform );
+
+        m_ShaderDebug__Square->SetUniformMat4("u_ViewProjection", view_projection );
+        m_ShaderDebug__Line->SetUniformMat4("u_ViewProjection", view_projection );
+        m_ShaderDebug__Triangle->SetUniformMat4("u_ViewProjection", view_projection );
+        
         BeginBatch();
     };
 
     void Renderer2D::End() {
         Flush();
+    };
+
+    void Renderer2D::DrawSprite( const glm::mat4& transform, SpriteRendererComponent& component) {
+        if(component.sprite.get())
+            DrawTexture(transform, component.sprite, component.tiling, component.color);
+        else
+            DrawQuad(transform, component.color);            
     };
 };

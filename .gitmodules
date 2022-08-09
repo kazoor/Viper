@@ -16,3 +16,6 @@
 [submodule "viper-editor/external/entt"]
 	path = viper-editor/external/entt
 	url = git@github.com:skypjack/entt.git
+[submodule "viper-editor/external/box2d"]
+	path = viper-editor/external/box2d
+	url = https://github.com/erincatto/box2d.git
