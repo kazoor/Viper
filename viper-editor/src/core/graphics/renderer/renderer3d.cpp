@@ -1,14 +1,14 @@
 #include <glad/glad.h>
 #include <cstring>
 #include "renderer3d.hpp"
-#include <graphics/shaders/shader/shader.hpp>
+
 
 struct Vertex {
     glm::vec3 position;
     glm::vec4 color;
 };
 
-constexpr uint32_t max_quads = 32000;
+constexpr uint32_t max_quads = 20000;
 constexpr uint32_t max_vertices = max_quads * 24;
 constexpr uint32_t max_indices = max_quads * 36;
 
@@ -20,7 +20,7 @@ namespace Viper {
     uint32_t m_IndiceCount = 0;
     uint32_t m_Cube = 0;
     Renderer3D::Stats3D_t stats3d;
-    Graphics::Shader* m_Shader = nullptr;
+    Graphics::Shader* m_Shader = nullptr, *m_ShaderLight = nullptr;
 
     Vertex* Ptr = nullptr;
     Vertex* PtrBuffer = nullptr;
@@ -38,6 +38,7 @@ namespace Viper {
 
     void Renderer3D::Init() {
         m_Shader = new Graphics::Shader("resources/shaders/flat.vert", "resources/shaders/flat.frag");
+        m_ShaderLight = new Graphics::Shader("resources/shaders/light.vert", "resources/shaders/light.frag");
         Ptr = new Vertex[ max_vertices ];
 
         glCreateVertexArrays(1, &m_Vao);
@@ -129,6 +130,7 @@ namespace Viper {
     void Renderer3D::Shutdown() {
         delete[] Ptr;
         delete m_Shader;
+        delete m_ShaderLight;
         glDeleteVertexArrays(1, &m_Vao);
         glDeleteBuffers(1, &m_Vbo);
         glDeleteBuffers(1, &m_Ebo);
@@ -156,6 +158,7 @@ namespace Viper {
         std::memset(&stats3d, 0, sizeof( Stats3D_t ) );
         glm::mat4 view_projection = camera_transform * glm::inverse( transform );
         m_Shader->SetUniformMat4("viewmatrix", view_projection );
+        m_ShaderLight->SetUniformMat4("viewmatrix", view_projection );
 
         BeginBatch();
     };
@@ -177,6 +180,7 @@ namespace Viper {
 
         stats3d.m_IndexCount = m_IndiceCount;
         stats3d.m_CubeCount = m_Cube;
+        stats3d.m_DrawCalls++;
     };
 
     void Renderer3D::BeginBatch() {

@@ -184,15 +184,19 @@ namespace Viper::Graphics {
 		glEnable(GL_DEPTH_TEST);
         glEnable(GL_LINE_SMOOTH);
 
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+        glFrontFace(GL_CCW);
+
         const GLubyte* vendor = glGetString(GL_VENDOR); // Returns the vendor
         const GLubyte* renderer = glGetString(GL_RENDERER); // Returns a hint to the model
         const GLubyte* version = glGetString(GL_VERSION); // Returns a hint to the model
         const GLubyte* shading = glGetString(GL_SHADING_LANGUAGE_VERSION); // Returns the amount of extensions.
 
-        spdlog::info("OpenGL Vendor: {0}", vendor );
-        spdlog::info("OpenGL Renderer: {0}", renderer );
-        spdlog::info("OpenGL Version: {0}", version );
-        spdlog::info("OpenGL Shading: {0}", shading );
+        spdlog::info("OpenGL Vendor: {0}", reinterpret_cast< const char* >( vendor ) );
+        spdlog::info("OpenGL Renderer: {0}", reinterpret_cast< const char* >( renderer ) );
+        spdlog::info("OpenGL Version: {0}", reinterpret_cast< const char* >( version ) );
+        spdlog::info("OpenGL Shading: {0}", reinterpret_cast< const char* >( shading ) );
     };
 
     GLFWwindow* Window::CreateWindowEx(WindowParams_t Params) {

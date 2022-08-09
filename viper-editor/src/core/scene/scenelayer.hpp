@@ -8,15 +8,17 @@
 
 // graphics:
 #include <graphics/window/window.hpp>
-#include <graphics/renderer/camera/orthographic_camera_controller.hpp>
 
 #include "scene.hpp"
 
-#include "hierarchy.hpp"
-#include "inspector.hpp"
-#include "viewport.hpp"
-#include "filexplorer.hpp"
+#include "panels/hierarchy.hpp"
+#include "panels/inspector.hpp"
+#include "panels/filexplorer.hpp"
+#include "panels/viewport.hpp"
+
 #include <graphics/renderer/framebuffer.hpp>
+#include <graphics/renderer/camera/orthographic_camera_controller.hpp>
+#include <graphics/renderer/camera/editor_camera.hpp>
 
 #include "sceneentity.hpp"
 
@@ -44,6 +46,8 @@ namespace Viper {
         OrthoGraphicCameraController* m_Camera;
         Ref< Scene > m_ActiveScene;
         Ref< FrameBuffer > m_FrameBuffer;
+
+        EditorCamera m_EditorCamera;
 
         float m_LastFrame = 0.0f;
         float AspectRatio;

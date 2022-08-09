@@ -5,6 +5,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp> // ortho
 #include <viper/viper.hpp>
+#include <graphics/shaders/shader/shader.hpp>
 
 namespace Viper {
     class VIPER_API Renderer3D {
@@ -12,6 +13,7 @@ namespace Viper {
         struct Stats3D_t {
             uint32_t m_IndexCount = 0;
             uint32_t m_CubeCount = 0;
+            uint32_t m_DrawCalls = 0;
         };
         static void Init();
         static void Shutdown();

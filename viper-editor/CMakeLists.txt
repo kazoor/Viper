@@ -23,16 +23,19 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/orthographic_camera_controller.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/scene_camera.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/camera/editor_camera.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/layers/layerstack/layerstack.cpp
         
         # Scene related files
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/scene.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/sceneentity.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/hierarchy.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/inspector.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/viewport.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/filexplorer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/scenelayer.cpp
+
+        # Scene -> Panels
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/hierarchy.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/inspector.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/viewport.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/filexplorer.cpp
 
         # Input handlers
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/inputhandler/inputhandler.cpp

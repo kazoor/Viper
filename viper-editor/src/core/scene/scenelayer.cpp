@@ -28,11 +28,12 @@ namespace Viper {
     SceneLayer::SceneLayer(void* context) : Layer("Scene"), WindowContext((GLFWwindow*)context) {
         //m_Camera = new OrthoGraphicCameraController(1280.0f/720.0f);
 
-        //Renderer2D::Init();
+        Renderer2D::Init();
         Renderer3D::Init();
 
         m_Texture = Sprite2D::Create( "resources/textures/checkerboard.png" );
 
+        m_EditorCamera = EditorCamera(90.0f, 1.0f, -1.0f, (float)1280 / (float)720.0f );
 
         Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Success!", "Window has been loaded!", Globals::ConsoleSuccess );
         
@@ -43,7 +44,19 @@ namespace Viper {
         specification.samplers = 1;
         m_FrameBuffer = FrameBuffer::Create( specification );
 
-        m_ActiveScene->CreateCameraEntity();
+        //m_ActiveScene->CreateCameraEntity();
+
+        /*
+        // The following code is used for stress testing the 3D Renderer pipeline.
+        // This will draw ~10,000 cubes onto the scene.
+        for( float y = 0; y != 100.0f; y += 1.0f ) {
+            for( float x = 0; x != 100.0f; x += 1.0f ) {
+                auto ent = m_ActiveScene->CreateEntity();
+                ent.add< SpriteRendererComponent >();
+                auto& tr = ent.get< TransformComponent >( );
+                tr.Translation = glm::vec3( x, y, 0.0f );
+            }
+        }*/
 
         m_Viewport = SceneViewport( m_ActiveScene.get(), context );
         m_Hierarchy = SceneHierarchy( m_ActiveScene.get() );
@@ -59,7 +72,7 @@ namespace Viper {
 
     void SceneLayer::Destroy() {
         //delete m_Camera;
-        //Renderer2D::Shutdown();
+        Renderer2D::Shutdown();
         Renderer3D::Shutdown();
 
         OnImGuiExit();
@@ -73,8 +86,13 @@ namespace Viper {
             window_size.x > 0.0f && window_size.y > 0.0f && spec.width != window_size.x || spec.height != window_size.y ) {
                 m_FrameBuffer->Resize((uint32_t)window_size.x, (uint32_t)window_size.y);
                 m_ActiveScene->OnViewportResize((uint32_t)window_size.x, (uint32_t)window_size.y);
+                m_EditorCamera.OnViewportResize((uint32_t)window_size.x, (uint32_t)window_size.y);
             };
-            
+        
+        m_EditorCamera.OnUpdate(ts);
+
+        m_ActiveScene->OnSetEditorTransform(m_EditorCamera.GetProjection(), m_EditorCamera.GetTransform());
+        
         m_FrameBuffer->Bind();
              
         RenderCommand::SetColor({ 0.05f, 0.05f, 0.05f, 1.0f });
@@ -87,7 +105,9 @@ namespace Viper {
         OnImGuiRender(ts);
     }
 
-    void SceneLayer::OnEvent(Events::Event& event) { };
+    void SceneLayer::OnEvent(Events::Event& event) {
+        m_EditorCamera.OnEvent(event);
+     };
 
     void SceneLayer::OnImGuiInit() {
         ImGui::CreateContext();

@@ -1,5 +1,5 @@
 #include "scene_camera.hpp"
-#include <stdio.h>
+//#include <stdio.h>
 #include <glm/gtc/matrix_transform.hpp> // ortho
 
 namespace Viper {
@@ -29,7 +29,7 @@ namespace Viper {
         m_AspectRatio = (float)width / (float)height;
         RecalculateMatrix();
 
-        printf("[SceneCamera] Viewport update: %dx%d, aspect: %.2f\n", width, height, (float)width / (float)height);
+        //printf("[SceneCamera] Viewport update: %dx%d, aspect: %.2f\n", width, height, (float)width / (float)height);
     };
 
     void SceneCamera::RecalculateMatrix() {
