@@ -4,6 +4,7 @@
 #include <string>
 #include "renderer3d.hpp"
 #include "presets3d/cube.hpp"
+#include <vector>
 
 
 struct Vertex {
@@ -23,6 +24,10 @@ constexpr uint32_t max_indices = max_quads * VIPER_Cube_Cube_001_IND_SIZE;
 
 // flytta mig till en separat fil.
 namespace Viper {
+    enum class ShaderType : int {
+	    S_INT, S_FLOAT, S_DOUBLE, S_BOOL,
+	    S_VEC2, S_VEC3, S_VEC4
+    };
     class IndexBuffer {
     public:
         IndexBuffer(uint32_t* data, size_t size) : m_Count( size ) {
@@ -107,6 +112,36 @@ namespace Viper {
             m_indexbuffer = indexbuffer;
         };
 
+        template< typename Vert >
+        void SetShaderInfo(const Ref< VertexBuffer >& vertexbuffer, const std::vector< ShaderType > sinfo ) {
+            Bind();
+            vertexbuffer->Bind();
+
+            uint32_t m_current_array = 0;
+	        uint32_t m_current_stride = 0;
+
+	        for ( const auto offset : sinfo ) {
+                glEnableVertexAttribArray(m_current_array);
+	        	uint32_t m_stride_offset = 0;
+	        	uint16_t m_stride_type = 0;
+	        	uint32_t m_stride_alt = 0;
+
+	        	switch( offset ) {
+	        		case ShaderType::S_INT: m_stride_offset = 4; m_stride_alt = 1; m_stride_type = 0x1404; break;
+	        		case ShaderType::S_FLOAT: m_stride_offset = 4; m_stride_alt = 1; m_stride_type = 0x1406; break;
+	        		case ShaderType::S_DOUBLE: m_stride_offset = 8; m_stride_alt = 1; m_stride_type = 0x140A; break;
+	        		case ShaderType::S_BOOL: m_stride_offset = 1; m_stride_alt = 1; m_stride_type = 0x8B56; break;
+
+	        		case ShaderType::S_VEC2: m_stride_offset = 8; m_stride_alt = 2; m_stride_type = 0x1406; break;
+	        		case ShaderType::S_VEC3: m_stride_offset = 12; m_stride_alt = 3; m_stride_type = 0x1406; break;
+	        		case ShaderType::S_VEC4: m_stride_offset = 16; m_stride_alt = 4; m_stride_type = 0x1406; break;
+	        	};
+                glVertexAttribPointer(m_current_array, m_stride_alt, m_stride_type, GL_FALSE, sizeof( Vert ), reinterpret_cast< const void* >( m_current_stride ) );
+	        	m_current_array++;
+	        	m_current_stride += m_stride_offset;
+	        };
+        };
+
         void SetQuad(const Ref< VertexBuffer >& vertexbuffer) {
             Bind();
             vertexbuffer->Bind();
@@ -175,7 +210,13 @@ namespace Viper {
 
         CubeArray = VertexArray::Create();
         CubeBuffer = VertexBuffer::Create(max_vertices * sizeof(Vertex));
-        CubeArray->SetQuad(CubeBuffer);
+
+
+        CubeArray->SetShaderInfo< Vertex >( CubeBuffer, {
+            ShaderType::S_VEC3, // Position
+            ShaderType::S_VEC4, // Color
+            ShaderType::S_VEC3 // Normals
+        });
 
         uint32_t* m_cube_indices = new uint32_t[ max_indices ];
         uint32_t offset = 0;
@@ -227,7 +268,12 @@ namespace Viper {
 
         LightArray = VertexArray::Create();
         LightBuffer = VertexBuffer::Create(max_vertices * sizeof(VertexLight));
-        LightArray->SetLight(LightBuffer);
+        //LightArray->SetLight(LightBuffer);
+
+        LightArray->SetShaderInfo< VertexLight >( LightBuffer, {
+            ShaderType::S_VEC3, // Position
+            ShaderType::S_VEC4 // Color
+        });
 
         // viking note: det finns ingen anledning att skapa en helt ny uint32 pointer array
         // eftersom för light's så vill vi använda samma kub igen.
