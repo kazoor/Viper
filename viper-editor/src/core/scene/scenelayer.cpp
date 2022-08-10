@@ -59,8 +59,22 @@ namespace Viper {
         }*/
 
         // Create the 3d cube as a default entity.
-        Entity cube = m_ActiveScene->CreateEntity();
-        cube.add< SpriteRendererComponent >();
+        Entity cube = m_ActiveScene->CreateEntity("CubeMesh");
+        auto& tr = cube.get< TransformComponent >();
+        tr.Translation = glm::vec3(-0.5f, 0.0f, 0.0f);
+        MeshComponent comp;
+        comp.Type = MeshComponent::MeshType::Mesh_Cube;
+        comp.color = glm::vec4(1.0f, 0.2f, 0.2f, 1.0f);
+        cube.add< MeshComponent >(comp);
+
+        Entity cube2 = m_ActiveScene->CreateEntity("LightMesh");
+        auto& tr2 = cube2.get< TransformComponent >();
+        tr2.Translation = glm::vec3(0.5f, 0.0f, 0.0f);
+        MeshComponent comp2;
+        comp2.Type = MeshComponent::MeshType::Mesh_Light;
+        comp2.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        
+        cube2.add< MeshComponent >(comp2);
 
         m_Viewport = SceneViewport( m_ActiveScene.get(), context );
         m_Hierarchy = SceneHierarchy( m_ActiveScene.get() );
