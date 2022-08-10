@@ -52,6 +52,7 @@ static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_
             ImGui::Text("Cubes: %d", stats3d.m_CubeCount);
             ImGui::Text("IndexCount: %d", stats3d.m_IndexCount);
             ImGui::Text("DrawCalls: %d", stats3d.m_DrawCalls);
+            ImGui::Text("Light Sources: %d", stats3d.m_LightSources);
 
             ImGui::DragFloat("Rad", &Globals::Editor::Radians );
 

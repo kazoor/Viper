@@ -62,6 +62,18 @@ namespace Viper {
         SpriteRendererComponent( const glm::vec4& col, const Ref< Sprite2D >& texture ) : color( col ), sprite( texture ) { };
     };
 
+    struct VIPER_API MeshComponent {
+        enum class MeshType : int {
+            Mesh_Cube,
+            Mesh_Light
+        };
+
+        MeshType Type = MeshType::Mesh_Cube;
+        glm::vec4 color = glm::vec4(1.0f);
+        MeshComponent() = default;
+        MeshComponent( const MeshComponent& o ) = default;
+    };
+
     struct VIPER_API Rigidbody2DComponent {
         enum class BodyType : int {
             body_static = 0,

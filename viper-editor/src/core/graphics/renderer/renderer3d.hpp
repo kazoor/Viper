@@ -14,6 +14,8 @@ namespace Viper {
             uint32_t m_IndexCount = 0;
             uint32_t m_CubeCount = 0;
             uint32_t m_DrawCalls = 0;
+
+            uint32_t m_LightSources = 0;
         };
         static void Init();
         static void Shutdown();
@@ -22,7 +24,7 @@ namespace Viper {
         static void Quad( const glm::mat4& transform, const glm::vec4& color );
         static void End();
 
-        static void SetLightPosition(const glm::vec3& pos, const glm::vec4& color, float intensity);
+        static void SetLightPosition( const glm::mat4& transform, const glm::vec4& color, float intensity);
 
         static Stats3D_t& GetStats();
     private:

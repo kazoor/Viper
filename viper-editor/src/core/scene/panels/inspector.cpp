@@ -58,7 +58,7 @@ static void imgui_gizmo_transform(const std::string& string, glm::vec3& values, 
 
 constexpr const char* RigidbodyTypes[] = { "Static", "Dynamic", "Kinematic" };
 constexpr const char* CameraTypes[] = { "Perspective", "Orthographic" };
-constexpr const char* SpriteTypes[] = { "Quad", "Triangle" };
+constexpr const char* MeshTypes[] = { "Quad", "Light" };
 
 namespace Viper {
     SceneInspector::SceneInspector( Scene* SceneContext ) : m_Context( SceneContext ) { };
@@ -201,7 +201,7 @@ namespace Viper {
         OnImGuiPopulateContext< Rigidbody2DComponent >( entity, "Rigidbody2D" );
         OnImGuiPopulateContext< BoxCollider2DComponent >( entity, "BoxCollider2D" );
         OnImGuiPopulateContext< CameraComponent >( entity, "Camera" );
-        OnImGuiPopulateContext< LightComponent >( entity, "LightComponent" );
+        OnImGuiPopulateContext< MeshComponent >( entity, "Mesh" );
     };
 
     template< typename T >
@@ -343,20 +343,6 @@ namespace Viper {
                     if(ImGui::TreeNodeEx(" " ICON_FA_PAINT_BRUSH "  SpriteRenderer", t)) {
                         ImGui::ColorEdit4("Sprite Color", glm::value_ptr(sprite.color));
 
-                        const char* current_sprite_type = SpriteTypes[(int)sprite.type];
-                        if(ImGui::BeginCombo("Sprite Type", current_sprite_type)) {
-                            for( int i = 0; i < 2; i++ ) {
-                                bool is_selected = current_sprite_type == SpriteTypes[i];
-                                if( ImGui::Selectable(SpriteTypes[i], is_selected)) {
-                                    current_sprite_type = SpriteTypes[i];
-                                    sprite.type = (SpriteRendererComponent::SpriteType)i;
-                                };
-
-                                if( is_selected )
-                                    ImGui::SetItemDefaultFocus();
-                            }
-                            ImGui::EndCombo();
-                        };
                         if(sprite.sprite.get() == nullptr) {
                             if(ImGui::Button("Bake Texture")) {
                                 sprite.sprite = Sprite2D::Create( "resources/textures/checkerboard.png" );
@@ -378,6 +364,31 @@ namespace Viper {
                             if(ImGui::Button("Delete texture")) {
                                 sprite.sprite.reset();
                             }
+                        };
+                        
+                        ImGui::TreePop();
+                    };
+                };
+
+                if( ent.has< MeshComponent >( ) ) {
+                    auto& mesh = ent.get< MeshComponent >( );
+
+                    if(ImGui::TreeNodeEx(" " ICON_FA_PAINT_BRUSH "  Mesh", t)) {
+                        ImGui::ColorEdit4("Sprite Color", glm::value_ptr(mesh.color));
+
+                        const char* current_sprite_type = MeshTypes[(int)mesh.Type];
+                        if(ImGui::BeginCombo("Sprite Type", current_sprite_type)) {
+                            for( int i = 0; i < 2; i++ ) {
+                                bool is_selected = current_sprite_type == MeshTypes[i];
+                                if( ImGui::Selectable(MeshTypes[i], is_selected)) {
+                                    current_sprite_type = MeshTypes[i];
+                                    mesh.Type = (MeshComponent::MeshType)i;
+                                };
+
+                                if( is_selected )
+                                    ImGui::SetItemDefaultFocus();
+                            }
+                            ImGui::EndCombo();
                         };
                         
                         ImGui::TreePop();
