@@ -3,11 +3,8 @@
 #include <cstring>
 #include <string>
 #include "renderer3d.hpp"
-#include <fstream>
-#include <sstream>
+#include "presets3d/cube.hpp"
 #include <vector>
-#include <iomanip>
-#include "objloader.hpp"
 
 
 struct Vertex {
@@ -16,84 +13,21 @@ struct Vertex {
     glm::vec3 normals;
 };
 
-constexpr uint32_t max_quads = 20000;
-constexpr uint32_t max_vertices = max_quads * 24;
-constexpr uint32_t max_indices = max_quads * 36;
-
-void DumpFileData( const char* file_to_dump ) {
-    objl::Loader Loader;
-
-	// Load .obj File
-	bool loadout = Loader.LoadFile(file_to_dump);
-
-	// Check to see if it loaded
-
-	// If so continue
-	if (loadout)
-	{
-		// Create/Open e1Out.txt
-		std::ofstream file("object_file_dump.txt");
-
-		// Go through each loaded mesh and out its contents
-		for (int i = 0; i < Loader.LoadedMeshes.size(); i++)
-		{
-			// Copy one of the loaded meshes to be our current mesh
-			objl::Mesh curMesh = Loader.LoadedMeshes[i];
-
-			// Print Mesh Name
-			file << "Mesh " << i << ": " << curMesh.MeshName << "\n";
-
-			// Print Vertices
-			file << "Vertices:\n";
-
-			// Go through each vertex and print its number,
-			//  position, normal, and texture coordinate
-			for (int j = 0; j < curMesh.Vertices.size(); j++)
-			{
-				file << "glm::vec4(" << curMesh.Vertices[j].Position.X << "f, " << curMesh.Vertices[j].Position.Y << "f, " << curMesh.Vertices[j].Position.Z << "f, 1.0f)," << std::endl;
-			}
-
-            for (int j = 0; j < curMesh.Vertices.size(); j++)
-			{
-				file << "glm::vec3(" << curMesh.Vertices[j].Normal.X << ", " << curMesh.Vertices[j].Normal.Y << ", " << curMesh.Vertices[j].Normal.Z << "), " << std::endl;
-			}
-
-			// Print Indices
-			file << "Indices:\n";
-
-			// Go through every 3rd index and print the
-			//	triangle that these indices represent
-			for (int j = 0; j < curMesh.Indices.size(); j += 3)
-			{
-				file << curMesh.Indices[j] << ", " << curMesh.Indices[j + 1] << ", " << curMesh.Indices[j + 2] << ", " << std::endl;
-			}
-
-			file << "\n";
-		}
-
-		// Close File
-		file.close();
-	}
-}
-
-void CorrectIndex(uint32_t* indices, size_t indices_count, size_t vertices_count) {
-    std::ofstream load_data("indices_corrected.log");
-    for( uint32_t i = 0; i < indices_count; i++ ) {
-        load_data << "m_indices[ i + " << i << " ] = offset + " << indices[i] << ";" << std::endl;
-    };
-
-    load_data << "i += " << indices_count << "." << std::endl;
-    load_data << "offset += " << vertices_count << "." << std::endl;
-
-    load_data << "#define VIPER_INDICE_COUNT " << indices_count << std::endl;
-    load_data << "#define VIPER_VERICE_COUNT " << vertices_count << std::endl;
-
-    load_data << "Next object would be located at " << vertices_count << std::endl;
-    load_data.close();
+struct VertexLight {
+    glm::vec3 position;
+    glm::vec4 color;
 };
+
+constexpr uint32_t max_quads = 20000;
+constexpr uint32_t max_vertices = max_quads * VIPER_Cube_Cube_001_VERT_SIZE;
+constexpr uint32_t max_indices = max_quads * VIPER_Cube_Cube_001_IND_SIZE;
 
 // flytta mig till en separat fil.
 namespace Viper {
+    enum class ShaderType : int {
+	    S_INT, S_FLOAT, S_DOUBLE, S_BOOL,
+	    S_VEC2, S_VEC3, S_VEC4
+    };
     class IndexBuffer {
     public:
         IndexBuffer(uint32_t* data, size_t size) : m_Count( size ) {
@@ -178,6 +112,36 @@ namespace Viper {
             m_indexbuffer = indexbuffer;
         };
 
+        template< typename Vert >
+        void SetShaderInfo(const Ref< VertexBuffer >& vertexbuffer, const std::vector< ShaderType > sinfo ) {
+            Bind();
+            vertexbuffer->Bind();
+
+            uint32_t m_current_array = 0;
+	        uint32_t m_current_stride = 0;
+
+	        for ( const auto offset : sinfo ) {
+                glEnableVertexAttribArray(m_current_array);
+	        	uint32_t m_stride_offset = 0;
+	        	uint16_t m_stride_type = 0;
+	        	uint32_t m_stride_alt = 0;
+
+	        	switch( offset ) {
+	        		case ShaderType::S_INT: m_stride_offset = 4; m_stride_alt = 1; m_stride_type = 0x1404; break;
+	        		case ShaderType::S_FLOAT: m_stride_offset = 4; m_stride_alt = 1; m_stride_type = 0x1406; break;
+	        		case ShaderType::S_DOUBLE: m_stride_offset = 8; m_stride_alt = 1; m_stride_type = 0x140A; break;
+	        		case ShaderType::S_BOOL: m_stride_offset = 1; m_stride_alt = 1; m_stride_type = 0x8B56; break;
+
+	        		case ShaderType::S_VEC2: m_stride_offset = 8; m_stride_alt = 2; m_stride_type = 0x1406; break;
+	        		case ShaderType::S_VEC3: m_stride_offset = 12; m_stride_alt = 3; m_stride_type = 0x1406; break;
+	        		case ShaderType::S_VEC4: m_stride_offset = 16; m_stride_alt = 4; m_stride_type = 0x1406; break;
+	        	};
+                glVertexAttribPointer(m_current_array, m_stride_alt, m_stride_type, GL_FALSE, sizeof( Vert ), reinterpret_cast< const void* >( m_current_stride ) );
+	        	m_current_array++;
+	        	m_current_stride += m_stride_offset;
+	        };
+        };
+
         void SetQuad(const Ref< VertexBuffer >& vertexbuffer) {
             Bind();
             vertexbuffer->Bind();
@@ -189,7 +153,18 @@ namespace Viper {
     
             glEnableVertexAttribArray(2);
             glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof(Vertex, normals));
-        }
+        };
+
+        // light doesnt need normals iirc.
+        void SetLight(const Ref< VertexBuffer >& vertexbuffer) {
+            Bind();
+            vertexbuffer->Bind();
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof( VertexLight ), ( const void* )offsetof(VertexLight, position));
+    
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof( VertexLight ), ( const void* )offsetof(VertexLight, color));
+        };
 
         Ref< IndexBuffer > GetIndexBuffer() const { return m_indexbuffer; };
 
@@ -210,152 +185,130 @@ namespace Viper {
 // !!
 
 namespace Viper {
-    uint32_t m_Vao = 0;
-    uint32_t m_Vbo = 0;
-    uint32_t m_Ebo = 0;
     uint32_t m_IndiceCount = 0;
-    uint32_t m_Cube = 0;
+    uint32_t m_LightCount = 0;
     Renderer3D::Stats3D_t stats3d;
-    Graphics::Shader* m_Shader = nullptr;
+    Graphics::Shader* m_Shader = nullptr, *m_ShaderLight = nullptr;
 
-    Vertex* Ptr = nullptr;
-    Vertex* PtrBuffer = nullptr;
+    Vertex* CubePtr = nullptr;
+    Vertex* CubePtrBuffer = nullptr;
 
-    constexpr glm::vec4 cube_object_transform[] = {
-        glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
-        glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-        glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
-        glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
-        glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
-        glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
-        glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
-        glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
-        glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
-        glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
-        glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
-        glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
-        glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
-        glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
-        glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-        glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
-        glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
-        glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
-        glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
-        glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
-        glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
-        glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
-        glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-        glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)
-    };
+    VertexLight* LightPtr = nullptr;
+    VertexLight* LightPtrBuffer = nullptr;
 
-    constexpr glm::vec3 cube_object_normals[] = {
-        glm::vec3(-1, 0, 0), 
-        glm::vec3(-1, 0, 0), 
-        glm::vec3(-1, 0, 0), 
-        glm::vec3(-1, 0, 0), 
-        glm::vec3(0, 0, -1), 
-        glm::vec3(0, 0, -1), 
-        glm::vec3(0, 0, -1), 
-        glm::vec3(0, 0, -1), 
-        glm::vec3(1, 0, 0), 
-        glm::vec3(1, 0, 0), 
-        glm::vec3(1, 0, 0), 
-        glm::vec3(1, 0, 0), 
-        glm::vec3(0, 0, 1), 
-        glm::vec3(0, 0, 1), 
-        glm::vec3(0, 0, 1), 
-        glm::vec3(0, 0, 1), 
-        glm::vec3(0, -1, 0), 
-        glm::vec3(0, -1, 0), 
-        glm::vec3(0, -1, 0), 
-        glm::vec3(0, -1, 0), 
-        glm::vec3(0, 1, 0), 
-        glm::vec3(0, 1, 0), 
-        glm::vec3(0, 1, 0), 
-        glm::vec3(0, 1, 0)
-    };
+    Ref< VertexArray > CubeArray;
+    Ref< VertexBuffer > CubeBuffer;
 
-    Ref< VertexArray > QuadArray;
-    Ref< VertexBuffer > QuadBuffer;
+    Ref< VertexArray > LightArray;
+    Ref< VertexBuffer > LightBuffer;
 
     void Renderer3D::Init() {
         m_Shader = new Graphics::Shader("resources/shaders/Renderer3D_Quad.vert", "resources/shaders/Renderer3D_Quad.frag");
-        Ptr = new Vertex[ max_vertices ];
+        m_ShaderLight = new Graphics::Shader("resources/shaders/Renderer3D_Light.vert", "resources/shaders/Renderer3D_Light.frag");
+        CubePtr = new Vertex[ max_vertices ];
+        LightPtr = new VertexLight[ max_vertices ];
 
-        QuadArray = VertexArray::Create();
-        QuadBuffer = VertexBuffer::Create(max_vertices * sizeof(Vertex));
-        QuadArray->SetQuad(QuadBuffer);
+        CubeArray = VertexArray::Create();
+        CubeBuffer = VertexBuffer::Create(max_vertices * sizeof(Vertex));
 
-        uint32_t* m_indices = new uint32_t[ max_indices ];
+
+        CubeArray->SetShaderInfo< Vertex >( CubeBuffer, {
+            ShaderType::S_VEC3, // Position
+            ShaderType::S_VEC4, // Color
+            ShaderType::S_VEC3 // Normals
+        });
+
+        uint32_t* m_cube_indices = new uint32_t[ max_indices ];
         uint32_t offset = 0;
-        for( uint32_t i = 0; i < max_indices; i += 36 ) {
-            m_indices[ i + 0 ] = offset + 0;
-            m_indices[ i + 1 ] = offset + 1;
-            m_indices[ i + 2 ] = offset + 3;
-            m_indices[ i + 3 ] = offset + 1;
-            m_indices[ i + 4 ] = offset + 2;
-            m_indices[ i + 5 ] = offset + 3;
-            m_indices[ i + 6 ] = offset + 4;
-            m_indices[ i + 7 ] = offset + 5;
-            m_indices[ i + 8 ] = offset + 7;
-            m_indices[ i + 9 ] = offset + 5;
-            m_indices[ i + 10 ] = offset + 6;
-            m_indices[ i + 11 ] = offset + 7;
-            m_indices[ i + 12 ] = offset + 8;
-            m_indices[ i + 13 ] = offset + 9;
-            m_indices[ i + 14 ] = offset + 11;
-            m_indices[ i + 15 ] = offset + 9;
-            m_indices[ i + 16 ] = offset + 10;
-            m_indices[ i + 17 ] = offset + 11;
-            m_indices[ i + 18 ] = offset + 12;
-            m_indices[ i + 19 ] = offset + 13;
-            m_indices[ i + 20 ] = offset + 15;
-            m_indices[ i + 21 ] = offset + 13;
-            m_indices[ i + 22 ] = offset + 14;
-            m_indices[ i + 23 ] = offset + 15;
-            m_indices[ i + 24 ] = offset + 16;
-            m_indices[ i + 25 ] = offset + 17;
-            m_indices[ i + 26 ] = offset + 19;
-            m_indices[ i + 27 ] = offset + 17;
-            m_indices[ i + 28 ] = offset + 18;
-            m_indices[ i + 29 ] = offset + 19;
-            m_indices[ i + 30 ] = offset + 20;
-            m_indices[ i + 31 ] = offset + 21;
-            m_indices[ i + 32 ] = offset + 23;
-            m_indices[ i + 33 ] = offset + 21;
-            m_indices[ i + 34 ] = offset + 22;
-            m_indices[ i + 35 ] = offset + 23;
+        for( uint32_t i = 0; i < max_indices; i += 36) {
+        	m_cube_indices[ i + 0 ] = offset + 0;
+        	m_cube_indices[ i + 1 ] = offset + 1;
+        	m_cube_indices[ i + 2 ] = offset + 3;
+        	m_cube_indices[ i + 3 ] = offset + 1;
+        	m_cube_indices[ i + 4 ] = offset + 2;
+        	m_cube_indices[ i + 5 ] = offset + 3;
+        	m_cube_indices[ i + 6 ] = offset + 4;
+        	m_cube_indices[ i + 7 ] = offset + 5;
+        	m_cube_indices[ i + 8 ] = offset + 7;
+        	m_cube_indices[ i + 9 ] = offset + 5;
+        	m_cube_indices[ i + 10 ] = offset + 6;
+        	m_cube_indices[ i + 11 ] = offset + 7;
+        	m_cube_indices[ i + 12 ] = offset + 8;
+        	m_cube_indices[ i + 13 ] = offset + 9;
+        	m_cube_indices[ i + 14 ] = offset + 11;
+        	m_cube_indices[ i + 15 ] = offset + 9;
+        	m_cube_indices[ i + 16 ] = offset + 10;
+        	m_cube_indices[ i + 17 ] = offset + 11;
+        	m_cube_indices[ i + 18 ] = offset + 12;
+        	m_cube_indices[ i + 19 ] = offset + 13;
+        	m_cube_indices[ i + 20 ] = offset + 15;
+        	m_cube_indices[ i + 21 ] = offset + 13;
+        	m_cube_indices[ i + 22 ] = offset + 14;
+        	m_cube_indices[ i + 23 ] = offset + 15;
+        	m_cube_indices[ i + 24 ] = offset + 16;
+        	m_cube_indices[ i + 25 ] = offset + 17;
+        	m_cube_indices[ i + 26 ] = offset + 19;
+        	m_cube_indices[ i + 27 ] = offset + 17;
+        	m_cube_indices[ i + 28 ] = offset + 18;
+        	m_cube_indices[ i + 29 ] = offset + 19;
+        	m_cube_indices[ i + 30 ] = offset + 20;
+        	m_cube_indices[ i + 31 ] = offset + 21;
+        	m_cube_indices[ i + 32 ] = offset + 23;
+        	m_cube_indices[ i + 33 ] = offset + 21;
+        	m_cube_indices[ i + 34 ] = offset + 22;
+        	m_cube_indices[ i + 35 ] = offset + 23;
 
-            offset += 24;
+        	offset += 24;
         };
 
-        Ref<IndexBuffer> QuadIndex = IndexBuffer::Create(m_indices, max_indices);
-        QuadArray->SetIndexInfo(QuadIndex);
-		delete[] m_indices;
+        Ref<IndexBuffer> CubeIndex = IndexBuffer::Create(m_cube_indices, max_indices);
+        CubeArray->SetIndexInfo(CubeIndex);
+
+        // Light
+
+        LightArray = VertexArray::Create();
+        LightBuffer = VertexBuffer::Create(max_vertices * sizeof(VertexLight));
+        //LightArray->SetLight(LightBuffer);
+
+        LightArray->SetShaderInfo< VertexLight >( LightBuffer, {
+            ShaderType::S_VEC3, // Position
+            ShaderType::S_VEC4 // Color
+        });
+
+        // viking note: det finns ingen anledning att skapa en helt ny uint32 pointer array
+        // eftersom för light's så vill vi använda samma kub igen.
+        // använd den som existerar.
+        
+        Ref<IndexBuffer> LightIndex = IndexBuffer::Create(m_cube_indices, max_indices);
+        LightArray->SetIndexInfo(LightIndex);
+		delete[] m_cube_indices;
     };
 
     void Renderer3D::Shutdown() {
-        delete[] Ptr;
+        delete[] CubePtr;
+        delete[] LightPtr;
         delete m_Shader;
-        glDeleteVertexArrays(1, &m_Vao);
-        glDeleteBuffers(1, &m_Vbo);
-        glDeleteBuffers(1, &m_Ebo);
+        delete m_ShaderLight;
     };
 
+    // ah yes, the giga chad cube.
+    // has vertices.
+    // has colors
+    // and has normals
     void Renderer3D::Quad( const glm::mat4& transform, const glm::vec4& color ) {
         if( m_IndiceCount >= max_indices ) {
             Flush();
             BeginBatch();
         };
         
-        for( int index = 0; index < 24; index++ ) {
-            PtrBuffer->position = transform * cube_object_transform[ index ];
-            PtrBuffer->color = color;
-            PtrBuffer->normals = cube_object_normals[index];
-            PtrBuffer++;
+        for( int index = 0; index < VIPER_Cube_Cube_001_VERT_SIZE; index++ ) {
+            CubePtrBuffer->position = transform * object_transform[ index ];
+            CubePtrBuffer->color = color;
+            CubePtrBuffer->normals = object_normals[index];
+            CubePtrBuffer++;
         };
-        m_IndiceCount += 36;
-        m_Cube++;
+        m_IndiceCount += VIPER_Cube_Cube_001_IND_SIZE;
+        stats3d.m_CubeCount++;
     };
 
     Renderer3D::Stats3D_t& Renderer3D::GetStats() { return stats3d; };
@@ -363,8 +316,12 @@ namespace Viper {
     void Renderer3D::Begin(const glm::mat4& camera_transform, const glm::mat4& transform ) {
         std::memset(&stats3d, 0, sizeof( Stats3D_t ) );
         glm::mat4 view_projection = camera_transform * glm::inverse( transform );
-        m_Shader->SetUniformMat4("viewmatrix", view_projection );
 
+        m_Shader->SetUniformMat4("viewmatrix", view_projection );
+        m_Shader->Use();
+        
+        m_ShaderLight->SetUniformMat4("viewmatrix", view_projection );
+        m_ShaderLight->Use();
         BeginBatch();
     };
 
@@ -374,28 +331,50 @@ namespace Viper {
 
     void Renderer3D::Flush() {
         if( m_IndiceCount ) {
-            const auto& size_ptr = ( uint8_t* )PtrBuffer - ( uint8_t* )Ptr;
-            QuadBuffer->SetData(Ptr, size_ptr);
+            const auto& size_ptr = ( uint8_t* )CubePtrBuffer - ( uint8_t* )CubePtr;
+            CubeBuffer->SetData(CubePtr, size_ptr);
 
-            m_Shader->Use();
-            QuadArray->Bind();
+            CubeArray->Bind();
             glDrawElements(GL_TRIANGLES, m_IndiceCount, GL_UNSIGNED_INT, nullptr);
         };
 
-        stats3d.m_IndexCount = m_IndiceCount;
-        stats3d.m_CubeCount = m_Cube;
+        if( m_LightCount ) {
+            const auto& size_ptr = ( uint8_t* )LightPtrBuffer - ( uint8_t* )LightPtr;
+            LightBuffer->SetData(LightPtr, size_ptr);
+
+            LightArray->Bind();
+            glDrawElements(GL_TRIANGLES, m_LightCount, GL_UNSIGNED_INT, nullptr);
+        };
+
+        stats3d.m_IndexCount = m_IndiceCount + m_LightCount;
         stats3d.m_DrawCalls++;
     };
 
-    void Renderer3D::SetLightPosition( const glm::vec3& pos, const glm::vec4& color, float intensity ) {
-        m_Shader->SetVector3("lightPosition", pos);
-        m_Shader->SetVector3("lightColor", color);
-        m_Shader->SetFloat("lightIntensity", intensity);
+    // ah yes, the virgin light
+    // has vertices
+    // has colors
+    // doesnt have normals.
+    void Renderer3D::SetLightPosition( const glm::mat4& transform, const glm::vec4& color, float intensity ) {
+        if( m_LightCount >= max_indices ) {
+            Flush();
+            BeginBatch();
+        };
+        
+        for( int index = 0; index < VIPER_Cube_Cube_001_VERT_SIZE; index++ ) {
+            LightPtrBuffer->position = transform * object_transform[ index ];
+            LightPtrBuffer->color = color;
+            LightPtrBuffer++;
+        };
+        m_LightCount += VIPER_Cube_Cube_001_IND_SIZE;
+        stats3d.m_CubeCount++;
+        stats3d.m_LightSources++;
     };
 
     void Renderer3D::BeginBatch() {
         m_IndiceCount = 0;
-        m_Cube = 0;
-        PtrBuffer = Ptr;
+        CubePtrBuffer = CubePtr;
+
+        m_LightCount = 0;
+        LightPtrBuffer = LightPtr;
     };
 };

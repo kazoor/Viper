@@ -9,10 +9,6 @@
 #include "entitycomponents.hpp"
 
 namespace Viper {
-    inline static void OnTransformConstruct( entt::registry& reg, entt::entity entity_handle ) {
-        printf("call construct.\n"); 
-    };
-
     static b2BodyType Rigidbody2DTypeToBox2D(Rigidbody2DComponent::BodyType bodytype) {
         switch( bodytype ) {
             case Rigidbody2DComponent::BodyType::body_static: return b2_staticBody;
@@ -113,11 +109,14 @@ namespace Viper {
             {
                 Renderer3D::Begin( default_projection, default_transform );
                 //Renderer3D::SetLightPosition(light_position, light_color, light_intensity);
-                auto group = m_register.group< TransformComponent >( entt::get< SpriteRendererComponent > );
+                auto group = m_register.group< TransformComponent >( entt::get< MeshComponent > );
                 for( auto entity : group ) {
-                    auto [tr, spr] = group.get< TransformComponent, SpriteRendererComponent >( entity );
+                    auto [tr, msh] = group.get< TransformComponent, MeshComponent >( entity );
 
-                    Renderer3D::Quad(tr.GetTransform(), spr.color );//DrawSprite(tr.GetTransform(), spr);
+                    if(msh.Type == MeshComponent::MeshType::Mesh_Cube )
+                        Renderer3D::Quad(tr.GetTransform(), msh.color );
+                    else if(msh.Type == MeshComponent::MeshType::Mesh_Light )
+                        Renderer3D::SetLightPosition(tr.GetTransform(), msh.color, 1.0f );//DrawSprite(tr.GetTransform(), spr);
                 };
                 Renderer3D::End();
             }
