@@ -62,31 +62,31 @@ namespace Viper {
                     ImVec2(ViewportSize.x, ViewportSize.y),
                     ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
 
-            auto selected_entity = m_Context->GetSelectedEntity();
-            if( selected_entity ) {
-                ImGuizmo::SetOrthographic(false);
-                ImGuizmo::SetDrawlist();
-
-                float windowWidth = ( float )ImGui::GetWindowWidth();
-                float windowHeight = ( float )ImGui::GetWindowHeight();
-                ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-
-                auto cameraEntity = m_Context->GetCameraEntity();
-                if( cameraEntity && cameraEntity != selected_entity ) {
-                    const auto& camera = cameraEntity.get< CameraComponent >().camera;
-                    const glm::mat4& cameraProjection = camera.GetProjection();
-                    glm::mat4 cameraView = glm::inverse(cameraEntity.get< TransformComponent >().GetTransform());
-
-                    auto& tc = selected_entity.get< TransformComponent >();
-                    glm::mat4 transform = tc.GetTransform();
-
-                    ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-                            ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transform));
-
-                    if(ImGuizmo::IsUsing())
-                        tc.Translation = glm::vec3(transform[3]);
-                }
-            };
+            //auto selected_entity = m_Context->GetSelectedEntity();
+            //if( selected_entity ) {
+            //    ImGuizmo::SetOrthographic(false);
+            //    ImGuizmo::SetDrawlist();
+//
+            //    float windowWidth = ( float )ImGui::GetWindowWidth();
+            //    float windowHeight = ( float )ImGui::GetWindowHeight();
+            //    ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+//
+            //    auto cameraEntity = m_Context->GetCameraEntity();
+            //    if( cameraEntity && cameraEntity != selected_entity ) {
+            //        const auto& camera = cameraEntity.get< CameraComponent >().camera;
+            //        const glm::mat4& cameraProjection = camera.GetProjection();
+            //        glm::mat4 cameraView = glm::inverse(cameraEntity.get< TransformComponent >().GetTransform());
+//
+            //        auto& tc = selected_entity.get< TransformComponent >();
+            //        glm::mat4 transform = tc.GetTransform();
+//
+            //        ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+            //                ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transform));
+//
+            //        if(ImGuizmo::IsUsing())
+            //            tc.Translation = glm::vec3(transform[3]);
+            //    }
+            //};
 
             //if (ImGui::IsItemClicked())
             //    m_Context->ResetViewport();

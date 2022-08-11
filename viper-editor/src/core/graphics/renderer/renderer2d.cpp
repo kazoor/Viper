@@ -1,8 +1,8 @@
+#include <cstring>
 #include <glad/glad.h>
 #include "renderer2d.hpp"
 #include <util/ref/reference.hpp>
 #include <graphics/shaders/shader/shader.hpp>
-#include <cstring>
 #include <util/timer/timer.hpp>
 
 struct Vertex {
