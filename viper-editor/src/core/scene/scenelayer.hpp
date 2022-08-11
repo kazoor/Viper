@@ -15,6 +15,7 @@
 #include "panels/inspector.hpp"
 #include "panels/filexplorer.hpp"
 #include "panels/viewport.hpp"
+#include "panels/shadereditor.hpp"
 
 #include <graphics/renderer/framebuffer.hpp>
 #include <graphics/renderer/camera/orthographic_camera_controller.hpp>
@@ -57,5 +58,6 @@ namespace Viper {
         SceneHierarchy m_Hierarchy;
         SceneInspector m_Inspector;
         SceneViewport m_Viewport;
+        SceneShaderEditor m_ShaderEditor;
     };
 }

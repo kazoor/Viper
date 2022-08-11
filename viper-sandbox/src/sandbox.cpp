@@ -14,7 +14,6 @@ static float m_LastFrame = 0.0f;
 class SandboxLayer : public Viper::Layers::Layer {
 public:
     SandboxLayer(GLFWwindow* context) : Layer("SandboxLayer"), m_PtrToWindow( context ) {
-        Viper::Renderer3D::Init();
     };
 
     ~SandboxLayer() {
@@ -22,24 +21,11 @@ public:
     };
 
     void Destroy() {
-        Viper::Renderer3D::Shutdown();
     };
 
     void OnUpdate( Timestep ts ) {
         Viper::RenderCommand::SetColor({ 0.05f, 0.05f, 0.05f, 1.0f });
         Viper::RenderCommand::Clear();
-
-        //Viper::Renderer3D::Quad();
-        //Viper::Renderer3D::Begin();
-        static float m_Angle = 0.0f;
-        m_Angle += 10.0f * ts.deltatime() * 6.0f;
-
-        auto trans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f) ) * glm::scale( glm::mat4(1.0f), glm::vec3(1.0f,1.0f,1.0f) ) * glm::rotate( glm::mat4( 1.0f ), glm::radians( m_Angle ), glm::vec3(1, 1, 1 ));
-        Viper::Renderer3D::Quad(trans, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-        auto trans2 = glm::translate(glm::mat4(1.0f), glm::vec3(-0.3f, 0.2f, 0.0f) ) * glm::scale( glm::mat4(1.0f), glm::vec3(0.1f,0.1f,1.0f) ) * glm::rotate( glm::mat4( 1.0f ), glm::radians( m_Angle ), glm::vec3(1, 1, 1 ));
-        Viper::Renderer3D::Quad(trans2, glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
-        Viper::Renderer3D::End();
     };
 
     void OnEvent(Viper::Events::Event& event) {

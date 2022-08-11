@@ -12,7 +12,6 @@ namespace Viper {
         m_Window = CreateScope< Graphics::Window >( 1280, 720, "Viper" );
         m_Window->Setup();
         m_Window->RegisterCallback([this](Events::Event& e){ return Application::OnEvent(e);});
-        printf("created new callback.\n");
     };
 
     void Application::Run() {

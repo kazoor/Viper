@@ -1,11 +1,15 @@
-#define OBJL_CONSOLE_OUTPUT
+
 #include <glad/glad.h>
 #include <cstring>
 #include <string>
 #include "renderer3d.hpp"
 #include "presets3d/cube.hpp"
-#include <vector>
+#include "api/vertex.hpp"
 
+
+//#include "objloader.hpp"
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
 
 struct Vertex {
     glm::vec3 position;
@@ -18,177 +22,26 @@ struct VertexLight {
     glm::vec4 color;
 };
 
+struct MeshVertex {
+    glm::vec3 position;
+    glm::vec4 color;
+    glm::vec3 normals;
+};
+
 constexpr uint32_t max_quads = 20000;
 constexpr uint32_t max_vertices = max_quads * VIPER_Cube_Cube_001_VERT_SIZE;
 constexpr uint32_t max_indices = max_quads * VIPER_Cube_Cube_001_IND_SIZE;
 
-// flytta mig till en separat fil.
-namespace Viper {
-    enum class ShaderType : int {
-	    S_INT, S_FLOAT, S_DOUBLE, S_BOOL,
-	    S_VEC2, S_VEC3, S_VEC4
-    };
-    class IndexBuffer {
-    public:
-        IndexBuffer(uint32_t* data, size_t size) : m_Count( size ) {
-            glCreateBuffers(1, &m_Ebo);
-
-            glBindBuffer(GL_ARRAY_BUFFER, m_Ebo);
-
-            glBufferData(GL_ARRAY_BUFFER, size * sizeof( uint32_t ), data, GL_STATIC_DRAW);
-        };
-
-        ~IndexBuffer() {
-            glDeleteBuffers(1, &m_Ebo);
-        };
-
-        void Bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo); };
-
-        void Unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); };
-
-        uint32_t GetCount() const { return m_Count; };
-
-        static Ref< IndexBuffer > Create( uint32_t* data, size_t size ) {
-            return CreateRef< IndexBuffer >( data, size );
-        };
-    private:
-        uint32_t m_Ebo;
-        uint32_t m_Count;
-    };
-
-    class VertexBuffer {
-    public:
-        VertexBuffer(const uint32_t size) {
-            glCreateBuffers(1, &m_Vbo);
-            Bind();
-
-            glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
-        };
-
-         VertexBuffer( float* vertices, const uint32_t maxbuffer ) {
-            glCreateBuffers(1, &m_Vbo);
-            glBindBuffer(GL_ARRAY_BUFFER, m_Vbo );
-            glBufferData(GL_ARRAY_BUFFER, maxbuffer, vertices, GL_STATIC_DRAW );
-        };
-
-        ~VertexBuffer() {
-            glDeleteBuffers(1, &m_Vbo);
-        };
-
-        void Bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_Vbo); };
-
-        void Unind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); };
-
-        void SetData(const void* ptr, uint32_t size ) {
-            glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, size, ptr );
-        };
-
-        static Ref< VertexBuffer > Create(const uint32_t size) {
-            return CreateRef< VertexBuffer >( size );
-        };
-
-        static Ref< VertexBuffer > Create(float* vertices, const uint32_t maxbuffer) {
-            return CreateRef< VertexBuffer >( vertices, maxbuffer );
-        };
-    private:
-        uint32_t m_Vbo;  
-    };
-
-    class VertexArray {
-    public:
-        VertexArray() {
-            glCreateVertexArrays(1, &m_Vao);
-        };
-
-        ~VertexArray() {
-            glDeleteVertexArrays(1, &m_Vao);
-        };
-
-        void SetIndexInfo( const Ref< IndexBuffer >& indexbuffer ) {
-            glBindVertexArray(m_Vao);
-            indexbuffer->Bind();
-
-            m_indexbuffer = indexbuffer;
-        };
-
-        template< typename Vert >
-        void SetShaderInfo(const Ref< VertexBuffer >& vertexbuffer, const std::vector< ShaderType > sinfo ) {
-            Bind();
-            vertexbuffer->Bind();
-
-            uint32_t m_current_array = 0;
-	        uint32_t m_current_stride = 0;
-
-	        for ( const auto offset : sinfo ) {
-                glEnableVertexAttribArray(m_current_array);
-	        	uint32_t m_stride_offset = 0;
-	        	uint16_t m_stride_type = 0;
-	        	uint32_t m_stride_alt = 0;
-
-	        	switch( offset ) {
-	        		case ShaderType::S_INT: m_stride_offset = 4; m_stride_alt = 1; m_stride_type = 0x1404; break;
-	        		case ShaderType::S_FLOAT: m_stride_offset = 4; m_stride_alt = 1; m_stride_type = 0x1406; break;
-	        		case ShaderType::S_DOUBLE: m_stride_offset = 8; m_stride_alt = 1; m_stride_type = 0x140A; break;
-	        		case ShaderType::S_BOOL: m_stride_offset = 1; m_stride_alt = 1; m_stride_type = 0x8B56; break;
-
-	        		case ShaderType::S_VEC2: m_stride_offset = 8; m_stride_alt = 2; m_stride_type = 0x1406; break;
-	        		case ShaderType::S_VEC3: m_stride_offset = 12; m_stride_alt = 3; m_stride_type = 0x1406; break;
-	        		case ShaderType::S_VEC4: m_stride_offset = 16; m_stride_alt = 4; m_stride_type = 0x1406; break;
-	        	};
-                glVertexAttribPointer(m_current_array, m_stride_alt, m_stride_type, GL_FALSE, sizeof( Vert ), reinterpret_cast< const void* >( m_current_stride ) );
-	        	m_current_array++;
-	        	m_current_stride += m_stride_offset;
-	        };
-        };
-
-        void SetQuad(const Ref< VertexBuffer >& vertexbuffer) {
-            Bind();
-            vertexbuffer->Bind();
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof(Vertex, position));
-    
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof(Vertex, color));
-    
-            glEnableVertexAttribArray(2);
-            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( const void* )offsetof(Vertex, normals));
-        };
-
-        // light doesnt need normals iirc.
-        void SetLight(const Ref< VertexBuffer >& vertexbuffer) {
-            Bind();
-            vertexbuffer->Bind();
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof( VertexLight ), ( const void* )offsetof(VertexLight, position));
-    
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof( VertexLight ), ( const void* )offsetof(VertexLight, color));
-        };
-
-        Ref< IndexBuffer > GetIndexBuffer() const { return m_indexbuffer; };
-
-        void Bind() const { glBindVertexArray(m_Vao); };
-
-        void Unbind() const { glBindVertexArray(0); };
-
-        static Ref< VertexArray > Create( ) {
-            return CreateRef< VertexArray >( );
-        };
-    private:
-        uint32_t m_Vao;
-
-        Ref< IndexBuffer > m_indexbuffer;
-    };
-};
-
-// !!
 
 namespace Viper {
     uint32_t m_IndiceCount = 0;
     uint32_t m_LightCount = 0;
+    uint32_t m_MeshCount = 0;
+
     Renderer3D::Stats3D_t stats3d;
-    Graphics::Shader* m_Shader = nullptr, *m_ShaderLight = nullptr;
+
+    Ref< Graphics::Shader > CubeShader;
+    Ref< Graphics::Shader > LightShader;
 
     Vertex* CubePtr = nullptr;
     Vertex* CubePtrBuffer = nullptr;
@@ -196,26 +49,133 @@ namespace Viper {
     VertexLight* LightPtr = nullptr;
     VertexLight* LightPtrBuffer = nullptr;
 
+    MeshVertex* MeshPtr = nullptr;
+    MeshVertex* MeshPtrBuffer = nullptr;
+
     Ref< VertexArray > CubeArray;
     Ref< VertexBuffer > CubeBuffer;
 
     Ref< VertexArray > LightArray;
     Ref< VertexBuffer > LightBuffer;
 
+    Ref< VertexArray > MeshArray;
+    Ref< VertexBuffer > MeshBuffer;
+
+    struct CameraData {
+		glm::mat4 ViewProjection;
+	};
+
+	CameraData CameraBuffer;
+
+	Ref<UniformBuffer> CameraUniformBuffer;
+
+    static void DrawIndexed( const Ref<VertexArray>& vertexArray, uint32_t indexCount) {
+        vertexArray->Bind();
+        uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
+		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+    };
+
+    Mesh* LoadMeshFromPath( const char* path ) {
+        Mesh* m = new Mesh();
+        std::string inputfile = path;
+        tinyobj::ObjReaderConfig reader_config;
+        reader_config.mtl_search_path = "./"; // Path to material files
+
+        tinyobj::ObjReader reader;
+
+        if (!reader.ParseFromFile(inputfile, reader_config)) {
+          if (!reader.Error().empty()) {
+              std::cerr << "TinyObjReader: " << reader.Error();
+          }
+          exit(1);
+        }
+
+        if (!reader.Warning().empty()) {
+          std::cout << "TinyObjReader: " << reader.Warning();
+        }
+
+        auto& attrib = reader.GetAttrib();
+        auto& shapes = reader.GetShapes();
+        auto& materials = reader.GetMaterials();
+
+        // Loop over shapes
+        for (size_t s = 0; s < shapes.size(); s++) {
+            for (size_t f = 0; f < shapes[s].mesh.indices.size() / 3; f++) {
+                // Get the three indexes of the face (all faces are triangular)
+                tinyobj::index_t idx0 = shapes[s].mesh.indices[3 * f + 0];
+                tinyobj::index_t idx1 = shapes[s].mesh.indices[3 * f + 1];
+                tinyobj::index_t idx2 = shapes[s].mesh.indices[3 * f + 2];
+                m->indices.push_back(idx0.vertex_index);
+                m->indices.push_back(idx1.vertex_index);
+                m->indices.push_back(idx2.vertex_index);
+            }
+          // Loop over faces(polygon)
+          size_t index_offset = 0;
+          for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
+            size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
+
+            // Loop over vertices in the face.
+            for (size_t v = 0; v < fv; v++) {
+              // access to vertex
+              tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+              tinyobj::real_t vx = attrib.vertices[3*size_t(idx.vertex_index)+0];
+              tinyobj::real_t vy = attrib.vertices[3*size_t(idx.vertex_index)+1];
+              tinyobj::real_t vz = attrib.vertices[3*size_t(idx.vertex_index)+2];
+
+              m->transform.push_back(glm::vec4(vx, vy, vz, 1.0f));
+
+              // Check if `normal_index` is zero or positive. negative = no normal data
+              if (idx.normal_index >= 0) {
+                tinyobj::real_t nx = attrib.normals[3*size_t(idx.normal_index)+0];
+                tinyobj::real_t ny = attrib.normals[3*size_t(idx.normal_index)+1];
+                tinyobj::real_t nz = attrib.normals[3*size_t(idx.normal_index)+2];
+                m->normals.push_back(glm::vec3(nx, ny, nz));
+              }
+
+              // Check if `texcoord_index` is zero or positive. negative = no texcoord data
+              if (idx.texcoord_index >= 0) {
+                tinyobj::real_t tx = attrib.texcoords[2*size_t(idx.texcoord_index)+0];
+                tinyobj::real_t ty = attrib.texcoords[2*size_t(idx.texcoord_index)+1];
+              }
+
+              // Optional: vertex colors
+              tinyobj::real_t red   = attrib.colors[3*size_t(idx.vertex_index)+0];
+              tinyobj::real_t green = attrib.colors[3*size_t(idx.vertex_index)+1];
+              tinyobj::real_t blue  = attrib.colors[3*size_t(idx.vertex_index)+2];
+              m->colors.push_back(glm::vec3(red, green, blue));
+            }
+            index_offset += fv;
+
+            // per-face material
+            shapes[s].mesh.material_ids[f];
+          }
+        }
+        return m;
+    };
+    
+    void FreeMesh(Mesh* m) {
+        delete m;
+    };
+    
+
     void Renderer3D::Init() {
-        m_Shader = new Graphics::Shader("resources/shaders/Renderer3D_Quad.vert", "resources/shaders/Renderer3D_Quad.frag");
-        m_ShaderLight = new Graphics::Shader("resources/shaders/Renderer3D_Light.vert", "resources/shaders/Renderer3D_Light.frag");
+        CubeShader = Graphics::Shader::Create("resources/shaders/Renderer3D_Quad.vert", "resources/shaders/Renderer3D_Quad.frag");
+        LightShader = Graphics::Shader::Create("resources/shaders/Renderer3D_Light.vert", "resources/shaders/Renderer3D_Light.frag");
+
         CubePtr = new Vertex[ max_vertices ];
         LightPtr = new VertexLight[ max_vertices ];
+        MeshPtr = new MeshVertex[ max_vertices ];
 
         CubeArray = VertexArray::Create();
         CubeBuffer = VertexBuffer::Create(max_vertices * sizeof(Vertex));
 
-
+        // CubeArray->SetShaderInfo: Detta vore ytterst dumt att göra.
+        // Vi vill inte sätta VertexBuffer attributer i en VertexArray, istället vill vi sätta det i
+        // en vertexbuffer.
         CubeArray->SetShaderInfo< Vertex >( CubeBuffer, {
-            ShaderType::S_VEC3, // Position
-            ShaderType::S_VEC4, // Color
-            ShaderType::S_VEC3 // Normals
+            { ShaderType::S_VEC3, "m_Position" }, // Position
+            { ShaderType::S_VEC4, "m_Color" }, // Color
+            { ShaderType::S_VEC3, "m_Normals" } // Normals
         });
 
         uint32_t* m_cube_indices = new uint32_t[ max_indices ];
@@ -263,32 +223,42 @@ namespace Viper {
 
         Ref<IndexBuffer> CubeIndex = IndexBuffer::Create(m_cube_indices, max_indices);
         CubeArray->SetIndexInfo(CubeIndex);
+		delete[] m_cube_indices;
 
         // Light
 
         LightArray = VertexArray::Create();
         LightBuffer = VertexBuffer::Create(max_vertices * sizeof(VertexLight));
-        //LightArray->SetLight(LightBuffer);
-
-        LightArray->SetShaderInfo< VertexLight >( LightBuffer, {
-            ShaderType::S_VEC3, // Position
-            ShaderType::S_VEC4 // Color
+        LightArray->SetShaderInfo< VertexLight >(LightBuffer,{
+            { ShaderType::S_VEC3, "m_Position" }, // Position
+            { ShaderType::S_VEC4, "m_Color" } // Color
         });
+        LightArray->SetIndexInfo(CubeIndex);
 
-        // viking note: det finns ingen anledning att skapa en helt ny uint32 pointer array
-        // eftersom för light's så vill vi använda samma kub igen.
-        // använd den som existerar.
-        
-        Ref<IndexBuffer> LightIndex = IndexBuffer::Create(m_cube_indices, max_indices);
-        LightArray->SetIndexInfo(LightIndex);
-		delete[] m_cube_indices;
+        CameraUniformBuffer = UniformBuffer::Create(sizeof(CameraData), 0);
     };
 
     void Renderer3D::Shutdown() {
         delete[] CubePtr;
         delete[] LightPtr;
-        delete m_Shader;
-        delete m_ShaderLight;
+        delete[] MeshPtr;
+    };
+
+    void Renderer3D::InvalidateMesh(Mesh* mesh) {
+        if( !mesh->mesh_is_constructed ) {
+            MeshArray = VertexArray::Create();
+            MeshBuffer = VertexBuffer::Create(mesh->transform.size() * sizeof(MeshVertex));
+            MeshArray->SetShaderInfo< MeshVertex >(MeshBuffer,{
+                { ShaderType::S_VEC3, "m_Position" }, // Position
+                { ShaderType::S_VEC4, "m_Color" }, // Color,
+                { ShaderType::S_VEC3, "m_Normals"} // Normals
+            });
+
+            Ref<IndexBuffer> MeshIndex = IndexBuffer::Create(&mesh->indices[0], mesh->indices.size());
+            MeshArray->SetIndexInfo(MeshIndex);
+
+            mesh->mesh_is_constructed = true;
+        };
     };
 
     // ah yes, the giga chad cube.
@@ -317,11 +287,10 @@ namespace Viper {
         std::memset(&stats3d, 0, sizeof( Stats3D_t ) );
         glm::mat4 view_projection = camera_transform * glm::inverse( transform );
 
-        m_Shader->SetUniformMat4("viewmatrix", view_projection );
-        m_Shader->Use();
-        
-        m_ShaderLight->SetUniformMat4("viewmatrix", view_projection );
-        m_ShaderLight->Use();
+        CameraBuffer.ViewProjection = view_projection;
+        CameraUniformBuffer->SetData(&CameraBuffer, sizeof(CameraData));
+
+
         BeginBatch();
     };
 
@@ -330,20 +299,30 @@ namespace Viper {
     };
 
     void Renderer3D::Flush() {
+
         if( m_IndiceCount ) {
             const auto& size_ptr = ( uint8_t* )CubePtrBuffer - ( uint8_t* )CubePtr;
             CubeBuffer->SetData(CubePtr, size_ptr);
 
-            CubeArray->Bind();
-            glDrawElements(GL_TRIANGLES, m_IndiceCount, GL_UNSIGNED_INT, nullptr);
+            CubeShader->Use();
+            DrawIndexed(CubeArray, m_IndiceCount);
         };
 
         if( m_LightCount ) {
             const auto& size_ptr = ( uint8_t* )LightPtrBuffer - ( uint8_t* )LightPtr;
             LightBuffer->SetData(LightPtr, size_ptr);
 
-            LightArray->Bind();
-            glDrawElements(GL_TRIANGLES, m_LightCount, GL_UNSIGNED_INT, nullptr);
+            LightShader->Use();
+            DrawIndexed(LightArray, m_LightCount);
+        };
+
+        if( m_MeshCount ) {
+            const auto& size_ptr = ( uint8_t* )MeshPtrBuffer - ( uint8_t* )MeshPtr;
+            MeshBuffer->SetData(MeshPtr, size_ptr);
+            
+            CubeShader->Use();
+            //DrawIndexed(MeshArray, m_MeshCount);
+            glDrawArrays(GL_TRIANGLES, 0, m_MeshCount);
         };
 
         stats3d.m_IndexCount = m_IndiceCount + m_LightCount;
@@ -370,11 +349,45 @@ namespace Viper {
         stats3d.m_LightSources++;
     };
 
+    void Renderer3D::SetLightPosition( const glm::mat4& transform, const glm::vec3& pos, const glm::vec4& color, float intensity ) {
+        if( m_LightCount >= max_indices ) {
+            Flush();
+            BeginBatch();
+        };
+        
+        for( int index = 0; index < VIPER_Cube_Cube_001_VERT_SIZE; index++ ) {
+            LightPtrBuffer->position = transform * object_transform[ index ];
+            LightPtrBuffer->color = color;
+            LightPtrBuffer++;
+        };
+        //CubeShader->SetVector3("light_positions", pos);
+
+
+        m_LightCount += VIPER_Cube_Cube_001_IND_SIZE;
+        stats3d.m_CubeCount++;
+        stats3d.m_LightSources++;
+
+    };
+
+    void Renderer3D::DrawMesh( const glm::mat4& transform, Mesh* mesh ) {
+        for( int i = 0; i < mesh->transform.size(); i++ ) {
+            MeshPtrBuffer->position = transform * mesh->transform[ i ];
+            MeshPtrBuffer->color = glm::vec4(mesh->colors[ i ], 1.0f);
+            MeshPtrBuffer->normals = mesh->normals[ i ];
+            MeshPtrBuffer++;
+        };
+        m_MeshCount += mesh->indices.size();
+    };
+
     void Renderer3D::BeginBatch() {
+        
         m_IndiceCount = 0;
         CubePtrBuffer = CubePtr;
 
         m_LightCount = 0;
         LightPtrBuffer = LightPtr;
+
+        m_MeshCount = 0;
+        MeshPtrBuffer = MeshPtr;
     };
 };

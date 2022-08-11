@@ -9,6 +9,8 @@
 #include "entitycomponents.hpp"
 
 namespace Viper {
+    Mesh* m_Cube = nullptr;
+
     static b2BodyType Rigidbody2DTypeToBox2D(Rigidbody2DComponent::BodyType bodytype) {
         switch( bodytype ) {
             case Rigidbody2DComponent::BodyType::body_static: return b2_staticBody;
@@ -31,7 +33,6 @@ namespace Viper {
             m_point = point;
             m_normal = normal;
             m_fraction = fraction;
-            printf("ray hit: %.2f\n", m_fraction);
             return fraction;
         };
 
@@ -43,9 +44,11 @@ namespace Viper {
     };
 
     Scene::Scene() {
+        //m_Cube = LoadMeshFromPath("cubeobj.obj");
     };
 
     Scene::~Scene() {
+        //FreeMesh(m_Cube);
     };
 
     template< typename... Components >
@@ -92,35 +95,37 @@ namespace Viper {
                 transform.Rotation.z = body->GetAngle();
             };
         };
-        Camera* m_MainCamera = nullptr;
-        glm::mat4 m_MainTransform;
-        {
-            auto view = m_register.view< CameraComponent, TransformComponent >( );
-            for( auto camera_entity : view ) {
-                auto [cam, trans] = view.get< CameraComponent, TransformComponent >( camera_entity );
-                if( cam.MainCamera ) {
-                    m_MainCamera = &cam.camera;
-                    m_MainTransform = trans.GetTransform();
-                    break;
-                };
-            }; 
-        };
+        //Camera* m_MainCamera = nullptr;
+        //glm::mat4 m_MainTransform;
+        //{
+        //    auto view = m_register.view< CameraComponent, TransformComponent >( );
+        //    for( auto camera_entity : view ) {
+        //        auto [cam, trans] = view.get< CameraComponent, TransformComponent >( camera_entity );
+        //        if( cam.MainCamera ) {
+        //            m_MainCamera = &cam.camera;
+        //            m_MainTransform = trans.GetTransform();
+        //            break;
+        //        };
+        //    }; 
+        //};
         //if( m_MainCamera != nullptr ) {
-            {
-                Renderer3D::Begin( default_projection, default_transform );
-                //Renderer3D::SetLightPosition(light_position, light_color, light_intensity);
-                auto group = m_register.group< TransformComponent >( entt::get< MeshComponent > );
-                for( auto entity : group ) {
-                    auto [tr, msh] = group.get< TransformComponent, MeshComponent >( entity );
+            //{
+                    
+        {
+            Renderer3D::Begin( default_projection, default_transform );
+            //Renderer3D::SetLightPosition(light_position, light_color, light_intensity);
 
-                    if(msh.Type == MeshComponent::MeshType::Mesh_Cube )
-                        Renderer3D::Quad(tr.GetTransform(), msh.color );
-                    else if(msh.Type == MeshComponent::MeshType::Mesh_Light )
-                        Renderer3D::SetLightPosition(tr.GetTransform(), msh.color, 1.0f );//DrawSprite(tr.GetTransform(), spr);
-                };
-                Renderer3D::End();
-            }
-       // }
+            auto group = m_register.group< TransformComponent >( entt::get< MeshComponent > );
+            for( auto entity : group ) {
+                auto [tr, msh] = group.get< TransformComponent, MeshComponent >( entity );
+//  
+                if(msh.Type == MeshComponent::MeshType::Mesh_Cube )
+                    Renderer3D::Quad(tr.GetTransform(), msh.color );
+                else if(msh.Type == MeshComponent::MeshType::Mesh_Light )
+                    Renderer3D::SetLightPosition(tr.GetTransform(), tr.Translation, msh.color, 1.0f );//DrawSprite(tr.GetTransform(), spr);
+            };
+            Renderer3D::End();
+        }
     };
 
     void Scene::OnOverlay( Timestep::Timestep ts ) {
