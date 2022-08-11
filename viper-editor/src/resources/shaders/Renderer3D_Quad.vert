@@ -10,10 +10,13 @@ layout(std140, binding = 0) uniform Camera
 
 out flat vec4 vColor;
 out vec3 vNormals;
+out vec3 vPos;
 
 void main()
 {
     vColor = aColor;
     vNormals = aNormals;
+    vPos = aPos;
+
     gl_Position = u_ViewProjection * vec4(aPos, 1.0);
 }
