@@ -15,6 +15,7 @@ add_library(Viper MODULE
 
         # Rendering related files
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/shaders/shader/shader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/api/vertex.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/rendercommand.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics/renderer/renderer3d.cpp
@@ -36,6 +37,7 @@ add_library(Viper MODULE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/inspector.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/viewport.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/filexplorer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core/scene/panels/shadereditor.cpp
 
         # Input handlers
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/util/input/inputhandler/inputhandler.cpp

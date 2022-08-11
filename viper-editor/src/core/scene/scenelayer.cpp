@@ -28,12 +28,12 @@ namespace Viper {
     SceneLayer::SceneLayer(void* context) : Layer("Scene"), WindowContext((GLFWwindow*)context) {
         //m_Camera = new OrthoGraphicCameraController(1280.0f/720.0f);
 
-        Renderer2D::Init();
+        //Renderer2D::Init();
         Renderer3D::Init();
 
         m_Texture = Sprite2D::Create( "resources/textures/checkerboard.png" );
 
-        m_EditorCamera = EditorCamera(90.0f, 1.0f, -1.0f, (float)1280 / (float)720.0f );
+        m_EditorCamera = EditorCamera(45.0f, 0.1f, 1000.0f, (float)1280 / (float)720.0f );
 
         Globals::ConsoleContext::AddLog( VIPER_ICON_SUCC " Success!", "Window has been loaded!", Globals::ConsoleSuccess );
         
@@ -46,40 +46,30 @@ namespace Viper {
 
         //m_ActiveScene->CreateCameraEntity();
 
-        /*
-        // The following code is used for stress testing the 3D Renderer pipeline.
-        // This will draw ~10,000 cubes onto the scene.
-        for( float y = 0; y != 100.0f; y += 1.0f ) {
-            for( float x = 0; x != 100.0f; x += 1.0f ) {
-                auto ent = m_ActiveScene->CreateEntity();
-                ent.add< SpriteRendererComponent >();
-                auto& tr = ent.get< TransformComponent >( );
-                tr.Translation = glm::vec3( x, y, 0.0f );
-            }
-        }*/
-
         // Create the 3d cube as a default entity.
-        Entity cube = m_ActiveScene->CreateEntity("CubeMesh");
-        auto& tr = cube.get< TransformComponent >();
-        tr.Translation = glm::vec3(-0.5f, 0.0f, 0.0f);
-        MeshComponent comp;
-        comp.Type = MeshComponent::MeshType::Mesh_Cube;
-        comp.color = glm::vec4(1.0f, 0.2f, 0.2f, 1.0f);
-        cube.add< MeshComponent >(comp);
+        {
+            Entity cube = m_ActiveScene->CreateEntity("CubeMesh");
+            auto& tr = cube.get< TransformComponent >();
+            tr.Translation = glm::vec3(-0.5f, 0.0f, 0.0f);
+            MeshComponent comp;
+            comp.Type = MeshComponent::MeshType::Mesh_Cube;
+            comp.color = glm::vec4(1.0f, 0.2f, 0.2f, 1.0f);
+            cube.add< MeshComponent >(comp);
 
-        Entity cube2 = m_ActiveScene->CreateEntity("LightMesh");
-        auto& tr2 = cube2.get< TransformComponent >();
-        tr2.Translation = glm::vec3(0.5f, 0.0f, 0.0f);
-        MeshComponent comp2;
-        comp2.Type = MeshComponent::MeshType::Mesh_Light;
-        comp2.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+            Entity cube2 = m_ActiveScene->CreateEntity("LightMesh");
+            auto& tr2 = cube2.get< TransformComponent >();
+            tr2.Translation = glm::vec3(0.5f, 0.0f, 0.0f);
+            MeshComponent comp2;
+            comp2.Type = MeshComponent::MeshType::Mesh_Light;
+            comp2.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+            cube2.add< MeshComponent >(comp2);
+        }
         
-        cube2.add< MeshComponent >(comp2);
-
         m_Viewport = SceneViewport( m_ActiveScene.get(), context );
         m_Hierarchy = SceneHierarchy( m_ActiveScene.get() );
         m_Inspector = SceneInspector( m_ActiveScene.get() );
         m_Filexplorer = SceneFilexplorer();
+        m_ShaderEditor = SceneShaderEditor();
 
         OnImGuiInit();
     };
@@ -90,7 +80,7 @@ namespace Viper {
 
     void SceneLayer::Destroy() {
         //delete m_Camera;
-        Renderer2D::Shutdown();
+        //Renderer2D::Shutdown();
         Renderer3D::Shutdown();
 
         OnImGuiExit();
@@ -200,7 +190,7 @@ namespace Viper {
         ImGui_ImplGlfw_NewFrame();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
-        ImGuizmo::BeginFrame();
+        //ImGuizmo::BeginFrame();
     };
 
     void SceneLayer::OnImGuiEnd() {
@@ -215,6 +205,7 @@ namespace Viper {
             m_Filexplorer.OnImGuiRender(ts);
             m_Hierarchy.OnImGuiRender(ts, m_FrameBuffer);
             m_Inspector.OnImGuiRender(ts);
+            //m_ShaderEditor.OnImGuiRender(ts);
         OnImGuiEnd();
     };
 };
