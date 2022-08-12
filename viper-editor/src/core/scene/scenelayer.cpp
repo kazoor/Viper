@@ -48,21 +48,20 @@ namespace Viper {
 
         // Create the 3d cube as a default entity.
         {
-            Entity cube = m_ActiveScene->CreateEntity("CubeMesh");
-            auto& tr = cube.get< TransformComponent >();
-            tr.Translation = glm::vec3(-0.5f, 0.0f, 0.0f);
-            MeshComponent comp;
-            comp.Type = MeshComponent::MeshType::Mesh_Cube;
-            comp.color = glm::vec4(1.0f, 0.2f, 0.2f, 1.0f);
-            cube.add< MeshComponent >(comp);
-
-            Entity cube2 = m_ActiveScene->CreateEntity("LightMesh");
-            auto& tr2 = cube2.get< TransformComponent >();
-            tr2.Translation = glm::vec3(0.5f, 0.0f, 0.0f);
-            MeshComponent comp2;
-            comp2.Type = MeshComponent::MeshType::Mesh_Light;
-            comp2.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-            cube2.add< MeshComponent >(comp2);
+            for( float y = -5.0f; y < 10.0f; y += 1.0f ) {
+                for( float x = -5.0f; x < 10.0f; x += 1.0f ) {
+                    Entity cube2 = m_ActiveScene->CreateEntity("LightMesh");
+                    auto& tr2 = cube2.get< TransformComponent >();
+                    tr2.Translation = glm::vec3(x * 1.5f, y * 1.5f, 0.0f);
+                    MeshComponent comp2;
+                    comp2.Type = MeshComponent::MeshType::Mesh_Light;
+//
+                    auto col_x = ( x + 10.0f ) / 20.0f;
+                    auto col_y = ( y + 10.0f ) / 20.0f;
+                    comp2.color = glm::vec4(col_x, 0.2f, col_y, 1.0f);
+                    cube2.add< MeshComponent >(comp2);
+                }
+            };
         }
         
         m_Viewport = SceneViewport( m_ActiveScene.get(), context );

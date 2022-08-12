@@ -3,13 +3,14 @@
 
 #include <graphics/renderer/renderer2d.hpp>
 #include <graphics/renderer/renderer3d.hpp>
+#include <util/timer/timer.hpp>
 
 #include "scene.hpp"
 #include "sceneentity.hpp"
 #include "entitycomponents.hpp"
 
 namespace Viper {
-    Mesh* m_Cube = nullptr;
+    //Mesh* m_Cube = nullptr;
 
     static b2BodyType Rigidbody2DTypeToBox2D(Rigidbody2DComponent::BodyType bodytype) {
         switch( bodytype ) {
@@ -44,7 +45,7 @@ namespace Viper {
     };
 
     Scene::Scene() {
-        //m_Cube = LoadMeshFromPath("cubeobj.obj");
+        //m_Cube = LoadMeshFromPath("bil.obj");
     };
 
     Scene::~Scene() {
@@ -115,15 +116,17 @@ namespace Viper {
             Renderer3D::Begin( default_projection, default_transform );
             //Renderer3D::SetLightPosition(light_position, light_color, light_intensity);
 
-            auto group = m_register.group< TransformComponent >( entt::get< MeshComponent > );
-            for( auto entity : group ) {
-                auto [tr, msh] = group.get< TransformComponent, MeshComponent >( entity );
-//  
-                if(msh.Type == MeshComponent::MeshType::Mesh_Cube )
-                    Renderer3D::Quad(tr.GetTransform(), msh.color );
-                else if(msh.Type == MeshComponent::MeshType::Mesh_Light )
-                    Renderer3D::SetLightPosition(tr.GetTransform(), tr.Translation, msh.color, 1.0f );//DrawSprite(tr.GetTransform(), spr);
-            };
+                uint32_t m_Index = 0;
+                auto group = m_register.group< TransformComponent >( entt::get< MeshComponent > );
+                for( auto entity : group ) {
+                    auto [tr, msh] = group.get< TransformComponent, MeshComponent >( entity );
+
+                    if(msh.Type == MeshComponent::MeshType::Mesh_Cube )
+                        Renderer3D::Quad(tr.GetTransform(), msh.color );
+                    else if(msh.Type == MeshComponent::MeshType::Mesh_Light )
+                        Renderer3D::SetLightPosition(tr.GetTransform(), tr.Translation, msh.color, 1.0f );//DrawSprite(tr.GetTransform(), spr);
+                };
+            
             Renderer3D::End();
         }
     };
