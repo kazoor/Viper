@@ -1,4 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
+#include <cinttypes>
 #include <stb/stb_image.h>
 #include <glad/glad.h>
 #include <util/globals/global.hpp>
@@ -12,6 +13,7 @@ namespace Viper {
     };
 
     Sprite2D::Sprite2D( const std::string& path ) : Path(path) {
+        stbi_set_flip_vertically_on_load(1);
         int m_texture_width, m_texture_height, m_texture_channels;
         unsigned char* m_TextureData = stbi_load(path.c_str( ), &m_texture_width, &m_texture_height, &m_texture_channels, 0);
         if( m_TextureData )
@@ -72,6 +74,7 @@ namespace Viper {
 
     void Sprite2D::Delete() {
         glDeleteTextures(1, &SpriteID);
+        printf("Deallocted texture.\n");
     };
 
     Ref< Sprite2D > Sprite2D::Create( const std::string& sprite_path ) {
@@ -102,6 +105,10 @@ namespace Viper {
         glBindTextureUnit( slot, SpriteID );
     };
 
+    void Sprite2D::Release() {
+        Delete();
+    };
+
     void Sprite2D::Change( const std::string& location ) {
         Path = location;
 
@@ -118,4 +125,36 @@ namespace Viper {
     std::string Sprite2D::GetCurrentPath() {
         return Path;
     };
+
+    int Sprite2D::GetWidth() const {
+        return Width;
+    }
+
+    int Sprite2D::GetHeight() const {
+        return Height;
+    }
+
+    std::string Sprite2D::GetPath() const {
+        return Path;
+    }
+
+    uint32_t Sprite2D::GetSpriteID() const {
+        return SpriteID;
+    }
+
+    const void Sprite2D::SetWidth(const int W) {
+        Width = W;
+    }
+
+    const void Sprite2D::SetHeight(const int H) {
+        Height = H;
+    }
+
+    const void Sprite2D::SetPath(const std::string &Pth) {
+        Path = Pth;
+    }
+
+    const void Sprite2D::SetSpriteID(const std::uint32_t &ID) {
+        SpriteID = ID;
+    }
 };

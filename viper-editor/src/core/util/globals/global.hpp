@@ -1,16 +1,12 @@
 #pragma once
 #include <string>
 #include <vector>
-//#include <graphics/renderer/renderer.hpp>
-#include <components/gom.hpp>
 
 namespace Viper::Globals {
     class GlobalsContext {
     public:
         static void CreateContext();
         static void DestroyContext();
-
-        static Components::GameObjectManager* Gom;
     };
 
     enum ConsoleFlag : int {
@@ -59,5 +55,8 @@ namespace Viper::Globals {
 
         extern float MousePosX;
         extern float MousePosY;
+
+        extern bool IsSceneFocused;
+        extern bool IsSceneHovered;
     };
 };

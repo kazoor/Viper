@@ -1,5 +1,6 @@
 #pragma once
 #include <string.h>
+#include <cinttypes>
 #include <util/ref/reference.hpp>
 #include <viper/viper.hpp>
 
@@ -15,7 +16,7 @@ namespace Viper {
         static Ref< Sprite2D > Create( int width, int height );
 
         uint32_t GetSprite() const;
-
+        
         void Bind();
         void Unbind();
         void Bind( uint32_t slot );
@@ -24,6 +25,19 @@ namespace Viper {
         void Change( const std::string& location );
 
         std::string GetCurrentPath();
+
+        int GetWidth() const;
+        int GetHeight() const;
+        std::string GetPath() const;
+        uint32_t GetSpriteID() const;
+
+        const void SetWidth(const int W);
+        const void SetHeight(const int H);
+        const void SetPath(const std::string &Path);
+        const void SetSpriteID(const std::uint32_t &ID);
+
+        void Release();
+
     private:
         int Width;
         int Height;

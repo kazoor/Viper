@@ -23,18 +23,9 @@ namespace Viper::Globals {
 
         float SceneX = 2.0f;
         float SceneY = 2.0f;
-    };
 
-    // == // == // == // == // == // == //
-
-    VIPER_DECLARE_CONTEXT_NULL(Components::GameObjectManager*, Gom)
-
-    void GlobalsContext::CreateContext() {
-        Gom = new Components::GameObjectManager();
-    };
-
-    void GlobalsContext::DestroyContext() {
-        delete Gom;
+        bool IsSceneFocused = false;
+        bool IsSceneHovered = false;
     };
 
     // == // == // == // == // == // == //

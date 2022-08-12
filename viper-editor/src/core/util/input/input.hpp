@@ -1,5 +1,6 @@
 #pragma once
 #include <utility>
+#include <viper/viper.hpp>
 #include "../../events/event/event.hpp"
 
 namespace Viper::Input {
@@ -11,7 +12,7 @@ namespace Viper::Input {
         double Y;
     };
 
-    class Input {
+    class VIPER_API Input {
     public:
         static bool IsKeyPressed(int KeyCode) { return Instance->IsKeyPressedImpl(KeyCode); }
 

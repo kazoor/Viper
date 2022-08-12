@@ -21,11 +21,21 @@ namespace Viper::Renderer {
         m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
     };
 
-    void OrthoGraphicCamera::SetPosition( const glm::vec3& position ) {
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position);
+    void OrthoGraphicCamera::Recalculate() {
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_CameraPosition) * glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation), glm::vec3(0.0f, 0.0f, 1.0f));
 
         m_ViewMatrix = glm::inverse( transform );
         m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
+    };
+
+    void OrthoGraphicCamera::SetPosition( const glm::vec3& position ) {
+        m_CameraPosition = position;
+        Recalculate();
+    };
+
+    void OrthoGraphicCamera::SetRotation( const float& rotation ) {
+        m_Rotation = rotation;
+        Recalculate();
     };
 
     glm::mat4 OrthoGraphicCamera::GetViewProjectionMatrix() const {
