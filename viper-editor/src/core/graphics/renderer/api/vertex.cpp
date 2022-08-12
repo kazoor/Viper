@@ -64,6 +64,7 @@ namespace Viper {
     };
     // End Vertex Buffer --!>
 
+    // <!-- Begin Vertex Array
     VertexArray::VertexArray() {
         glCreateVertexArrays(1, &m_Vao);
     };
@@ -88,7 +89,9 @@ namespace Viper {
     Ref< VertexArray > VertexArray::Create( ) {
         return CreateRef< VertexArray >( );
     };
+    // End Vertex Array --!>
 
+    // <!-- Begin Uniform Buffer
     UniformBuffer::UniformBuffer( uint32_t size, uint32_t binding ) {
         glCreateBuffers(1, &m_Ubo);
         glNamedBufferData(m_Ubo, size, nullptr, GL_DYNAMIC_DRAW);
@@ -106,4 +109,5 @@ namespace Viper {
     Ref< UniformBuffer > UniformBuffer::Create(uint32_t size, uint32_t binding) {
         return CreateRef< UniformBuffer >( size, binding );
     };
+    // End Uniform Buffer --!>
 }
