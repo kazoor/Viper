@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <limits>
 #include <fstream>
+#include <spdlog/spdlog.h>
 
 const std::vector< const char* > validation_layers = { "VK_LAYER_KHRONOS_validation" };
 const std::vector< const char* > device_extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
@@ -118,9 +119,11 @@ namespace Viper {
 
             auto m_extensions = Vulkan_GetRequiredExtensions();
 
-            std::cout << "available extensions:" << std::endl;
+            //std::cout << "available extensions:" << std::endl;
+            spdlog::info("Available extensions:");
             for( const auto& ext : m_extensions )
-                std::cout << "\t" << ext << std::endl;
+                spdlog::info("ext: \t{0}", ext);
+                //std::cout << "\t" << ext << std::endl;
 
             //for( const auto& ext : extensions )
             //    std::cout << "\t" << ext.extensionName << std::endl;
@@ -293,17 +296,20 @@ namespace Viper {
 
             VkPhysicalDeviceProperties device_properties;
             vkGetPhysicalDeviceProperties(device, &device_properties);
-            std::cout << "Device Properties: " << device_properties.deviceName << std::endl;
+            //std::cout << "Device Properties: " << device_properties.deviceName << std::endl;
+            spdlog::info("Device Properties: {0}", device_properties.deviceName);
             
             VkPhysicalDeviceFeatures device_features;
             vkGetPhysicalDeviceFeatures(device, &device_features);
-            std::cout << "Device Features: Can render geometry shader? " << device_features.geometryShader << std::endl;
+            spdlog::info("Device Features: Can render geometry shaders? {0}", device_features.geometryShader);
+            //std::cout << "Device Features: Can render geometry shader? " << device_features.geometryShader << std::endl;
 //
             //return device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
             //    device_features.geometryShader;
 
             bool extensions_supported = Vulkan_CheckDeviceExtensionSupport(device);
-            std::cout << "[VULKAN] Can create swapchain? " << extensions_supported << std::endl;
+            //std::cout << "[VULKAN] Can create swapchain? " << extensions_supported << std::endl;
+            spdlog::info("Device Extensions: Can create a swapchain? {0}", extensions_supported);
 
             bool swap_chain_adequate = false;
             if( extensions_supported ) {
@@ -903,7 +909,8 @@ namespace Viper {
             const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
             void* pUserData
         ) {
-            std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
+            //std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
+            spdlog::info("Validation Layer: {0}", pCallbackData->pMessage);
             return VK_FALSE;
         };
 

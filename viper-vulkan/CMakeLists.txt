@@ -44,6 +44,9 @@ message(STATUS "Compiling & Linking GLFW")
 include_directories("${VIPER_EDITOR_ABSOLUTTE_DIR}/external/glfw")
 target_link_libraries(ViperVulkan PUBLIC glfw)
 
+include_directories("${VIPER_EDITOR_ABSOLUTTE_DIR}/external/spdlog")
+target_link_libraries(ViperVulkan PUBLIC spdlog)
+
 target_link_libraries(ViperVulkan PUBLIC ${Vulkan_LIBRARIES})
 
 target_include_directories(ViperVulkan SYSTEM PUBLIC
