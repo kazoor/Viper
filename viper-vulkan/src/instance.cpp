@@ -9,11 +9,16 @@
 #include <algorithm>
 #include <limits>
 #include <fstream>
-#include <spdlog/spdlog.h>
+#include <array>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 const std::vector< const char* > validation_layers = { "VK_LAYER_KHRONOS_validation" };
 const std::vector< const char* > device_extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
-#ifdef VIPER_DEBUG
+
+//#define VIPER_NDEBUG // NDEBUG meaning NO DEBUG.
+
+#ifdef VIPER_NDEBUG
     const bool enable_validation_layers = false;
 #else
     const bool enable_validation_layers = true;
@@ -21,6 +26,49 @@ const std::vector< const char* > device_extensions = { VK_KHR_SWAPCHAIN_EXTENSIO
 
 namespace Viper {
     // <!-- Vulkan API Start (Debugging)
+    struct Vertex { // TDL; Fixa instanced rendering för att hantera
+    // en jävla massa grejer för renderpass.
+        glm::vec3 position;
+        glm::vec4 color;
+
+        static VkVertexInputBindingDescription GetDescription() {
+            VkVertexInputBindingDescription bind_descriptions = {};
+            bind_descriptions.stride = sizeof(Vertex);
+            bind_descriptions.binding = 0;
+            bind_descriptions.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+            return bind_descriptions;
+        };
+
+        static std::array< VkVertexInputAttributeDescription, 2U > GetAttributeDescriptions() {
+            std::array< VkVertexInputAttributeDescription, 2U > attribute_descriptions = {};
+            attribute_descriptions[0].binding = 0;
+            attribute_descriptions[0].location = 0;
+            attribute_descriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT; // Vec2
+            attribute_descriptions[0].offset = offsetof(Vertex, position);
+
+            attribute_descriptions[1].binding = 0;
+            attribute_descriptions[1].location = 1;
+            attribute_descriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT; // Vec3
+            attribute_descriptions[1].offset = offsetof(Vertex, color);
+            return attribute_descriptions;
+        };
+    };
+
+    const std::vector< Vertex > m_vertices = {
+        {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0}},
+        {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0}},
+        {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f, 1.0}},
+        {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0}}
+    };
+
+    const std::vector< uint16_t > m_indices = {
+        0, 1, 2,    2, 3, 0  
+    };
+
+    struct UniformBufferObjects_t {
+        glm::mat4 projection;
+    };
+    
     struct SwapChainSupportDetails {
         VkSurfaceCapabilitiesKHR capabilities;
         std::vector< VkSurfaceFormatKHR > formats;
@@ -43,6 +91,7 @@ namespace Viper {
             fn( instance, debugMessenger, pAllocator );
     };
 
+   
     // Vulkan API End. (Debugging) --!>
 
     class VkViper {
@@ -54,8 +103,17 @@ namespace Viper {
             bool is_complete() { return graphics_family.has_value() && present_family.has_value(); };
         };
     public:
+     static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+        auto app = reinterpret_cast<VkViper*>(glfwGetWindowUserPointer(window));
+        app->framebuffer_resized = true;
+        printf("resized.\n");
+    }
+
         VkViper(GLFWwindow* wnd) : window(wnd) {};
         void Vulkan_Init() {
+            
+            Vulkan_RegisterGlfwCallbacks();
+
             Vulkan_CreateInstance(); // Creates the instance.
 
             Vulkan_SetDebugMessenger(); // Set's up a brev-duva. for debugging purposes..
@@ -72,13 +130,25 @@ namespace Viper {
 
             Vulkan_CreateRenderPass();
 
+            Vulkan_CreateDescriptorSetLayout();
+
             Vulkan_CreateGraphicsPipeline();
 
             Vulkan_CreateFramebuffers();
 
             Vulkan_CreateCommandPool();
 
-            Vulkan_CreateCommandBuffer();
+            Vulkan_CreateVertexBuffer();
+
+            Vulkan_CreateIndexBuffer();
+
+            Vulkan_CreateUniformBuffers();
+
+            Vulkan_CreateDescriptorPool();
+
+            Vulkan_CreateDescriptorSets();
+
+            Vulkan_CreateCommandBuffers();
 
             Vulkan_CreateSyncObjects();
         };
@@ -88,6 +158,58 @@ namespace Viper {
 
             Vulkan_Cleanup();
         };
+
+        void Vulkan_CreateDescriptorPool() {
+            VkDescriptorPoolSize pool_size = {};
+            pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            pool_size.descriptorCount = static_cast< uint32_t >( max_frames_in_flight );
+
+            VkDescriptorPoolCreateInfo pool_info = {};
+            pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+            pool_info.poolSizeCount = 1;
+            pool_info.pPoolSizes = &pool_size;
+            pool_info.maxSets = static_cast< uint32_t >( max_frames_in_flight );
+
+            VkResult result = vkCreateDescriptorPool(logical_device, &pool_info, nullptr, &descriptor_pool);
+            if(result != VK_SUCCESS)
+                throw std::runtime_error("unable to create descriptor pool.");
+        };
+
+        void Vulkan_CreateDescriptorSets() {
+            std::vector<VkDescriptorSetLayout> layouts(max_frames_in_flight, descriptor_set_layout);
+            VkDescriptorSetAllocateInfo alloc_info = {};
+            alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+            alloc_info.descriptorPool = descriptor_pool;
+            alloc_info.descriptorSetCount = static_cast< uint32_t >(max_frames_in_flight);
+            alloc_info.pSetLayouts = layouts.data();
+
+            descriptor_sets.resize(max_frames_in_flight);
+            if (vkAllocateDescriptorSets(logical_device, &alloc_info, descriptor_sets.data()) != VK_SUCCESS) {
+                throw std::runtime_error("failed to allocate descriptor sets!");
+            };
+
+            for( size_t i = 0; i < max_frames_in_flight; i++ ) {
+                VkDescriptorBufferInfo buffer_info = {};
+                buffer_info.buffer = uniform_buffers[i];
+                buffer_info.offset = 0;
+                buffer_info.range = sizeof(UniformBufferObjects_t);
+
+                VkWriteDescriptorSet descriptor_write = {};
+                descriptor_write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                descriptor_write.dstSet = descriptor_sets[i];
+                descriptor_write.dstBinding = 0;
+                descriptor_write.dstArrayElement = 0;
+                descriptor_write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+                descriptor_write.descriptorCount = 1;
+                descriptor_write.pBufferInfo = &buffer_info;
+
+                // both of these are optional.
+                descriptor_write.pImageInfo = nullptr;
+                descriptor_write.pTexelBufferView = nullptr;
+
+                vkUpdateDescriptorSets(logical_device, 1, &descriptor_write, 0, nullptr);
+            };
+        }
 
         // Create's an instance to the vulkan API.
         void Vulkan_CreateInstance() {
@@ -106,24 +228,12 @@ namespace Viper {
             VkInstanceCreateInfo createinfo{};
             createinfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
             createinfo.pApplicationInfo = &appinfo;
-           
-
-            //uint32_t glfwExtensionCount = 0;
-            //const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-//
-            //uint32_t extensionCount = 0;
-            //vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-            //std::vector< VkExtensionProperties > extensions(extensionCount);
-//
-            //vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
             auto m_extensions = Vulkan_GetRequiredExtensions();
 
-            //std::cout << "available extensions:" << std::endl;
-            spdlog::info("Available extensions:");
+            std::cout << "available extensions:" << std::endl;
             for( const auto& ext : m_extensions )
-                spdlog::info("ext: \t{0}", ext);
-                //std::cout << "\t" << ext << std::endl;
+                std::cout << "\t" << ext << std::endl;
 
             //for( const auto& ext : extensions )
             //    std::cout << "\t" << ext.extensionName << std::endl;
@@ -182,23 +292,44 @@ namespace Viper {
 
         // Cleanup and destroy the vulkan instance/callbacks.
         void Vulkan_Cleanup() {
-            vkDestroySemaphore(logical_device, render_finished_semaphore, nullptr);
-            vkDestroySemaphore(logical_device, image_available_semaphore, nullptr);
-            vkDestroyFence(logical_device, in_flight_fence, nullptr);
+            Vulkan_CleanSwapchain();
+
+            vkDestroyDescriptorPool(logical_device, descriptor_pool, nullptr);
+
+            vkDestroyDescriptorSetLayout(logical_device, descriptor_set_layout, nullptr);
+
+            for (size_t i = 0; i < max_frames_in_flight; i++) {
+                vkDestroyBuffer(logical_device, uniform_buffers[i], nullptr);
+                vkFreeMemory(logical_device, uniform_buffers_memory[i], nullptr);
+            };
+
+            //vkDestroyDescriptorSetLayout(logical_device, descriptor_set_layout, nullptr);
+
+            vkDestroyBuffer(logical_device, vertex_buffer, nullptr);
+            vkFreeMemory(logical_device, vertex_buffer_memory, nullptr);
+
+            vkDestroyBuffer(logical_device, index_buffer, nullptr);
+            vkFreeMemory(logical_device, index_buffer_memory, nullptr);
+
+            for( size_t i = 0; i < max_frames_in_flight; i++ ) {
+                vkDestroySemaphore(logical_device, render_finished_semaphore[i], nullptr);
+                vkDestroySemaphore(logical_device, image_available_semaphore[i], nullptr);
+                vkDestroyFence(logical_device, in_flight_fences[i], nullptr);
+            }
             
             vkDestroyCommandPool(logical_device, command_pool, nullptr);
 
-            for( auto frame_buffer : swap_chain_frame_buffers )
-                vkDestroyFramebuffer(logical_device, frame_buffer, nullptr );
+            //for( auto frame_buffer : swap_chain_frame_buffers )
+            //    vkDestroyFramebuffer(logical_device, frame_buffer, nullptr );
            
             vkDestroyPipeline(logical_device, graphics_pipeline, nullptr);
             vkDestroyPipelineLayout(logical_device, pipeline_layout, nullptr);
             vkDestroyRenderPass(logical_device, render_pass, nullptr);
             
-            for( auto image_view : swap_chain_image_views )
-                vkDestroyImageView(logical_device, image_view, nullptr);
+            //for( auto image_view : swap_chain_image_views )
+            //    vkDestroyImageView(logical_device, image_view, nullptr);
 
-            vkDestroySwapchainKHR(logical_device, swap_chain, nullptr);
+            //vkDestroySwapchainKHR(logical_device, swap_chain, nullptr);
             vkDestroyDevice(logical_device, nullptr);
 
             if( enable_validation_layers )
@@ -254,6 +385,24 @@ namespace Viper {
             return extensions;
         };
 
+        void Vulkan_CreateDescriptorSetLayout() {
+            VkDescriptorSetLayoutBinding ubo_layout_binding = {};
+            ubo_layout_binding.binding = 0;
+            ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            ubo_layout_binding.descriptorCount = 1;
+            ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+            ubo_layout_binding.pImmutableSamplers = nullptr;
+
+            VkDescriptorSetLayoutCreateInfo layout_info = {};
+            layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+            layout_info.bindingCount = 1;
+            layout_info.pBindings = &ubo_layout_binding;
+
+            VkResult result = vkCreateDescriptorSetLayout(logical_device, &layout_info, nullptr, &descriptor_set_layout);
+            if(result != VK_SUCCESS)
+                throw std::runtime_error("failed to create a descriptor set layout.");
+        };
+
         void Vulkan_PickPhysicalDevice() {
             uint32_t device_count = 0;
             vkEnumeratePhysicalDevices(instance, &device_count, nullptr);
@@ -296,20 +445,17 @@ namespace Viper {
 
             VkPhysicalDeviceProperties device_properties;
             vkGetPhysicalDeviceProperties(device, &device_properties);
-            //std::cout << "Device Properties: " << device_properties.deviceName << std::endl;
-            spdlog::info("Device Properties: {0}", device_properties.deviceName);
+            std::cout << "Device Properties: " << device_properties.deviceName << std::endl;
             
             VkPhysicalDeviceFeatures device_features;
             vkGetPhysicalDeviceFeatures(device, &device_features);
-            spdlog::info("Device Features: Can render geometry shaders? {0}", device_features.geometryShader);
-            //std::cout << "Device Features: Can render geometry shader? " << device_features.geometryShader << std::endl;
+            std::cout << "Device Features: Can render geometry shader? " << device_features.geometryShader << std::endl;
 //
             //return device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
             //    device_features.geometryShader;
 
             bool extensions_supported = Vulkan_CheckDeviceExtensionSupport(device);
-            //std::cout << "[VULKAN] Can create swapchain? " << extensions_supported << std::endl;
-            spdlog::info("Device Extensions: Can create a swapchain? {0}", extensions_supported);
+            std::cout << "[VULKAN] Can create swapchain? " << extensions_supported << std::endl;
 
             bool swap_chain_adequate = false;
             if( extensions_supported ) {
@@ -525,6 +671,16 @@ namespace Viper {
             return VK_PRESENT_MODE_FIFO_KHR;
         };
 
+        void Vulkan_CreateUniformBuffers() {
+            VkDeviceSize buffer_size = sizeof(UniformBufferObjects_t);
+            uniform_buffers.resize(max_frames_in_flight);
+            uniform_buffers_memory.resize(max_frames_in_flight);
+
+            for (size_t i = 0; i < max_frames_in_flight; i++) {
+                Vulkan_CreateBuffer(buffer_size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniform_buffers[i], uniform_buffers_memory[i]);
+            }
+        };
+
         void Vulkan_CreateImageViews() {
             swap_chain_image_views.resize(swap_chain_images.size());
             for( size_t i = 0; i < swap_chain_images.size(); i++) {
@@ -549,6 +705,56 @@ namespace Viper {
                 if( result != VK_SUCCESS )
                     throw std::runtime_error( "failed to create image views.");
             };
+        };
+
+        uint32_t Vulkan_FindMemoryType( uint32_t type_filter, VkMemoryPropertyFlags prop ) {
+            VkPhysicalDeviceMemoryProperties mem_props = {};
+            vkGetPhysicalDeviceMemoryProperties(physical_device, &mem_props);
+
+            for( uint32_t i = 0; i < mem_props.memoryTypeCount; i++ ) {
+                if( ( type_filter & (1 << i) ) && ( mem_props.memoryTypes[i].propertyFlags & prop ) == prop )
+                    return i;
+            };
+
+            throw std::runtime_error("failed to find suitable mem type.");
+        };
+
+        void Vulkan_CreateVertexBuffer() {
+            VkDeviceSize buffer_size = sizeof(m_vertices[0]) * m_vertices.size();
+
+            VkBuffer staging_buffer;
+            VkDeviceMemory staging_buffer_memory;
+            Vulkan_CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer, staging_buffer_memory);
+
+            void* data;
+            vkMapMemory(logical_device, staging_buffer_memory, 0, buffer_size, 0, &data);
+            memcpy(data, m_vertices.data(), (size_t) buffer_size);
+            vkUnmapMemory(logical_device, staging_buffer_memory);
+
+            Vulkan_CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertex_buffer, vertex_buffer_memory);
+            Vulkan_CopyBuffer(staging_buffer, vertex_buffer, buffer_size);
+            vkDestroyBuffer(logical_device, staging_buffer, nullptr);
+            vkFreeMemory(logical_device, staging_buffer_memory, nullptr);
+        };
+
+        void Vulkan_CreateIndexBuffer() {
+            VkDeviceSize buffer_size = sizeof( m_indices[0] ) * m_indices.size();
+            
+            VkBuffer staging_buffer;
+            VkDeviceMemory staging_buffer_memory;
+
+            Vulkan_CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer, staging_buffer_memory);
+        
+            void* data;
+            vkMapMemory(logical_device, staging_buffer_memory, 0, buffer_size, 0, &data);
+            memcpy(data, m_indices.data(), (size_t)buffer_size);
+            vkUnmapMemory(logical_device, staging_buffer_memory);
+
+            Vulkan_CreateBuffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, index_buffer, index_buffer_memory);
+        
+            Vulkan_CopyBuffer(staging_buffer, index_buffer, buffer_size);
+            vkDestroyBuffer(logical_device, staging_buffer, nullptr);
+            vkFreeMemory(logical_device, staging_buffer_memory, nullptr);
         };
 
         void Vulkan_CreateRenderPass() {
@@ -615,12 +821,15 @@ namespace Viper {
 
             VkPipelineShaderStageCreateInfo shader_stages[] = { vert_shader_stage_info, frag_shader_stage_info };
 
+            auto binding_description = Vertex::GetDescription();
+            auto attribute_description = Vertex::GetAttributeDescriptions();
+
             VkPipelineVertexInputStateCreateInfo vertex_input_info{};
             vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-            vertex_input_info.vertexBindingDescriptionCount = 0;
-            vertex_input_info.pVertexBindingDescriptions = nullptr; // opt.
-            vertex_input_info.vertexAttributeDescriptionCount = 0;
-            vertex_input_info.pVertexAttributeDescriptions = nullptr;
+            vertex_input_info.vertexBindingDescriptionCount = 1;
+            vertex_input_info.pVertexBindingDescriptions = &binding_description; // opt.
+            vertex_input_info.vertexAttributeDescriptionCount = static_cast< uint32_t >( attribute_description.size() );
+            vertex_input_info.pVertexAttributeDescriptions = attribute_description.data();
 
             VkPipelineInputAssemblyStateCreateInfo input_assembly{};
             input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -701,8 +910,8 @@ namespace Viper {
 
             VkPipelineLayoutCreateInfo pipeline_layout_info{};
             pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-            pipeline_layout_info.setLayoutCount = 0; // opt
-            pipeline_layout_info.pSetLayouts = nullptr; // opt
+            pipeline_layout_info.setLayoutCount = 1; // opt
+            pipeline_layout_info.pSetLayouts = &descriptor_set_layout; // opt
             pipeline_layout_info.pushConstantRangeCount = 0; // opt
             pipeline_layout_info.pPushConstantRanges = nullptr; // opt
 
@@ -785,16 +994,18 @@ namespace Viper {
                 throw std::runtime_error("failed to create a command pool");
         };
 
-        void Vulkan_CreateCommandBuffer() {
+        void Vulkan_CreateCommandBuffers() {
+            command_buffers.resize(max_frames_in_flight); // shouldn't this be swap chain images? the amount of them?
+
             VkCommandBufferAllocateInfo alloc_info{};
             alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
             alloc_info.commandPool = command_pool;
             alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-            alloc_info.commandBufferCount = 1;
+            alloc_info.commandBufferCount = static_cast< uint32_t >(command_buffers.size());
 
-            VkResult result = vkAllocateCommandBuffers(logical_device, &alloc_info, &command_buffer);
+            VkResult result = vkAllocateCommandBuffers(logical_device, &alloc_info, command_buffers.data());
             if(result != VK_SUCCESS)
-                throw std::runtime_error("failed to allocate command buffers.");
+                throw std::runtime_error("failed to allocate command buffer(s).");
         };
 
         void Vulkan_RecordCommandBuffer(VkCommandBuffer commandbuffer, uint32_t imageindex) {
@@ -835,7 +1046,16 @@ namespace Viper {
             scissor.extent = swap_chain_extent;
             vkCmdSetScissor(commandbuffer, 0, 1, &scissor);
 
-            vkCmdDraw(commandbuffer, 3, 1, 0, 0);
+            VkBuffer vertex_buffers[] = { vertex_buffer };
+            VkDeviceSize offsets[] = {0};
+            vkCmdBindVertexBuffers(commandbuffer, 0, 1, vertex_buffers, offsets);
+
+            vkCmdBindIndexBuffer(commandbuffer, index_buffer, 0, VK_INDEX_TYPE_UINT16);
+
+            vkCmdBindDescriptorSets(commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0,
+                1, &descriptor_sets[current_frame], 0, nullptr);
+
+            vkCmdDrawIndexed(commandbuffer, static_cast< uint32_t >( m_indices.size() ), 1, 0, 0, 0);
 
             vkCmdEndRenderPass(commandbuffer);
 
@@ -845,6 +1065,10 @@ namespace Viper {
         };
 
         void Vulkan_CreateSyncObjects() {
+            image_available_semaphore.resize(max_frames_in_flight);
+            render_finished_semaphore.resize(max_frames_in_flight);
+            in_flight_fences.resize(max_frames_in_flight);
+
             VkSemaphoreCreateInfo semaphore_info{};
             semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -852,39 +1076,66 @@ namespace Viper {
             fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
             fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-            if(vkCreateSemaphore(logical_device, &semaphore_info, nullptr, &image_available_semaphore) != VK_SUCCESS ||
-                vkCreateSemaphore(logical_device, &semaphore_info, nullptr, &render_finished_semaphore) != VK_SUCCESS ||
-                vkCreateFence(logical_device, &fence_info, nullptr, &in_flight_fence) != VK_SUCCESS) {
+            for( size_t i = 0; i < max_frames_in_flight; i++ ) {
+                if(vkCreateSemaphore(logical_device, &semaphore_info, nullptr, &image_available_semaphore[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(logical_device, &semaphore_info, nullptr, &render_finished_semaphore[i]) != VK_SUCCESS ||
+                vkCreateFence(logical_device, &fence_info, nullptr, &in_flight_fences[i]) != VK_SUCCESS) {
                     throw std::runtime_error("failed to create semaphores.");
                 };
+            }
+        };
+
+        // This is where the shenanigans happens.
+        void Vulkan_UpdateUniformBuffer(uint32_t current_image) {
+            //code.
+            UniformBufferObjects_t ubo;
+            static float m_flUpdater = 0.0f;
+            m_flUpdater += 0.1f;
+
+            ubo.projection = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(m_flUpdater), glm::vec3(0.0f, 0.0f, 1.0f));
+
+            void* data;
+            vkMapMemory(logical_device, uniform_buffers_memory[current_image], 0, sizeof(ubo), 0, &data);
+            memcpy(data, &ubo, sizeof(ubo));
+            vkUnmapMemory(logical_device, uniform_buffers_memory[current_image]);
         };
 
         void Vulkan_DrawFrame() {
-            vkWaitForFences(logical_device, 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
-            vkResetFences(logical_device, 1, &in_flight_fence);
+            vkWaitForFences(logical_device, 1, &in_flight_fences[current_frame], VK_TRUE, UINT64_MAX);
 
             uint32_t image_index;
-            vkAcquireNextImageKHR(logical_device, swap_chain, UINT64_MAX, image_available_semaphore, VK_NULL_HANDLE, &image_index);
-           
-            vkResetCommandBuffer(command_buffer, 0);
+            VkResult res = vkAcquireNextImageKHR(logical_device, swap_chain, UINT64_MAX, image_available_semaphore[current_frame], VK_NULL_HANDLE, &image_index);
 
-            Vulkan_RecordCommandBuffer(command_buffer, image_index);
+            if (res == VK_ERROR_OUT_OF_DATE_KHR) {
+                Vulkan_RecreateSwapchain();
+                return;
+            } else if (res != VK_SUCCESS && res != VK_SUBOPTIMAL_KHR) {
+                throw std::runtime_error("failed to acquire swap chain image!");
+            };
+
+            Vulkan_UpdateUniformBuffer(current_frame);
+
+            vkResetFences(logical_device, 1, &in_flight_fences[current_frame]);
+           
+            vkResetCommandBuffer(command_buffers[current_frame], 0);
+            Vulkan_RecordCommandBuffer(command_buffers[current_frame], image_index);
 
             VkSubmitInfo submit_info{};
             submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            VkSemaphore wait_semaphores[] = { image_available_semaphore };
+            
+            VkSemaphore wait_semaphores[] = { image_available_semaphore[current_frame] };
             VkPipelineStageFlags wait_stages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
             submit_info.waitSemaphoreCount = 1;
             submit_info.pWaitSemaphores = wait_semaphores;
             submit_info.pWaitDstStageMask = wait_stages;
             submit_info.commandBufferCount = 1;
-            submit_info.pCommandBuffers = &command_buffer;
+            submit_info.pCommandBuffers = &command_buffers[current_frame];
 
-            VkSemaphore signal_semaphores[] = { render_finished_semaphore };
+            VkSemaphore signal_semaphores[] = { render_finished_semaphore[current_frame] };
             submit_info.signalSemaphoreCount = 1;
             submit_info.pSignalSemaphores = signal_semaphores;
 
-            VkResult result = vkQueueSubmit(graphics_queue, 1, &submit_info, in_flight_fence);
+            VkResult result = vkQueueSubmit(graphics_queue, 1, &submit_info, in_flight_fences[current_frame]);
             if(result != VK_SUCCESS)
                 throw std::runtime_error("failed to submit draw command buffer.");
 
@@ -899,7 +1150,118 @@ namespace Viper {
             present_info.pImageIndices = &image_index;
             present_info.pResults = nullptr; // opt?
 
-            vkQueuePresentKHR(present_queue, &present_info);
+            VkResult res2 = vkQueuePresentKHR(present_queue, &present_info);
+
+            if (res2 == VK_ERROR_OUT_OF_DATE_KHR || res2 == VK_SUBOPTIMAL_KHR || framebuffer_resized) {
+                framebuffer_resized = false;
+                Vulkan_RecreateSwapchain();
+            } else if (res2 != VK_SUCCESS) {
+                throw std::runtime_error("failed to present swap chain image!");
+            };
+
+            current_frame = ( current_frame + 1 ) % max_frames_in_flight;
+        };
+
+        void Vulkan_CleanSwapchain() {
+            for( auto framebuffer : swap_chain_frame_buffers )
+                vkDestroyFramebuffer(logical_device, framebuffer, nullptr);
+
+            for( auto imageview : swap_chain_image_views )
+                vkDestroyImageView(logical_device, imageview, nullptr);
+
+            vkDestroySwapchainKHR(logical_device, swap_chain, nullptr);
+        };
+
+        void Vulkan_RecreateSwapchain() {
+            int _w = 0, _h = 0;
+            glfwGetFramebufferSize(window, &_w, &_h);
+            while (_w == 0 || _h == 0) {
+                glfwGetFramebufferSize(window, &_w, &_h);
+                glfwWaitEvents();
+            };
+
+            vkDeviceWaitIdle(logical_device);
+
+            // clean the previous swapchain.
+            Vulkan_CleanSwapchain();
+            
+            // Create a new swap chain
+            Vulkan_CreateSwapChain();
+
+            // Create a new image views
+            Vulkan_CreateImageViews();
+
+            // Create framebuffers
+            Vulkan_CreateFramebuffers();
+        };
+
+        void Vulkan_RegisterGlfwCallbacks() {
+            glfwSetWindowUserPointer(window, this);
+            glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+        };
+
+        void Vulkan_CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& buffer_memory) {
+            VkBufferCreateInfo buffer_info = {};
+            buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+            buffer_info.size = size;
+            buffer_info.usage = usage;
+            buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+            VkResult result = vkCreateBuffer(logical_device, &buffer_info, nullptr, &buffer);
+            if(result != VK_SUCCESS)
+                throw std::runtime_error("failed to create buffer.");
+
+            VkMemoryRequirements memory_reqs = {};
+            vkGetBufferMemoryRequirements(logical_device, buffer, &memory_reqs);
+
+            VkMemoryAllocateInfo alloc_info = {};
+            alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+            alloc_info.allocationSize = memory_reqs.size;
+            alloc_info.memoryTypeIndex = Vulkan_FindMemoryType(memory_reqs.memoryTypeBits,
+                properties);
+
+            VkResult result2 = vkAllocateMemory(logical_device, &alloc_info, nullptr, &buffer_memory);
+            if(result2 != VK_SUCCESS)
+                throw std::runtime_error("failed to allocate buffer memory.");
+
+            vkBindBufferMemory(logical_device, buffer, buffer_memory, 0);
+        };
+
+        void Vulkan_CopyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size) {
+            VkCommandBufferAllocateInfo alloc_info = {};
+            alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+            alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+            alloc_info.commandPool = command_pool;
+            alloc_info.commandBufferCount = 1;
+
+            VkCommandBuffer command_buffer;
+            vkAllocateCommandBuffers( logical_device, &alloc_info, &command_buffer);
+
+            // Maybe the wrong place to put this in?
+            // Pretty sure this should be placed inside the RecordCommandBuffer function.
+            VkCommandBufferBeginInfo begin_info = {};
+            begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+            vkBeginCommandBuffer(command_buffer, &begin_info);
+            
+            VkBufferCopy copy_region = {};
+            copy_region.srcOffset = 0;
+            copy_region.dstOffset = 0;
+            copy_region.size = size;
+            vkCmdCopyBuffer(command_buffer, src_buffer, dst_buffer, 1, &copy_region);
+
+            vkEndCommandBuffer(command_buffer);
+
+            VkSubmitInfo submit_info = {};
+            submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+            submit_info.commandBufferCount = 1;
+            submit_info.pCommandBuffers = &command_buffer;
+
+            vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+            vkQueueWaitIdle(graphics_queue);
+
+            vkFreeCommandBuffers(logical_device, command_pool, 1, &command_buffer);
         };
 
     private:
@@ -909,8 +1271,7 @@ namespace Viper {
             const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
             void* pUserData
         ) {
-            //std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
-            spdlog::info("Validation Layer: {0}", pCallbackData->pMessage);
+            std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
             return VK_FALSE;
         };
 
@@ -931,36 +1292,60 @@ namespace Viper {
 
         return buffer;
     }
-    private:
+    public:
+        bool framebuffer_resized = false;
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugmessenger; // brev duva.
         VkPhysicalDevice physical_device = VK_NULL_HANDLE;
-        VkDevice logical_device;
-        VkQueue graphics_queue;
-        VkQueue present_queue;
-        VkSurfaceKHR surface;
-        VkSwapchainKHR swap_chain;
+        VkDevice logical_device = VK_NULL_HANDLE;
+        VkQueue graphics_queue = VK_NULL_HANDLE;
+        VkQueue present_queue = VK_NULL_HANDLE;
+        VkSurfaceKHR surface = VK_NULL_HANDLE;
+        VkSwapchainKHR swap_chain = VK_NULL_HANDLE;
         VkFormat swap_chain_image_format;
         VkExtent2D swap_chain_extent;
-        VkPipelineLayout pipeline_layout;
-        VkRenderPass render_pass;
-        VkPipeline graphics_pipeline;
-        VkCommandPool command_pool;
-        VkCommandBuffer command_buffer;
-        VkSemaphore image_available_semaphore;
-        VkSemaphore render_finished_semaphore;
-        VkFence in_flight_fence;
+        VkPipelineLayout pipeline_layout = VK_NULL_HANDLE;
+        VkRenderPass render_pass = VK_NULL_HANDLE;
+        VkPipeline graphics_pipeline = VK_NULL_HANDLE;
+        VkCommandPool command_pool = VK_NULL_HANDLE;
+        VkDescriptorSetLayout descriptor_set_layout = VK_NULL_HANDLE;
 
+        VkBuffer vertex_buffer = VK_NULL_HANDLE;
+        VkDeviceMemory vertex_buffer_memory = VK_NULL_HANDLE;
+
+        VkBuffer index_buffer = VK_NULL_HANDLE;
+        VkDeviceMemory index_buffer_memory = VK_NULL_HANDLE;
+
+        VkDescriptorPool descriptor_pool = VK_NULL_HANDLE;
+
+        //VkCommandBuffer command_buffer;
+        
+        //VkFence in_flight_fence;
+
+        std::vector<VkFence> in_flight_fences;
+        std::vector<VkSemaphore> image_available_semaphore;
+        std::vector<VkSemaphore> render_finished_semaphore;
+        std::vector<VkCommandBuffer> command_buffers;
         std::vector<VkImage> swap_chain_images;
         std::vector<VkImageView> swap_chain_image_views;
         std::vector<VkFramebuffer> swap_chain_frame_buffers;
+        std::vector<VkBuffer> uniform_buffers;
+        std::vector<VkDeviceMemory> uniform_buffers_memory;
+        std::vector<VkDescriptorSet> descriptor_sets;
 
+
+        uint32_t current_frame = 0;
+    private:
         GLFWwindow* window;
 
         const uint32_t viper_width = 800;
         const uint32_t viper_height = 600;
+        const int max_frames_in_flight = 2;
     };
 };
+
+#define assert_vk_res( res ) if( res != VK_SUCCESS ) \
+    throw std::runtime_error("error.");
 
 int main() {
     if(!glfwInit()) {
@@ -969,7 +1354,7 @@ int main() {
     };
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* m_Window = glfwCreateWindow(800, 600, "Super bob", nullptr, nullptr);
+    GLFWwindow* m_Window = glfwCreateWindow(800, 600, "Viper Engine - Renderer :: Vulkan (x64)", nullptr, nullptr);
     if(!m_Window) {
         printf("unable to create window.\n");
         return -1;
@@ -977,11 +1362,11 @@ int main() {
 
     Viper::VkViper* viper_vulkan = new Viper::VkViper(m_Window);
     viper_vulkan->Vulkan_Init();
-
     while(!glfwWindowShouldClose(m_Window)) {
         glfwPollEvents();
         viper_vulkan->Vulkan_DrawFrame();
     };
+    //vkDestroyDescriptorPool(viper_vulkan->logical_device, imguiPool, nullptr);
     viper_vulkan->Vulkan_Deinit();
 
     delete viper_vulkan;
